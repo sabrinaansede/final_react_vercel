@@ -1,4 +1,3 @@
-// index.js
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
@@ -10,7 +9,7 @@ connectDB();
 
 const app = express();
 
-// -------------------- CORS DEFINITIVO --------------------
+// -------------------- CORS --------------------
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -36,7 +35,7 @@ app.use(
 app.use(express.json());
 
 // -------------------- Rutas --------------------
-routerAPI(app);
+app.use('/api', routerAPI);
 
 // -------------------- 404 --------------------
 app.use((req, res) => {

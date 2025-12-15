@@ -34,20 +34,42 @@ const AuthLanding = ({ initialTab = "login" }) => {
     setRegLoading(true);
     setRegMsg("");
     try {
-      const res = await axios.post(`${API_URL}/api/usuarios/register`, regForm);
+      console.log('Enviando solicitud de registro a:', `${API_URL}/api/usuarios/register`);
+      console.log('Datos del formulario:', regForm);
+      
+      const res = await axios({
+        method: 'post',
+        url: `${API_URL}/api/usuarios/register`,
+        data: regForm,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Respuesta del servidor:', res);
+      
       if (res.status === 201) {
         setRegMsg("Cuenta creada. Ingresando...");
         // Auto-login con las mismas credenciales usando el contexto
-        const { data } = await axios.post(`${API_URL}/api/usuarios/login`, {
-          email: regForm.email,
-          password: regForm.password,
-        });
-        login(data.user, data.token);
-        const redirectTo = location.state?.from?.pathname || "/";
-        setTimeout(() => navigate(redirectTo, { replace: true }), 500);
+        try {
+          const { data } = await axios.post(`${API_URL}/api/usuarios/login`, {
+            email: regForm.email,
+            password: regForm.password,
+          });
+          login(data.user, data.token);
+          const redirectTo = location.state?.from?.pathname || "/";
+          setTimeout(() => navigate(redirectTo, { replace: true }), 500);
+        } catch (loginErr) {
+          console.error('Error en auto-login:', loginErr);
+          setRegMsg("Cuenta creada, pero hubo un error al iniciar sesión automáticamente. Por favor inicia sesión manualmente.");
+        }
       }
     } catch (err) {
-      setRegMsg(err.response?.data?.message || "Error al crear cuenta");
+      console.error('Error en el registro:', err);
+      const errorMessage = err.response?.data?.message || 
+                         err.message || 
+                         "Error al crear cuenta. Por favor intenta de nuevo.";
+      setRegMsg(errorMessage);
     } finally {
       setRegLoading(false);
     }

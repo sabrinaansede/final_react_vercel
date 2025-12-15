@@ -6,8 +6,12 @@ import { obtenerEstadisticas } from "../controllers/usuario.controller.js";
 
 const router = express.Router();
 
-// POST /usuarios/register
+// Ruta de registro
 router.post("/register", async (req, res) => {
+  // If it's a GET request, return method not allowed
+  if (req.method === 'GET') {
+    return res.status(405).json({ message: 'Método no permitido. Use POST para registrarse.' });
+  }
   const { nombre, email, password, telefono, tipoUsuario } = req.body;
 
   try {
@@ -51,8 +55,29 @@ router.post("/register", async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error al registrar usuario" });
+    console.error('Error en el registro:', error);
+    
+    // Check for validation errors
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        message: 'Error de validación',
+        errors 
+      });
+    }
+
+    // Check for duplicate key error (email already exists)
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        message: 'El correo electrónico ya está en uso' 
+      });
+    }
+
+    // For other errors
+    res.status(500).json({ 
+      message: 'Error al registrar usuario',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 

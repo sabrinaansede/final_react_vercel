@@ -3,7 +3,10 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// 🔥 URL correcta del backend
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://final-react-vercel.onrender.com";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -23,16 +26,30 @@ const LoginForm = () => {
     e.preventDefault();
     setLoading(true);
     setMensaje("");
+
     try {
-      const { data } = await axios.post(`${API_URL}/api/usuarios/login`, form);
-      // Guardar usuario y token en el contexto (y localStorage)
+      const { data } = await axios.post(
+        `${API_URL}/api/usuarios/login`,
+        form,
+        {
+          withCredentials: true, // 🔥 CLAVE
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       login(data.user, data.token);
       setMensaje("Inicio de sesión exitoso");
+
       const redirectTo = location.state?.from?.pathname || "/";
       setTimeout(() => navigate(redirectTo, { replace: true }), 400);
     } catch (err) {
-      if (err.response?.data?.message) setMensaje(err.response.data.message);
-      else setMensaje("Error al iniciar sesión");
+      if (err.response?.data?.message) {
+        setMensaje(err.response.data.message);
+      } else {
+        setMensaje("Error al iniciar sesión");
+      }
     } finally {
       setLoading(false);
     }
@@ -52,6 +69,7 @@ const LoginForm = () => {
             className="input"
           />
         </div>
+
         <div className="form-group">
           <label className="label">Contraseña</label>
           <input
@@ -63,10 +81,12 @@ const LoginForm = () => {
             className="input"
           />
         </div>
+
         <button type="submit" disabled={loading} className="btn btn-primary">
           {loading ? "Ingresando..." : "Ingresar"}
         </button>
       </form>
+
       {mensaje && (
         <p
           className={`msg ${
@@ -81,5 +101,3 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
-
-

@@ -1,52 +1,59 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import routerAPI from './routes/index.js';
-import cors from 'cors';
+// index.js
+import express from "express";
+import dotenv from "dotenv";
+import connectDB from "./config/db.js";
+import cors from "cors";
+import routerAPI from "./routes/index.js";
+
 dotenv.config();
-const PORT = process.env.PORT || 5000;
-const URI_DB = process.env.URI_DB;
-
-// Nos conectamos a la DB
-if (!URI_DB) {
-  console.warn('⚠️  URI_DB no está definido en .env. Configure la cadena de conexión de MongoDB.');
-}
-mongoose.connect(URI_DB || '', { dbName: process.env.DB_NAME }).catch((e) => {
-  console.error('Error inicial al conectar con MongoDB:', e.message);
-});
-
-const db = mongoose.connection;
-
-db.on('error', () => { console.error('Error de conexión')});
-db.once('open', () => { console.log('Conexión con la DB Correcta 👌')});
+connectDB();
 
 const app = express();
 
-// Configuración de CORS para permitir credenciales
-const corsOptions = {
-  origin: 'http://localhost:5173', // Reemplaza con tu URL de frontend
-  credentials: true, // Permite el envío de credenciales
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-};
+// -------------------- CORS DEFINITIVO --------------------
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
 
-app.use(cors(corsOptions));
+      if (
+        origin === "http://localhost:5173" ||
+        origin.endsWith(".vercel.app") ||
+        origin.endsWith(".onrender.com")
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// -------------------- Middlewares --------------------
 app.use(express.json());
 
-//metodo estatico
+// -------------------- Rutas --------------------
+routerAPI(app);
 
-app.use('/', express.static('public'));
-
-app.use(  (request, response, next) => {
-    console.log('Hola soy el middleware ');
-    next();
+// -------------------- 404 --------------------
+app.use((req, res) => {
+  res.status(404).json({ message: "Ruta no encontrada" });
 });
 
-app.get('/', (request, response) => {
-    response.send('<h1> API 📍 </h1>');
-})
+// -------------------- Error handler --------------------
+app.use((err, req, res, next) => {
+  console.error(err.message);
+  res.status(500).json({
+    message: "Error interno del servidor",
+    error: {},
+  });
+});
 
-routerAPI(app);
+// -------------------- Servidor --------------------
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`API 📍 en el puerto ${PORT}`);
-} )
+  console.log(`🔥 Servidor corriendo en puerto ${PORT}`);
+});

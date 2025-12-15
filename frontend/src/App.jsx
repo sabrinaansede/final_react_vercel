@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/navbar";
 import Registro from "./views/registro";
 import MapaLugares from "./components/mapalugares";
@@ -34,7 +34,8 @@ const App = () => (
           </ProtectedRoute>
         }
       />
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/registro" element={<Registro />} />
       <Route 
         path="/perfil" 

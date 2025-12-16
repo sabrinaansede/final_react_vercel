@@ -8,7 +8,6 @@ import { crearReseña, listarReseñas, obtenerReseña, actualizarReseña, elimin
 
 const router = express.Router();
 
-// Asegurar carpeta de uploads
 const uploadsDir = path.join(process.cwd(), "public", "uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 

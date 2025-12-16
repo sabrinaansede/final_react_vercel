@@ -3,17 +3,14 @@
     id="inicio"
     className="flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-blue-50 to-white"
   >
-    {/* Título principal */}
     <h1 className="text-5xl font-bold mb-4 text-blue-700">
       🧩 Bienvenid@ a Lugares Seguros APADEA
     </h1>
 
-    {/* Subtítulo */}
     <p className="text-lg text-gray-700 max-w-3xl mb-6">
       Descubrí lugares certificados por APADEA, agregá tus propios lugares desde la comunidad y ayudá a construir un mapa inclusivo y seguro para todos.
     </p>
 
-    {/* Botones de acción rápidos */}
     <div className="flex flex-col sm:flex-row gap-4 mb-10">
       <button
         onClick={() => setVistaActiva("mapa")}
@@ -29,7 +26,6 @@
       </button>
     </div>
 
-    {/* Destacados de lugares */}
     <h2 className="text-2xl font-semibold text-blue-600 mb-6">
       Algunos lugares destacados
     </h2>

@@ -94,7 +94,6 @@ const MisResenas = () => {
         <div className="reviews-grid">
           {reseñas.map((r) => (
             <div key={r._id} className="review-card">
-              {/* Imagen del lugar */}
               {r.fotoUrl && (
                 <div className="review-image-container">
                   <img 
@@ -105,9 +104,7 @@ const MisResenas = () => {
                 </div>
               )}
               
-              {/* Contenido de la tarjeta */}
               <div className="review-content">
-                {/* Encabezado con nombre y fecha */}
                 <div className="review-header">
                   <h3 className="review-place">
                     {typeof r.lugar === 'object' ? (r.lugar?.nombre || 'Lugar no especificado') : 'Lugar no especificado'}
@@ -117,7 +114,6 @@ const MisResenas = () => {
                   </span>
                 </div>
                 
-                {/* Puntuación */}
                 <div className="review-rating">
                   <div className="stars-container">
                     {renderStars(r.puntuacion || 0)}
@@ -125,14 +121,12 @@ const MisResenas = () => {
                   <span className="rating-text">{r.puntuacion || 0}/5</span>
                 </div>
                 
-                {/* Comentario */}
                 {r.comentario && (
                   <p className="review-comment">
                     {r.comentario}
                   </p>
                 )}
                 
-                {/* Dirección */}
                 {typeof r.lugar === 'object' && r.lugar?.direccion && (
                   <div className="review-address">
                     <MapPin size={14} className="address-icon" />
@@ -140,7 +134,6 @@ const MisResenas = () => {
                   </div>
                 )}
                 
-                {/* Acciones */}
                 <div className="review-actions">
                   <div className="action-buttons">
                     <button 

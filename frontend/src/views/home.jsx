@@ -68,7 +68,6 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Estado de ánimo + tarjetas rápidas, estilo app de bienestar */}
         <section className="home-mood-section">
           <div className="home-mood-header">
             <p className="home-mood-label">¿Cómo te sentís hoy?</p>

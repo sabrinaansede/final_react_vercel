@@ -190,9 +190,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      {/* SIDEBAR */}
       <aside className="sidebar">
-        {/* Se eliminó el logo de la barra lateral */}
 
         <div className="user-profile">
           <div className="user-avatar">
@@ -233,7 +231,6 @@ const Dashboard = () => {
           <button 
             className="action-btn text-danger"
             onClick={() => {
-              // Handle logout
               localStorage.removeItem('token');
               navigate('/login');
             }}
@@ -244,7 +241,6 @@ const Dashboard = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="main-content">
         <header className="main-header">
           <div>
@@ -260,7 +256,6 @@ const Dashboard = () => {
           </button>
         </header>
 
-        {/* Metrics Grid */}
         <div className="metrics-grid">
           <div className="metric-card">
             <div className="metric-icon-container primary">
@@ -305,7 +300,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Activity Feed */}
         <section className="activity-feed">
           <h2 className="section-title">Actividad Reciente</h2>
           {stats.actividadesRecientes && stats.actividadesRecientes.length > 0 ? (
@@ -330,7 +324,6 @@ const Dashboard = () => {
           )}
         </section>
 
-        {/* Recent Reviews */}
         {stats.resenasRecientes && stats.resenasRecientes.length > 0 && (
           <section className="recent-reviews mt-5">
             <div className="section-header">
@@ -383,7 +376,6 @@ const Dashboard = () => {
           </section>
         )}
 
-        {/* ACCIONES RÁPIDAS */}
         <section className="quick-actions-grid">
           <div className="quick-action-card" onClick={() => navigate('/mapa')}>
             <MapPin size={24} />

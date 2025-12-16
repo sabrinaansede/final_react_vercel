@@ -3,7 +3,6 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
-// 🔥 URL correcta del backend
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://final-react-vercel.onrender.com";
@@ -32,7 +31,7 @@ const LoginForm = () => {
         `${API_URL}/api/usuarios/login`,
         form,
         {
-          withCredentials: true, // 🔥 CLAVE
+          withCredentials: true, 
           headers: {
             "Content-Type": "application/json",
           },

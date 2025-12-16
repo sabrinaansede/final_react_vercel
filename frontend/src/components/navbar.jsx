@@ -7,7 +7,6 @@ const Navbar = () => {
   const [usuario, setUsuario] = useState(null);
   const [scrolled, setScrolled] = useState(false);
 
-  // Efecto para manejar el scroll
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
@@ -50,7 +49,6 @@ const Navbar = () => {
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="navbar-inner">
-        {/* Logo */}
         <Link to="/" className="navbar-brand flex items-center gap-2">
           <img
             src={logo}
@@ -62,8 +60,6 @@ const Navbar = () => {
             }}
           />
         </Link>
-
-        {/* Links */}
         <div className="nav-links">
           {usuario ? (
             <>

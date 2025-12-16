@@ -6,8 +6,6 @@ import "../App.css";
 import "./ModalDetalleLugar.css";
 import LeyendaMapa from "./LeyendaMapa";
 import { useAuth } from "../context/AuthContext.jsx";
-
-// 🧭 Íconos personalizados
 import apadeaIcon from "../assets/apadea.png";
 
 // Base URL del backend (Vite)
@@ -16,11 +14,8 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const iconoApadea = L.divIcon({
   className: "icono-apadea",
   html: `<div class="pin"><img src="${apadeaIcon}" alt="APADEA"/></div>`,
-  // 36px círculo + ~12px punta = 48px alto total aprox
   iconSize: [36, 48],
-  // Anclar en la punta inferior
   iconAnchor: [18, 48],
-  // Elevar popup un poco por encima del pin
   popupAnchor: [0, -44],
 });
 
@@ -67,7 +62,7 @@ export default function MapaLugares() {
   const [mensaje, setMensaje] = useState("");
   const { user: usuario, token: authToken } = useAuth();
   const [favLugares, setFavLugares] = useState(new Set());
-  const [ratingComentarios, setRatingComentarios] = useState({}); // { [lugarId]: string }
+  const [ratingComentarios, setRatingComentarios] = useState({}); 
   const [detalleLugar, setDetalleLugar] = useState(null);
   const cerrarDetalle = () => {
     console.log('Cerrando modal de detalles');
@@ -93,16 +88,13 @@ export default function MapaLugares() {
   };
   const [resenaForm, setResenaForm] = useState({ puntuacion: 0, comentario: "" });
   const [fotoUI, setFotoUI] = useState({ open: false, file: null, preview: "" });
-  // UI: menús y orden
-  const [menuOpen, setMenuOpen] = useState(null); // 'show' | 'sort' | 'filters' | null
-  const [sortKey, setSortKey] = useState("default"); // 'default' | 'name' | 'rating'
+
+  const [menuOpen, setMenuOpen] = useState(null); 
+  const [sortKey, setSortKey] = useState("default");
   const [soloGuardados, setSoloGuardados] = useState(false);
   const [selectedLugarId, setSelectedLugarId] = useState(null);
-
-  // Normalizar certificación del lugar (compatibilidad con datos antiguos)
   const getCert = (l) => (l.certificacion || l.certificadoPor || "Comunidad");
 
-  // 🔹 Cargar lugares desde backend
   useEffect(() => {
     const cargarLugares = async () => {
       try {
@@ -117,7 +109,6 @@ export default function MapaLugares() {
     cargarLugares();
   }, []);
 
-  // 🔹 Cargar reseñas/calificaciones
   useEffect(() => {
     const cargarResenas = async () => {
       try {
@@ -131,9 +122,8 @@ export default function MapaLugares() {
     cargarResenas();
   }, []);
 
-  // 🔹 Promedio de rating por lugar
   const ratingPorLugar = useMemo(() => {
-    const map = new Map(); // idLugar -> {sum, count}
+    const map = new Map();
     resenas.forEach((r) => {
       const id = r.lugar?._id || r.lugar;
       if (!id) return;
@@ -145,7 +135,6 @@ export default function MapaLugares() {
     return result;
   }, [resenas]);
 
-  // 🔹 Capturar clic en el mapa para obtener coordenadas
   function ClickMarker() {
     useMapEvents({
       click(e) {
@@ -159,7 +148,6 @@ export default function MapaLugares() {
     return null;
   }
 
-  // 🔹 Agregar nuevo lugar
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nuevoLugar.nombre || !nuevoLugar.direccion) {
@@ -306,7 +294,6 @@ export default function MapaLugares() {
     }
   };
 
-  // 🔹 Votar para validar lugar
   const votarLugar = async (id) => {
     try {
       const res = await fetch(`${API_URL}/api/lugares/${id}/votar`, {
@@ -321,7 +308,6 @@ export default function MapaLugares() {
     }
   };
 
-  // 🔹 Enviar calificación
   const enviarRating = async (lugarId, puntuacion, comentario = "") => {
     if (!usuario?._id) {
       setMensaje("⚠️ Debes iniciar sesión para calificar.");
@@ -349,7 +335,6 @@ export default function MapaLugares() {
     }
   };
 
-  // Enviar reseña desde modal con posible foto (multipart)
   const enviarResenaModal = async () => {
     if (!usuario?._id || !detalleLugar?._id) {
       setMensaje("⚠️ Debes iniciar sesión para dejar reseña.");
@@ -387,12 +372,9 @@ export default function MapaLugares() {
       setMensaje("❌ Error al enviar la reseña.");
     }
   };
-
-  // 🔹 Derivar listas para selects
   const tipos = useMemo(() => Array.from(new Set(lugares.map((l) => l.tipo).filter(Boolean))), [lugares]);
   const provincias = useMemo(() => Array.from(new Set(lugares.map((l) => l.provincia).filter(Boolean))), [lugares]);
 
-  // 🔹 Cargar favoritos por usuario
   useEffect(() => {
     try {
       const key = `fav_lugares_${usuario?._id || "anon"}`;
@@ -404,7 +386,6 @@ export default function MapaLugares() {
     }
   }, [usuario?._id]);
 
-  // 🔹 Toggle favoritos (lugares guardados)
   const toggleFavLugar = (id) => {
     setFavLugares((prev) => {
       const next = new Set(prev);
@@ -417,7 +398,6 @@ export default function MapaLugares() {
     });
   };
 
-  // 🔹 Aplicar filtros
   const lugaresFiltrados = useMemo(() => {
     return lugares.filter((l) => {
       const rating = ratingPorLugar[l._id]?.avg || 0;
@@ -456,7 +436,6 @@ export default function MapaLugares() {
   return (
     <div className="mapa-container">
       <div className="container-mapa-form">
-        {/* 🗺️ Mapa */}
         <MapContainer center={[-34.6037, -58.3816]} zoom={13} className="mapa-leaflet" whenCreated={(map) => (mapRef.current = map)}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -464,7 +443,6 @@ export default function MapaLugares() {
         />
         <ClickMarker />
 
-        {/* 📍 Marcadores */}
         {lugaresFiltrados.map((lugar) => (
           <Marker
             key={lugar._id}
@@ -524,7 +502,6 @@ export default function MapaLugares() {
         ))}
       </MapContainer>
 
-      {/* 🧭 Formulario lateral */}
       <div className="formulario-lugar">
         {/* Exploración estilo lista (claro) */}
         <div className="sidebar-light">
@@ -541,7 +518,6 @@ export default function MapaLugares() {
           </div>
           <input className="input" type="text" placeholder="Buscar..." value={filtros.q} onChange={(e)=> setFiltros({ ...filtros, q: e.target.value })} />
 
-          {/* Toolbar con menús desplegables */}
           <div className="toolbar">
             <div className="toolbar-group">
               <button type="button" className="menu-button" onClick={() => setMenuOpen(menuOpen === 'show' ? null : 'show')}>Mostrar ▾</button>
@@ -642,9 +618,6 @@ export default function MapaLugares() {
           </div>
         </div>
         
-
-        
-
         <div className="card">
           <div className="card-title">Agregar nuevo lugar</div>
           <p className="label">

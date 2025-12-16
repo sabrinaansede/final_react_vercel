@@ -4,19 +4,10 @@ import express from "express";
 import connectDB from "./config/db.js";
 import routerAPI from "./routes/index.js";
 
-// -------------------- Debug variables --------------------
-console.log('🔍 MONGO_URI_PROD:', process.env.MONGO_URI_PROD ? '✅ Presente' : '❌ Faltante');
-console.log('🔍 URI_DB:', process.env.URI_DB ? '✅ Presente' : '❌ Faltante (opcional)');
-console.log('🔍 JWT_SECRET actual:', process.env.JWT_SECRET ? '✅ Presente' : '❌ Faltante');
-console.log('🔍 NODE_ENV actual:', process.env.NODE_ENV || 'development');
-
-// -------------------- Conexión a la DB --------------------
 connectDB();
 
-// -------------------- Inicializar Express --------------------
 const app = express();
 
-// -------------------- CORS --------------------
 import cors from 'cors';
 
 const allowedOrigins = [
@@ -38,18 +29,14 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization']
 }));
 
-// -------------------- Middlewares --------------------
 app.use(express.json());
 
-// -------------------- Rutas --------------------
 app.use('/api', routerAPI);
 
-// -------------------- 404 --------------------
 app.use((req, res) => {
   res.status(404).json({ message: "Ruta no encontrada" });
 });
 
-// -------------------- Error handler --------------------
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
@@ -58,6 +45,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// -------------------- Servidor --------------------
-const PORT = process.env.PORT || 5000; // Render asigna process.env.PORT automáticamente
+const PORT = process.env.PORT || 5000; 
 app.listen(PORT, () => console.log(`🔥 Servidor corriendo en puerto ${PORT}`));

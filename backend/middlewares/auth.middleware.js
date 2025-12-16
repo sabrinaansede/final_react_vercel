@@ -1,7 +1,5 @@
 import jwt from "jsonwebtoken";
 
-// Middleware de autenticación con JWT
-// Espera header: Authorization: Bearer <token>
 export default function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization || "";
   const [, token] = authHeader.split(" ");
@@ -13,7 +11,7 @@ export default function authMiddleware(req, res, next) {
   try {
     const secret = process.env.JWT_SECRET || "dev_secret_autisi";
     const decoded = jwt.verify(token, secret);
-    req.user = decoded; // { id, email, tipoUsuario, ... }
+    req.user = decoded;
     next();
   } catch (err) {
     console.error("Error verificando JWT:", err.message);

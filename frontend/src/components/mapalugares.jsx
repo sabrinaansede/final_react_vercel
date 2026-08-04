@@ -38,6 +38,7 @@ const iconoComunidad = L.divIcon({
 export default function MapaLugares() {
   const mapRef = useRef(null);
   const markerRefs = useRef({});
+  const panelRef = useRef(null);
   const [lugares, setLugares] = useState([]);
   const [resenas, setResenas] = useState([]);
   const [filtros, setFiltros] = useState({
@@ -89,10 +90,12 @@ export default function MapaLugares() {
   const [resenaForm, setResenaForm] = useState({ puntuacion: 0, comentario: "" });
   const [fotoUI, setFotoUI] = useState({ open: false, file: null, preview: "" });
 
-  const [menuOpen, setMenuOpen] = useState(null); 
+  const [menuOpen, setMenuOpen] = useState(null);
   const [sortKey, setSortKey] = useState("default");
   const [soloGuardados, setSoloGuardados] = useState(false);
   const [selectedLugarId, setSelectedLugarId] = useState(null);
+  const [sheetExpanded, setSheetExpanded] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
   const getCert = (l) => (l.certificacion || l.certificadoPor || "Comunidad");
 
   useEffect(() => {
@@ -147,6 +150,35 @@ export default function MapaLugares() {
     });
     return null;
   }
+
+  const centrarUbicacionActual = () => {
+    if (!navigator.geolocation) {
+      setMensaje("⚠️ Geolocalización no disponible.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        if (mapRef.current) {
+          mapRef.current.setView([latitude, longitude], 15, { animate: true });
+        }
+      },
+      () => setMensaje("⚠️ No se pudo obtener tu ubicación."),
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  const abrirPanelAgregar = () => {
+    setShowAddForm(true);
+    setSheetExpanded(true);
+    setTimeout(() => {
+      if (panelRef.current) panelRef.current.scrollIntoView({ behavior: "smooth" });
+    }, 120);
+  };
+
+  const cerrarPanel = () => {
+    setSheetExpanded(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -502,7 +534,28 @@ export default function MapaLugares() {
         ))}
       </MapContainer>
 
-      <div className="formulario-lugar">
+      <div className="map-controls">
+        <button type="button" className="map-control-btn" onClick={centrarUbicacionActual}>
+          Mi ubicación
+        </button>
+        <button type="button" className="map-control-btn map-control-add" onClick={abrirPanelAgregar}>
+          + Agregar lugar
+        </button>
+      </div>
+
+      <div className={`sheet-preview ${sheetExpanded ? 'hidden' : ''}`} onClick={abrirPanelAgregar}>
+        <div>
+          <div className="preview-title">Explorar lugares</div>
+          <div className="preview-subtitle">Abrí el panel para ver lugares y agregar uno nuevo.</div>
+        </div>
+        <button type="button" className="preview-open">Abrir</button>
+      </div>
+
+      <div ref={panelRef} className={`formulario-lugar ${sheetExpanded ? 'sheet-open' : 'sheet-closed'}`}>
+        <div className="sheet-handle" onClick={() => setSheetExpanded((v) => !v)}>
+          <span className="sheet-handle-bar" />
+          <span className="sheet-handle-label">{sheetExpanded ? 'Desliza hacia abajo para cerrar' : 'Explorar lugares'}</span>
+        </div>
         {/* Exploración estilo lista (claro) */}
         <div className="sidebar-light">
           <div className="sidebar-header">
@@ -586,7 +639,7 @@ export default function MapaLugares() {
           </div>
 
           <div className="place-list">
-            {listaOrdenada.slice(0, 12).map((l) => (
+            {listaOrdenada.slice(0, 3).map((l) => (
               <button
                 key={l._id}
                 type="button"
@@ -618,19 +671,19 @@ export default function MapaLugares() {
           </div>
         </div>
         
-        <div className="card">
-          <div className="card-title">Agregar nuevo lugar</div>
-          <p className="label">
-            Podés escribir la dirección real y/o hacer clic en el mapa para afinar la ubicación.
-          </p>
+        {showAddForm && (
+          <div className="card">
+            <div className="card-title">Agregar nuevo lugar</div>
+            <p className="label">
+              Podés escribir la dirección real y el sistema la geocodificará automáticamente.
+            </p>
           <div style={{ fontSize: 12, color: '#64748b' }}>
             {nuevoLugar.latitud && nuevoLugar.longitud ? (
               <span>
-                Ubicación seleccionada ✓ (lat: {nuevoLugar.latitud.toFixed(5)}, lng:{" "}
-                {nuevoLugar.longitud.toFixed(5)})
+                Coordenadas cargadas ✓ (lat: {nuevoLugar.latitud.toFixed(5)}, lng: {nuevoLugar.longitud.toFixed(5)})
               </span>
             ) : (
-              <span>Usaremos la dirección para buscar la ubicación en el mapa.</span>
+              <span>Usaremos la dirección para ubicar el lugar automáticamente.</span>
             )}
           </div>
 
@@ -730,8 +783,8 @@ export default function MapaLugares() {
             <p className={mensaje.includes("Error") ? "msg msg-error" : "msg msg-success"}>{mensaje}</p>
           )}
         </div>
+      )}
       </div>
-
       {detalleLugar && (
         <div className="modal-backdrop" onClick={cerrarDetalle}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

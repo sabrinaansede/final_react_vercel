@@ -10,6 +10,9 @@ import MisResenas from "./views/misresenas";
 import Contacto from "./views/contacto.jsx";
 import Perfil from "./components/dashboard/Dashboard";
 import Tecnicas from "./views/tecnicas.jsx";
+import AgendaTerapias from "./views/agenda.jsx";
+import ChecklistPersonalizado from "./views/checklist.jsx";
+import Profesionales from "./views/profesionales";
 
 const App = () => (
   <>
@@ -34,7 +37,6 @@ const App = () => (
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Login />} />
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/registro" element={<Registro />} />
       <Route 
@@ -45,6 +47,23 @@ const App = () => (
           </ProtectedRoute>
         } 
       />
+      <Route
+        path="/agenda"
+        element={
+          <ProtectedRoute>
+            <AgendaTerapias />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/checklist"
+        element={
+          <ProtectedRoute>
+            <ChecklistPersonalizado />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/profesionales" element={<Profesionales />} />
     </Routes>
   </>
 );

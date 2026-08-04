@@ -116,6 +116,15 @@ const Home = () => {
               to: "/mapa",
             },
             {
+              id: "checklist",
+              variant: "premium",
+              kicker: "Premium",
+              title: "Checklist personalizado",
+              text: "Organizá tus salidas y actividades para no olvidar nada importante.",
+              action: "Ver checklist",
+              to: "/checklist",
+            },
+            {
               id: "tecnicas",
               variant: "secondary",
               kicker: "Autorregulación",
@@ -141,6 +150,15 @@ const Home = () => {
               text: "Si algo no funciona o tenés una idea, podés escribirnos.",
               action: "Contactar equipo",
               to: "/contacto",
+            },
+            {
+              id: "profesionales",
+              variant: "primary",
+              kicker: "Profesionales",
+              title: "Red de especialistas",
+              text: "Accedé a profesionales especializados en TEA y disciplinas afines.",
+              action: "Ver profesionales",
+              to: "/profesionales",
             },
           ].map((card) => (
             <button
@@ -175,6 +193,8 @@ const Home = () => {
             </div>
           </div>
         )}
+
+        
       </div>
     </div>
   );

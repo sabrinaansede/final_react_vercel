@@ -13,7 +13,8 @@ import {
   Settings,
   LogOut,
   Plus,
-  RefreshCw
+  RefreshCw,
+  ChevronRight
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
@@ -133,21 +134,30 @@ const Dashboard = () => {
 
       if (!usuario?._id || !token) return navigate('/login');
 
-      const [resEstadisticas, resResenas] = await Promise.all([
-        fetch(`${API_URL}/api/usuarios/${usuario._id}/estadisticas`, {
+      // Cargar estadísticas primero
+      let estadisticas = { data: {} };
+      try {
+        const resEstadisticas = await fetch(`${API_URL}/api/usuarios/${usuario._id}/estadisticas`, {
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           credentials: 'include'
-        }),
-        fetch(`${API_URL}/api/resenas?usuario=${usuario._id}`, {
+        });
+        estadisticas = await resEstadisticas.json();
+      } catch (e) {
+        console.error('Error al cargar estadísticas:', e);
+      }
+
+      // Cargar reseñas después
+      let resenasData = [];
+      try {
+        const resResenas = await fetch(`${API_URL}/api/resenas?usuario=${usuario._id}`, {
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           credentials: 'include'
-        })
-      ]);
-
-      const estadisticas = await resEstadisticas.json();
-      let resenasData = await resResenas.json();
-
-      if (resenasData?.data) resenasData = resenasData.data;
+        });
+        const data = await resResenas.json();
+        resenasData = data?.data || data || [];
+      } catch (e) {
+        console.error('Error al cargar reseñas:', e);
+      }
 
       const reseñas = Array.isArray(resenasData) ? resenasData : [];
 
@@ -173,6 +183,7 @@ const Dashboard = () => {
           .slice(0, 5)
       });
     } catch (error) {
+      console.error('Error en recargarDatos:', error);
       setStats(getDatosEjemplo());
     } finally {
       setLoading(false);
@@ -183,7 +194,7 @@ const Dashboard = () => {
     recargarDatos();
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
     setUserData(usuario);
-  }, [location]);
+  }, []);
 
   if (loading) return <LoadingSkeleton />;
   if (error) return <div className="error-message">{error}</div>;

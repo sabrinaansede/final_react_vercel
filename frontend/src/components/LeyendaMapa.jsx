@@ -4,7 +4,7 @@ import apadeaIcon from '../assets/apadea.png';
 const styles = {
   container: {
     position: 'absolute',
-    bottom: '16px',
+    bottom: '110px',
     left: '16px',
     zIndex: 1000,
     padding: '10px 12px',
@@ -50,9 +50,9 @@ const LeyendaMapa = () => {
   const containerStyle = isMobile
     ? {
         position: 'absolute',
-        bottom: '16px',
+        bottom: '110px',
         left: '16px',
-        zIndex: 1000,
+        zIndex: 30,
         padding: '10px 12px',
         backgroundColor: 'rgba(255, 255, 255, 0.92)',
         borderRadius: '12px',

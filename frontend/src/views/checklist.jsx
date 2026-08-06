@@ -22,15 +22,37 @@ const ChecklistPersonalizado = () => {
 
   // Cargar checklists del localStorage
   useEffect(() => {
-    const savedChecklists = localStorage.getItem("checklistsPersonalizados");
-    if (savedChecklists) {
-      setChecklists(JSON.parse(savedChecklists));
-    }
+    const loadChecklists = () => {
+      try {
+        const savedChecklists = localStorage.getItem("checklistsPersonalizados");
+        if (savedChecklists) {
+          setChecklists(JSON.parse(savedChecklists));
+        }
+      } catch (error) {
+        console.error("Error al cargar checklists:", error);
+      }
+    };
+
+    loadChecklists();
+    
+    // Escuchar cambios en localStorage (para sincronización entre pestañas)
+    const handleStorageChange = () => {
+      loadChecklists();
+    };
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
-  // Guardar checklists en localStorage
+  // Guardar checklists en localStorage cuando cambien
   useEffect(() => {
-    localStorage.setItem("checklistsPersonalizados", JSON.stringify(checklists));
+    try {
+      localStorage.setItem("checklistsPersonalizados", JSON.stringify(checklists));
+    } catch (error) {
+      console.error("Error al guardar checklists:", error);
+    }
   }, [checklists]);
 
   const handleCreateChecklist = (e) => {
@@ -140,8 +162,8 @@ const ChecklistPersonalizado = () => {
   };
 
   const handleToggleItem = (itemId) => {
-    const updatedChecklists = checklists.map(checklist => 
-      checklist.id === selectedChecklist.id 
+    const updatedChecklists = checklists.map(checklist =>
+      checklist.id === selectedChecklist.id
         ? {
             ...checklist,
             items: checklist.items.map(item =>
@@ -152,7 +174,7 @@ const ChecklistPersonalizado = () => {
           }
         : checklist
     );
-    
+
     setChecklists(updatedChecklists);
     setSelectedChecklist({
       ...selectedChecklist,
@@ -162,6 +184,17 @@ const ChecklistPersonalizado = () => {
           : item
       )
     });
+
+    // Actualizar la checklist activa en localStorage
+    const activeChecklist = {
+      ...selectedChecklist,
+      items: selectedChecklist.items.map(item =>
+        item.id === itemId
+          ? { ...item, completado: !item.completado }
+          : item
+      )
+    };
+    localStorage.setItem("activeChecklist", JSON.stringify(activeChecklist));
   };
 
   const handleDeleteItem = (itemId) => {
@@ -224,7 +257,11 @@ const ChecklistPersonalizado = () => {
               <div 
                 key={checklist.id} 
                 className="checklist-card"
-                onClick={() => setSelectedChecklist(checklist)}
+                onClick={() => {
+                  setSelectedChecklist(checklist);
+                  // Guardar como rutina activa
+                  localStorage.setItem("activeChecklist", JSON.stringify(checklist));
+                }}
               >
                 <div className="checklist-icon">
                   <CheckSquare size={24} />

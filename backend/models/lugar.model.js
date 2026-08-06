@@ -10,6 +10,7 @@ const lugarSchema = new mongoose.Schema({
   descripcion: String,
   certificacion: String,
   etiquetasSensoriales: [String],
+  foto: { type: String, default: '' },
 });
 
 const Lugar = mongoose.model("Lugar", lugarSchema);

@@ -13,7 +13,12 @@ export const crearProfesional = async (req, res) => {
 export const listarProfesionales = async (req, res) => {
   try {
     const { especialidad, ubicacion, modalidad } = req.query;
-    const filtro = { activo: true };
+    const filtro = {
+      $or: [
+        { activo: true },
+        { activo: { $exists: false } },
+      ],
+    };
     
     if (especialidad) filtro.especialidad = especialidad;
     if (ubicacion) filtro.ubicacion = ubicacion;

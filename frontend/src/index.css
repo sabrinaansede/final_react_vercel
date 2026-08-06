@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+@import "tailwindcss";
 
 :root {
   --color-brand: #43a1f2;   /* azul principal */
+  --color-brand-dark: #2E7BB8; /* azul principal oscuro para degradados */
   --color-ink: #444443;     /* texto principal */
   --color-bg: #F5F5F5;      /* fondo app */
   --color-accent: #fdc647;  /* acento / warning */
@@ -10,7 +12,8 @@
   --color-success-soft: #c8e6c9; /* éxito suave */
   --color-navbar-bg: #ffffffcc; /* fondo translúcido navbar */
   --color-navbar-button: #f9f9f9; /* fondo botón navbar (light) */
-  --nav-h: 72px; /* altura navbar para acomodar logo grande */
+  --nav-h: 94px; /* navbar-inner 70px + padding vertical */
+  --mobile-nav-h: 72px;
 }
 
 /* Base reset */
@@ -27,13 +30,30 @@ body {
 a { color: var(--color-brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* Contenedor principal: compensa navbar fija */
+.app-main {
+  padding-top: var(--nav-h);
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.app-main--flush {
+  padding-top: 0;
+}
+
+@media (max-width: 768px) {
+  .app-main:not(.app-main--flush) {
+    padding-bottom: var(--mobile-nav-h);
+  }
+}
+
 /* Home view styling (pure CSS) */
 .home-page {
-  padding-top: 6rem; /* navbar offset */
   min-height: 100vh;
   background: var(--color-bg);
 }
-.home-container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 40px; }
+.home-container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 80px; } /* Extra padding bottom for mobile nav */
 .home-hero { text-align: center; margin-bottom: 24px; }
 .home-title { font-size: 34px; font-weight: 800; color: var(--color-brand); margin: 0; }
 .home-subtitle { margin-top: 8px; color: #475569; }
@@ -305,10 +325,16 @@ a:hover { text-decoration: underline; }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+}
+
+.home-section-heading {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #1b2a4a;
+  line-height: 1.3;
+  margin: 0 0 0.75rem 0;
 }
 
 h1 {
@@ -353,8 +379,10 @@ button:focus-visible {
   padding: 0.75rem 2.5rem;
   background: #ffffff;
   border-bottom: 1px solid #f0f0f0;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
@@ -384,9 +412,13 @@ button:focus-visible {
 
 /* Estilos específicos para el logo en la barra de navegación */
 .navbar .navbar-brand .navbar-logo {
-  height: 50px;
+  height: 64px;
+  width: auto;
+  max-width: 220px;
   transition: height 0.3s ease;
   object-fit: contain;
+  display: block;
+  flex-shrink: 0;
 }
 
 .navbar .navbar-brand .navbar-logo:hover {
@@ -424,7 +456,7 @@ button:focus-visible {
   .navbar-inner { display: flex; align-items: center; gap: 8px; }
   .mobile-menu-button { order: 0; margin-left: 4px; }
   .navbar-brand { order: 1; margin: 0 auto; display: flex; align-items: center; }
-  .navbar-logo { height: 40px; }
+  .navbar-logo { height: 54px; width: auto; max-width: 180px; }
 }
 
 /* Ocultar los botones principales (Ver mapa, Ver técnicas, Contacto) en móvil
@@ -466,8 +498,14 @@ button:focus-visible {
 }
 
 .nav-link.active {
-  color: #4f46e5;
+  color: #43A1F2;
   font-weight: 600;
+  background: transparent;
+}
+
+.nav-link.active:hover {
+  background: transparent;
+  color: #43A1F2;
 }
 
 /* Botones */
@@ -605,7 +643,7 @@ button:focus-visible {
     display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid #eef2f7;margin-bottom:12px
   }
 
-  .mobile-drawer-logo{height:56px;object-fit:contain}
+  .mobile-drawer-logo{height:64px;width:auto;max-width:180px;object-fit:contain;display:block}
 
   .mobile-user-name{font-weight:800;color:var(--color-ink);font-size:16px}
 

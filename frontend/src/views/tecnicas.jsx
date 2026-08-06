@@ -1,92 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Heart, Star } from 'lucide-react';
+import axios from "axios";
 
-const initialTecnicas = [
-  {
-    id: "respiracion",
-    titulo: "Respiración 4-7-8",
-    desc: "Inhalá 4s, retené 7s, exhalá 8s para reducir ansiedad.",
-    img: "https:",
-    tags: ["respiración", "calma"],
-    steps: [
-      "Encontrá un lugar cómodo y apoyá la espalda.",
-      "Inhalá por la nariz contando 4.",
-      "Retené el aire contando 7.",
-      "Exhalá suave por la boca contando 8.",
-      "Repetí 4 ciclos.",
-    ],
-    source: "https://undraw.co/illustrations",
-  },
-  {
-    id: "presion-profunda",
-    titulo: "Presión profunda",
-    desc: "Usá mantas pesadas o un chaleco para aportar contención.",
-    img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1200&auto=format&fit=crop",
-    tags: ["sensorial", "propiocepción"],
-    steps: [
-      "Elegí una manta pesada adecuada (10% del peso aprox).",
-      "Cubrí hombros y tronco de forma uniforme.",
-      "Mantené 10–15 minutos observando confort.",
-      "Retirá si hay incomodidad o calor.",
-    ],
-    source: "https://storyset.com/",
-  },
-  {
-    id: "ruido-blanco",
-    titulo: "Ruido blanco",
-    desc: "Auriculares con ruido blanco o sonidos suaves.",
-    img: "https://images.unsplash.com/photo-1518441902110-9f89f7e83cd0?q=80&w=1200&auto=format&fit=crop",
-    tags: ["auditivo", "calma"],
-    steps: [
-      "Colocá auriculares cómodos.",
-      "Elegí ruido blanco/lluvia/olas a volumen bajo.",
-      "Probá 5–10 minutos y ajustá si es necesario.",
-    ],
-    source: "https://www.freepik.com/vectors/illustrations",
-  },
-  {
-    id: "rincon-calmo",
-    titulo: "Rincón calmo",
-    desc: "Espacio con luz tenue, texturas suaves y pocos estímulos.",
-    img: "https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1200&auto=format&fit=crop",
-    tags: ["ambiente", "regulación"],
-    steps: [
-      "Elegí un rincón lejos de ruidos y paso.",
-      "Sumá almohadones y manta suave.",
-      "Iluminación cálida y tenue.",
-      "Guardá allí juguetes sensoriales favoritos.",
-    ],
-    source: "https://undraw.co/illustrations",
-  },
-  {
-    id: "juguetes-sensoriales",
-    titulo: "Juguetes sensoriales",
-    desc: "Pelotas antiestrés, fidget spinners o masas táctiles.",
-    img: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=1200&auto=format&fit=crop",
-    tags: ["táctil", "sensorial"],
-    steps: [
-      "Seleccioná 2–3 juguetes preferidos.",
-      "Usalos 3–5 minutos para descargar tensión.",
-      "Guardalos en una caja accesible.",
-    ],
-    source: "https://storyset.com/",
-  },
-  {
-    id: "rutinas-visuales",
-    titulo: "Rutinas visuales",
-    desc: "Secuencias con pictogramas para anticipar actividades.",
-    img: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=1200&auto=format&fit=crop",
-    tags: ["visual", "estructura"],
-    steps: [
-      "Elegí 3–5 actividades del día.",
-      "Representalas con pictogramas o dibujos.",
-      "Mostrá el orden e id marcando las realizadas.",
-    ],
-    source: "https://www.freepik.com/vectors/illustrations",
-  },
-];
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const categorias = ["todas", "respiración", "relajación", "enfoque", "movimiento", "sensorial"];
 
 const Tecnicas = () => {
-  const [tecnicas] = useState(initialTecnicas);
+  const [tecnicas, setTecnicas] = useState([]);
   const [favs, setFavs] = useState(() => {
     try {
       return new Set(JSON.parse(localStorage.getItem("fav_tecnicas") || "[]"));
@@ -95,6 +16,33 @@ const Tecnicas = () => {
     }
   });
   const [openTec, setOpenTec] = useState(null);
+  const [filtroActivo, setFiltroActivo] = useState("todas");
+  const [showFavs, setShowFavs] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Cargar técnicas del backend
+  useEffect(() => {
+    const fetchTecnicas = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/tecnicas`);
+        setTecnicas(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.error("Error al cargar técnicas:", error);
+        // Usar datos de fallback si falla la API
+        setTecnicas([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTecnicas();
+  }, []);
+
+  // Guardar favoritos en localStorage cuando cambien
+  useEffect(() => {
+    try {
+      localStorage.setItem("fav_tecnicas", JSON.stringify(Array.from(favs)));
+    } catch {}
+  }, [favs]);
 
   const toggleFav = (id) => {
     setFavs((prev) => {
@@ -111,57 +59,111 @@ const Tecnicas = () => {
   const openGuide = (t) => setOpenTec(t);
   const closeGuide = () => setOpenTec(null);
 
+  const tecnicasFiltradas = tecnicas.filter(t => {
+    if (showFavs) return favs.has(t._id);
+    if (filtroActivo === "todas") return true;
+    return t.categoria === filtroActivo;
+  });
+
   return (
-    <div className="home-page">
-      <div className="home-container">
-        <div className="home-hero" style={{ marginBottom: 32 }}>
-          <h1 className="home-title">Técnicas de autorregulación</h1>
-          <p className="home-subtitle">
-            Un espacio seguro para encontrar ideas simples y visuales que ayuden a regular el cuerpo y las emociones.
+    <div className="min-h-screen bg-slate-50 pt-4">
+      <div className="max-w-6xl mx-auto px-4 py-6 pb-24">
+        <div className="mb-6">
+          <h1 className="text-3xl font-extrabold text-[#43A1F2] mb-3">Técnicas de autorregulación</h1>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            Estrategias prácticas para regular emociones, reducir sobrecarga sensorial y favorecer el bienestar en situaciones cotidianas.
           </p>
         </div>
 
-        <div className="pinterest-section">
-          <div className="pinterest-grid">
-            {tecnicas.map((t) => (
-              <div key={t.id} className="coach-card">
-                <div className="coach-card-header">
-                  <div className="coach-card-main">
-                    <div className="coach-card-icon">🧠</div>
-                    <div>
-                      <div className="coach-card-title">{t.titulo}</div>
-                      <div className="coach-card-tags">
-                        {(t.tags || []).map((tag) => (
-                          <span key={tag} className="coach-card-tag">
-                            #{tag}
-                          </span>
-                        ))}
-                        <span className="coach-card-tag">#bienestar</span>
-                      </div>
-                    </div>
-                  </div>
+        <div className="mb-6 flex flex-wrap gap-3 items-center justify-between">
+          <div className="flex flex-wrap gap-2">
+            {categorias.map(cat => (
+              <button
+                key={cat}
+                style={{
+                  background: filtroActivo === cat ? '#43A1F2' : 'white',
+                  color: filtroActivo === cat ? 'white' : '#64748b',
+                  border: filtroActivo === cat ? '1px solid #43A1F2' : '1px solid #e2e8f0',
+                  padding: '8px 16px',
+                  borderRadius: '9999px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onClick={() => {
+                  setFiltroActivo(cat);
+                  setShowFavs(false);
+                }}
+              >
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </button>
+            ))}
+          </div>
+          <button
+            style={{
+              background: showFavs ? '#43A1F2' : 'white',
+              color: showFavs ? 'white' : '#64748b',
+              border: showFavs ? '1px solid #43A1F2' : '1px solid #e2e8f0',
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+            onClick={() => {
+              setShowFavs(!showFavs);
+              setFiltroActivo("todas");
+            }}
+          >
+            <Star size={16} fill={showFavs ? "currentColor" : "none"} />
+            Favoritos
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-slate-500">Cargando técnicas...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            {tecnicasFiltradas.map((t) => (
+              <div key={t._id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <div className="relative h-28 overflow-hidden">
+                  <img src={t.img} alt={t.titulo} className="w-full h-full object-cover" />
                   <button
-                    type="button"
-                    className="coach-card-fav"
-                    aria-label="Favorito"
-                    onClick={() => toggleFav(t.id)}
+                    className="absolute top-2 right-2 bg-white/90 border-none w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all hover:bg-white hover:scale-110 shadow-md p-0"
+                    onClick={() => toggleFav(t._id)}
                   >
-                    <svg
-                      className="heart"
-                      viewBox="0 0 24 24"
-                      fill={favs.has(t.id) ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M12 21s-6.716-4.297-9.428-7.009C.86 12.28.5 10.5 1.343 9.172 2.186 7.844 3.9 7 5.657 7c1.2 0 2.357.39 3.292 1.11L12 11l3.051-2.89C15.986 7.39 17.143 7 18.343 7c1.757 0 3.47.844 4.314 2.172.843 1.328.482 3.108-1.229 4.819C18.716 16.703 12 21 12 21z" />
-                    </svg>
+                    <Heart 
+                      size={18} 
+                      fill={favs.has(t._id) ? "#43A1F2" : "none"} 
+                      stroke={favs.has(t._id) ? "#43A1F2" : "currentColor"}
+                      strokeWidth={2}
+                    />
                   </button>
                 </div>
-                <div className="coach-card-body">{t.desc}</div>
-                <div className="coach-card-footer">
+                <div className="p-4">
+                  <div className="text-xs font-semibold text-[#43A1F2] uppercase tracking-wider mb-2">{t.categoria}</div>
+                  <h3 className="text-lg font-bold text-slate-800 mb-2">{t.titulo}</h3>
+                  <p className="text-sm text-slate-600 mb-4 leading-relaxed">{t.desc}</p>
                   <button
-                    type="button"
-                    className="coach-card-button"
+                    style={{
+                      width: '100%',
+                      background: '#43A1F2',
+                      color: 'white',
+                      padding: '10px 16px',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      border: 'none',
+                      transition: 'background 0.2s'
+                    }}
                     onClick={() => openGuide(t)}
                   >
                     Ver guía paso a paso
@@ -170,57 +172,57 @@ const Tecnicas = () => {
               </div>
             ))}
           </div>
-        </div>
+        )}
 
-        {openTec && (
-          <div className="modal-backdrop" onClick={closeGuide}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <div className="modal-title">{openTec.titulo}</div>
-                <button className="modal-close" onClick={closeGuide}>
-                  ×
-                </button>
-              </div>
-              <div className="modal-body">
-                <img className="modal-img" src={openTec.img} alt={openTec.titulo} />
-                <div>
-                  <p
-                    className="pin-desc"
-                    style={{ display: "block", color: "#475569", margin: "0 0 10px" }}
-                  >
-                    {openTec.desc}
-                  </p>
-                  <div className="pin-tags" style={{ marginBottom: 10 }}>
-                    {(openTec.tags || []).map((tag) => (
-                      <span key={tag} className="pin-tag pin-teal">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                  <h4 className="modal-section-title">Pasos</h4>
-                  <ol className="steps">
-                    {(openTec.steps || []).map((s, i) => (
-                      <li key={i}>{s}</li>
-                    ))}
-                  </ol>
-                  {openTec.source && (
-                    <div>
-                      <a
-                        className="source-link"
-                        href={openTec.source}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Fuente / Ilustración
-                      </a>
-                    </div>
-                  )}
+        <div className="bg-gradient-to-r from-[#43A1F2]/10 to-[#59C2BA]/10 rounded-2xl p-6 border border-[#43A1F2]/20">
+          <div className="support-message">
+            <p className="text-sm text-slate-700 leading-relaxed">
+              <strong className="text-slate-800">Recordá:</strong> Cada persona con TEA experimenta las emociones y los estímulos de manera diferente. 
+              Explorá distintas estrategias hasta encontrar aquellas que resulten más beneficiosas para vos.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {openTec && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-8 pt-32" onClick={closeGuide}>
+          <div className="bg-white rounded-2xl max-w-[500px] w-full max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-5 py-4 flex items-center justify-between">
+              <div className="text-lg font-bold text-slate-800">{openTec.titulo}</div>
+              <button className="text-3xl text-slate-400 hover:text-slate-600 cursor-pointer" onClick={closeGuide}>
+                ×
+              </button>
+            </div>
+            <div className="p-5">
+              <img className="w-full h-45 object-cover rounded-xl mb-4" src={openTec.img} alt={openTec.titulo} />
+              <div>
+                <p className="text-slate-600 mb-3 leading-relaxed text-sm">{openTec.desc}</p>
+                <div className="mb-3">
+                  <span className="inline-block px-3 py-1 bg-[#43A1F2]/10 text-[#43A1F2] rounded-full text-xs font-medium">{openTec.categoria}</span>
                 </div>
+                <h4 className="text-base font-bold text-slate-800 mb-2.5">Pasos</h4>
+                <ol className="list-decimal list-inside space-y-1.5 text-slate-600 text-sm pl-5">
+                  {(openTec.steps || []).map((s, i) => (
+                    <li key={i} className="pl-1">{s}</li>
+                  ))}
+                </ol>
+                {openTec.source && (
+                  <div className="mt-4">
+                    <a
+                      className="text-[#43A1F2] hover:underline text-xs"
+                      href={openTec.source}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Fuente / Ilustración
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

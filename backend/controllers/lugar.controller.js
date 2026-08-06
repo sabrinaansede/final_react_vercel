@@ -63,3 +63,25 @@ export const votarLugar = async (req, res) => {
     res.status(500).json({ error: "Error al votar el lugar" });
   }
 };
+
+export const subirFotoLugar = async (req, res) => {
+  try {
+    const lugar = await Lugar.findById(req.params.id);
+    if (!lugar) return res.status(404).json({ error: "Lugar no encontrado" });
+
+    if (req.file) {
+      const filename = req.file.filename || req.file.originalname;
+      lugar.foto = `/uploads/${filename}`;
+    } else if (req.body.fotoUrl) {
+      lugar.foto = req.body.fotoUrl;
+    } else {
+      return res.status(400).json({ error: "No se proporcionó ninguna imagen" });
+    }
+
+    await lugar.save();
+    res.json({ fotoUrl: lugar.foto });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al subir la foto" });
+  }
+};

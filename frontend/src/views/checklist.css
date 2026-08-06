@@ -1,7 +1,7 @@
 .checklist-page {
   min-height: 100vh;
   background: #f8f9fa;
-  padding: 20px;
+  padding: 120px 20px 80px 20px;
 }
 
 .checklist-container {
@@ -33,7 +33,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #43A1F2 0%, #2E7BB8 100%);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -72,18 +72,18 @@
 .checklist-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #43A1F2;
+  border-color: var(--color-brand);
 }
 
 .checklist-card.active {
-  border-color: #43A1F2;
+  border-color: var(--color-brand);
   background: #f0f9ff;
 }
 
 .checklist-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #43A1F2 0%, #2E7BB8 100%);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -110,7 +110,7 @@
 }
 
 .more-items {
-  color: #43A1F2;
+  color: var(--color-brand);
   font-weight: 600;
 }
 
@@ -224,12 +224,12 @@
   align-items: center;
   gap: 6px;
   background: #f0f9ff;
-  border: 1px solid #43A1F2;
+  border: 1px solid var(--color-brand);
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #43A1F2;
+  color: var(--color-brand);
   cursor: pointer;
   transition: all 0.3s;
 }
@@ -249,7 +249,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(135deg, #43A1F2 0%, #2E7BB8 100%);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
   transition: width 0.3s ease;
 }
 
@@ -280,7 +280,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #43A1F2 0%, #2E7BB8 100%);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -317,7 +317,7 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #43A1F2;
+  accent-color: var(--color-brand);
 }
 
 .item-content {
@@ -347,7 +347,7 @@
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-left: 4px solid #43A1F2;
+  border-left: 4px solid var(--color-brand);
 }
 
 .recommendations-header {
@@ -381,7 +381,7 @@
 
 .recommendations-list li::before {
   content: "•";
-  color: #43A1F2;
+  color: var(--color-brand);
   font-weight: bold;
   margin-right: 8px;
 }
@@ -474,7 +474,7 @@
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #43A1F2;
+  border-color: var(--color-brand);
   box-shadow: 0 0 0 3px rgba(67, 161, 242, 0.1);
 }
 
@@ -502,7 +502,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #43A1F2 0%, #2E7BB8 100%);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
   color: white;
 }
 

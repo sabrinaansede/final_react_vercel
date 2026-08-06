@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaf
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "../App.css";
-import "./ModalDetalleLugar.css";
 import LeyendaMapa from "./LeyendaMapa";
 import { useAuth } from "../context/AuthContext.jsx";
 import apadeaIcon from "../assets/apadea.png";
@@ -68,27 +67,26 @@ export default function MapaLugares() {
   const cerrarDetalle = () => {
     console.log('Cerrando modal de detalles');
     setDetalleLugar(null);
+    setShowAllReviews(false);
+    setShowReviewForm(false);
+    setExpandedDescription(false);
+    setExpandedTags(false);
+    setResenaForm({ puntuacion: 0, comentario: "" });
   };
   
   // Función para abrir el detalle del lugar
   const abrirDetalleLugar = (lugar) => {
     console.log('Abriendo detalles del lugar:', lugar);
-    
-    // Usar la función de actualización de estado para asegurar que obtenemos el estado más reciente
-    setDetalleLugar(prevLugar => {
-      const nuevoLugar = { ...lugar };
-      console.log('Actualizando detalleLugar a:', nuevoLugar);
-      return nuevoLugar;
-    });
-    
-    // Verificar el estado después de la actualización
-    setTimeout(() => {
-      console.log('Estado después de actualizar - detalleLugar:', detalleLugar);
-      console.log('¿El modal debería estar visible?', !!detalleLugar);
-    }, 100);
+    setDetalleLugar(lugar);
   };
   const [resenaForm, setResenaForm] = useState({ puntuacion: 0, comentario: "" });
   const [fotoUI, setFotoUI] = useState({ open: false, file: null, preview: "" });
+  const [emocionalForm, setEmocionalForm] = useState({ emocion: "", fecha: "", notas: "" });
+  const [showEmocionalForm, setShowEmocionalForm] = useState(false);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [expandedDescription, setExpandedDescription] = useState(false);
+  const [expandedTags, setExpandedTags] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   const [menuOpen, setMenuOpen] = useState(null);
   const [sortKey, setSortKey] = useState("default");
@@ -404,6 +402,46 @@ export default function MapaLugares() {
       setMensaje("❌ Error al enviar la reseña.");
     }
   };
+
+  const enviarRegistroEmocional = async () => {
+    if (!usuario?._id || !detalleLugar?._id) {
+      setMensaje("⚠️ Debes iniciar sesión para registrar cómo te sentiste.");
+      return;
+    }
+    if (!emocionalForm.emocion || !emocionalForm.fecha) {
+      setMensaje("⚠️ Completá la emoción y la fecha.");
+      return;
+    }
+    try {
+      const token = authToken || localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/registros-emocionales`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          usuario: usuario._id,
+          lugar: detalleLugar._id,
+          emocion: emocionalForm.emocion,
+          fecha: emocionalForm.fecha,
+          notas: emocionalForm.notas || ""
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMensaje("✅ Registro emocional guardado correctamente.");
+        setShowEmocionalForm(false);
+        setEmocionalForm({ emocion: "", fecha: "", notas: "" });
+      } else {
+        const msg = data?.error || data?.message || `Error ${res.status}`;
+        setMensaje(`❌ No se pudo guardar el registro: ${msg}`);
+      }
+    } catch (e) {
+      console.error(e);
+      setMensaje("❌ Error al guardar el registro emocional.");
+    }
+  };
   const tipos = useMemo(() => Array.from(new Set(lugares.map((l) => l.tipo).filter(Boolean))), [lugares]);
   const provincias = useMemo(() => Array.from(new Set(lugares.map((l) => l.provincia).filter(Boolean))), [lugares]);
 
@@ -468,80 +506,82 @@ export default function MapaLugares() {
   return (
     <div className="mapa-container">
       <div className="container-mapa-form">
-        <MapContainer center={[-34.6037, -58.3816]} zoom={13} className="mapa-leaflet" whenCreated={(map) => (mapRef.current = map)}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-        />
-        <ClickMarker />
+        <div className="map-wrapper">
+          <MapContainer center={[-34.6037, -58.3816]} zoom={13} className="mapa-leaflet" whenCreated={(map) => (mapRef.current = map)}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+            />
+            <ClickMarker />
 
-        {lugaresFiltrados.map((lugar) => (
-          <Marker
-            key={lugar._id}
-            position={[lugar.latitud, lugar.longitud]}
-            icon={getCert(lugar) === "APADEA" ? iconoApadea : iconoComunidad}
-            ref={(ref) => { if (ref) markerRefs.current[lugar._id] = ref; }}
-            eventHandlers={{
-              click: () => setSelectedLugarId(lugar._id),
-            }}
-          >
-            <Popup closeButton={false}>
-              <div className="marker-popup" onClick={(e) => e.stopPropagation()}>
-                <div className="marker-popup-header">
-                  <h4>{lugar.nombre}</h4>
-                </div>
-                <div className="marker-popup-body">
-                  <div className="address">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="12" height="12">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span>{lugar.direccion || 'Sin dirección'}</span>
-                  </div>
-                  
-                  {(lugar.tipo || lugar.provincia || getCert(lugar) === 'APADEA') && (
-                    <div className="popup-meta">
-                      {lugar.tipo && <span className="tag">{lugar.tipo}</span>}
-                      {lugar.provincia && lugar.provincia !== 'CABA' && (
-                        <span className="tag">{lugar.provincia}</span>
-                      )}
-                      {getCert(lugar) === 'APADEA' && (
-                        <span className="tag apadea-tag">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginRight: '4px'}}>
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#1e40af"/>
-                          </svg>
-                          Certificado APADEA
-                        </span>
-                      )}
+            {lugaresFiltrados.map((lugar) => (
+              <Marker
+                key={lugar._id}
+                position={[lugar.latitud, lugar.longitud]}
+                icon={getCert(lugar) === "APADEA" ? iconoApadea : iconoComunidad}
+                ref={(ref) => { if (ref) markerRefs.current[lugar._id] = ref; }}
+                eventHandlers={{
+                  click: () => setSelectedLugarId(lugar._id),
+                }}
+              >
+                <Popup closeButton={false}>
+                  <div className="marker-popup" onClick={(e) => e.stopPropagation()}>
+                    <div className="marker-popup-header">
+                      <h4>{lugar.nombre}</h4>
                     </div>
-                  )}
-                  
-                  <button 
-                    className="details-button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      abrirDetalleLugar(lugar);
-                      const marker = markerRefs.current[lugar._id];
-                      if (marker?.closePopup) marker.closePopup();
-                    }}
-                  >
-                    Ver detalles y reseñas
-                  </button>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+                    <div className="marker-popup-body">
+                      <div className="address">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="12" height="12">
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
+                        <span>{lugar.direccion || 'Sin dirección'}</span>
+                      </div>
+                      
+                      {(lugar.tipo || lugar.provincia || getCert(lugar) === 'APADEA') && (
+                        <div className="popup-meta">
+                          {lugar.tipo && <span className="tag">{lugar.tipo}</span>}
+                          {lugar.provincia && lugar.provincia !== 'CABA' && (
+                            <span className="tag">{lugar.provincia}</span>
+                          )}
+                          {getCert(lugar) === 'APADEA' && (
+                            <span className="tag apadea-tag">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginRight: '4px'}}>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#1e40af"/>
+                              </svg>
+                              Certificado APADEA
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      
+                      <button 
+                        className="details-button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          abrirDetalleLugar(lugar);
+                          const marker = markerRefs.current[lugar._id];
+                          if (marker?.closePopup) marker.closePopup();
+                        }}
+                      >
+                        Ver detalles y reseñas
+                      </button>
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
 
-      <div className="map-controls">
-        <button type="button" className="map-control-btn" onClick={centrarUbicacionActual}>
-          Mi ubicación
-        </button>
-        <button type="button" className="map-control-btn map-control-add" onClick={abrirPanelAgregar}>
-          + Agregar lugar
-        </button>
-      </div>
+          <div className={`map-controls ${detalleLugar ? 'hidden' : ''}`}>
+            <button type="button" className="map-control-btn" onClick={centrarUbicacionActual}>
+              Mi ubicación
+            </button>
+            <button type="button" className="map-control-btn map-control-add" onClick={abrirPanelAgregar}>
+              + Agregar lugar
+            </button>
+          </div>
+        </div>
 
       <div className={`sheet-preview ${sheetExpanded ? 'hidden' : ''}`} onClick={abrirPanelAgregar}>
         <div>
@@ -786,149 +826,292 @@ export default function MapaLugares() {
       )}
       </div>
       {detalleLugar && (
-        <div className="modal-backdrop" onClick={cerrarDetalle}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/80 flex items-start justify-center p-5 pt-24 z-[10000]" onClick={cerrarDetalle}>
+          <div className="bg-white rounded-t-3xl md:rounded-2xl max-w-3xl w-full md:max-h-[80vh] h-[80vh] md:h-auto overflow-y-auto relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <button 
-              className="modal-close-btn" 
+              className="absolute top-4 right-4 text-2xl text-slate-400 hover:text-slate-600 cursor-pointer z-[10001] bg-white/80 rounded-full w-8 h-8 flex items-center justify-center"
               onClick={cerrarDetalle}
               aria-label="Cerrar modal"
             >
               &times;
             </button>
             
-            <div className="modal-header">
-              <h2>{detalleLugar.nombre}</h2>
-              <p className="modal-address">{detalleLugar.direccion}</p>
+            {/* Encabezado - diseño unificado (igual en móvil y desktop) */}
+            <div className="border-b border-slate-200">
+              {/* Imagen de ancho completo */}
+              {detalleLugar.foto && (
+                <div>
+                  <img 
+                    src={detalleLugar.foto} 
+                    alt={detalleLugar.nombre}
+                    className="w-full h-40 object-cover"
+                  />
+                </div>
+              )}
+              
+              {/* Información principal - diseño vertical */}
+              <div className="p-4">
+                <div className="flex flex-col">
+                  {/* Información del lugar */}
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl font-bold text-slate-800 mb-2">
+                      {detalleLugar.nombre || 'Sin nombre'}
+                    </h2>
+                    <p className="text-sm text-slate-500 flex items-center gap-1 mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      </svg>
+                      {detalleLugar.direccion || 'Sin dirección'}
+                      {detalleLugar.provincia && detalleLugar.provincia !== 'CABA' ? `, ${detalleLugar.provincia}` : ''}
+                    </p>
+                    {detalleLugar.tipo && (
+                      <span className="inline-block px-3 py-1 bg-[#43A1F2]/10 text-[#43A1F2] rounded-full text-xs font-medium mb-2">
+                        {detalleLugar.tipo}
+                      </span>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <div className="flex text-yellow-400 text-sm">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <svg key={n} width={18} height={18} viewBox="0 0 24 24" fill={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "currentColor" : "none"} stroke={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "none" : "currentColor"} strokeWidth="2">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                          </svg>
+                        ))}
+                      </div>
+                      <span className="text-sm font-semibold text-slate-700">
+                        {Number(ratingPorLugar[detalleLugar._id]?.avg || 0).toFixed(1)}
+                      </span>
+                      <span className="text-sm text-slate-500">
+                        ({resenas.filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id).length} opiniones)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div className="modal-body">
-              <div className="info-section">
-                <p><strong>Tipo:</strong> {detalleLugar.tipo || 'No especificado'}</p>
-                <p><strong>Provincia:</strong> {detalleLugar.provincia || 'No especificada'}</p>
-                
-                {detalleLugar.descripcion && (
-                  <div className="modal-section">
-                    <h4>Descripción</h4>
-                    <p>{detalleLugar.descripcion}</p>
-                  </div>
-                )}
-                
-                <div className="certification-section">
-                  <div className="certification-header">
-                    <h4 className="certification-title">Certificación</h4>
-                  </div>
-                  <div className="certification-items">
-                    <div className="certification-item">
-                      <span className="certification-dot yellow"></span>
-                      <span>Certificación oficial: {detalleLugar.certificadoPor === 'APADEA' ? 'APADEA' : 'No certificado'}</span>
-                    </div>
-                    <div className="certification-item">
-                      <span className="certification-dot green"></span>
-                      <span>Validación comunitaria: {Number(ratingPorLugar[detalleLugar._id]?.avg || 0).toFixed(1)}/5 ({ratingPorLugar[detalleLugar._id]?.count || 0} usuarios)</span>
-                    </div>
-                  </div>
-                </div>
-
-                {detalleLugar.etiquetasSensoriales?.length > 0 && (
-                  <div className="modal-section">
-                    <h4>Características sensoriales</h4>
-                    <div className="tags-container">
-                      {detalleLugar.etiquetasSensoriales.map((tag, i) => (
-                        <span key={i} className="modal-tag">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              <div className="reviews-section">
-                <h3>Reseñas</h3>
-                
-                <div className="review-form-section">
-                  <h4>Dejar reseña</h4>
-                  <div className="rating-stars">
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <button
-                        key={n}
-                        type="button"
-                        className={`star-btn ${n <= resenaForm.puntuacion ? 'active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setResenaForm(prev => ({ ...prev, puntuacion: n }));
-                        }}
-                        aria-label={`Calificar con ${n} estrellas`}
-                      >
-                        ★
-                      </button>
-                    ))}
-                  </div>
-                  
-                  <textarea
-                    className="review-textarea"
-                    placeholder="Escribe tu reseña aquí..."
-                    value={resenaForm.comentario}
-                    onChange={(e) => setResenaForm(prev => ({ ...prev, comentario: e.target.value }))}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  
-                  <button
-                    className="submit-review-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      enviarResenaModal();
-                    }}
-                    disabled={!resenaForm.puntuacion}
-                  >
-                    Enviar reseña
-                  </button>
-                  
-                  {mensaje && (
-                    <p className={`review-message ${mensaje.includes('Error') ? 'error' : 'success'}`}>
-                      {mensaje}
-                    </p>
-                  )}
-                </div>
-                
-                <div className="community-reviews">
-                  <h4>Opiniones de la comunidad</h4>
-                  <div className="reviews-list">
-                    {resenas
-                      .filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id)
-                      .slice(-3)
-                      .reverse()
-                      .map((r, idx) => (
-                        <div key={idx} className="review-item">
-                          {r.fotoUrl && (
-                            <img 
-                              src={r.fotoUrl} 
-                              alt="foto reseña" 
-                              className="review-image"
-                            />
-                          )}
-                          <div className="review-comment">
-                            {r.comentario || '(Sin comentario)'}
-                          </div>
-                          <div className="review-user">
-                            {typeof r.usuario === 'object' ? (r.usuario?.nombre || 'Usuario') : 'Usuario'}
-                          </div>
+            <div className="p-4 md:p-4 md:pt-6 max-w-2xl mx-auto">
+              {/* Tarjeta de certificación - diseño unificado (vertical en ambos) */}
+              <div className="bg-gradient-to-r from-[#43A1F2]/10 to-[#43A1F2]/5 border border-[#43A1F2]/20 rounded-xl p-4 mb-4">
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-3">
+                    {detalleLugar.certificadoPor === 'APADEA' && (
+                      <div className="flex items-center gap-2 px-3 py-2 bg-white border border-[#43A1F2]/30 rounded-lg shadow-sm">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#43A1F2"/>
+                        </svg>
+                        <div>
+                          <div className="text-xs font-bold text-[#43A1F2]">Certificado APADEA</div>
+                          <div className="text-[10px] text-[#43A1F2]/70">Validación oficial</div>
                         </div>
-                      ))}
-                    
-                    {!resenas.some(r => (r.lugar?._id || r.lugar) === detalleLugar._id) && (
-                      <div className="no-reviews">
-                        Aún no hay opiniones. ¡Sé el primero en dejar una reseña!
                       </div>
                     )}
+                    <div className="flex items-center gap-2 px-3 py-2 bg-white border border-[#43A1F2]/30 rounded-lg shadow-sm">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-[#43A1F2]">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                      </svg>
+                      <div>
+                        <div className="text-xs font-bold text-[#43A1F2]">Validado por comunidad</div>
+                      </div>
+                    </div>
                   </div>
+                  <div className="flex items-center gap-4 justify-center pt-2 border-t border-[#43A1F2]/20">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-[#43A1F2]">{Number(ratingPorLugar[detalleLugar._id]?.avg || 0).toFixed(1)}</div>
+                      <div className="text-[10px] text-slate-500">Puntaje promedio</div>
+                    </div>
+                    <div className="h-8 w-px bg-slate-300"></div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-[#43A1F2]">{ratingPorLugar[detalleLugar._id]?.count || 0}</div>
+                      <div className="text-[10px] text-slate-500">Usuarios</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Descripción */}
+              {detalleLugar.descripcion && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-[#43A1F2] mb-2">Descripción</h4>
+                  <div className="text-sm text-slate-600 leading-relaxed">
+                    {expandedDescription ? (
+                      <>
+                        {detalleLugar.descripcion}
+                        <button 
+                          className="text-[#43A1F2] font-medium ml-2 hover:underline text-xs"
+                          onClick={(e) => { e.stopPropagation(); setExpandedDescription(false); }}
+                        >
+                          Ver menos
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {detalleLugar.descripcion.split(' ').slice(0, 15).join(' ')}...
+                        <button 
+                          className="text-[#43A1F2] font-medium ml-2 hover:underline text-xs"
+                          onClick={(e) => { e.stopPropagation(); setExpandedDescription(true); }}
+                        >
+                          Ver más
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Características sensoriales */}
+              {detalleLugar.etiquetasSensoriales?.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-[#43A1F2] mb-2">Características sensoriales</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {detalleLugar.etiquetasSensoriales.slice(0, expandedTags ? undefined : 3).map((tag, i) => (
+                      <span key={i} className="px-3 py-1.5 bg-gradient-to-r from-[#43A1F2]/10 to-[#59C2BA]/10 text-slate-700 rounded-full text-xs font-medium border border-[#43A1F2]/20">
+                        {tag}
+                      </span>
+                    ))}
+                    {detalleLugar.etiquetasSensoriales.length > 3 && !expandedTags && (
+                      <button 
+                        className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-xs font-medium hover:bg-slate-200"
+                        onClick={(e) => { e.stopPropagation(); setExpandedTags(true); }}
+                      >
+                        +{detalleLugar.etiquetasSensoriales.length - 3} más
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {/* Sección inferior: diseño unificado (vertical en ambos) */}
+              <div className="grid grid-cols-1 gap-4 mb-4">
+                {/* Tarjeta izquierda: Opiniones de la comunidad */}
+                <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
+                  <h3 className="text-base font-bold text-[#43A1F2] mb-3">Opiniones de la comunidad</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="flex text-yellow-400">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <svg key={n} width="16" height="16" viewBox="0 0 24 24" fill={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "currentColor" : "none"} stroke={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "none" : "currentColor"} strokeWidth="2">
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="text-sm font-semibold text-slate-700">
+                      {Number(ratingPorLugar[detalleLugar._id]?.avg || 0).toFixed(1)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-500 mb-3">
+                    {resenas.filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id).length} opiniones
+                  </p>
+                  {resenas.filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id).length > 0 && (
+                    <button 
+                      className="w-full py-2.5 bg-white text-slate-800 border border-slate-300 rounded-lg text-sm font-medium cursor-pointer hover:bg-slate-50"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowAllReviews(true);
+                      }}
+                    >
+                      Ver todas las opiniones
+                    </button>
+                  )}
+
+                  {/* Lista de opiniones */}
+                  {showAllReviews && (
+                    <div className="bg-white p-3 rounded-lg mt-3">
+                      <div className="reviews-list max-h-40 overflow-y-auto">
+                        {resenas
+                          .filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id)
+                          .reverse()
+                          .map((r, idx) => (
+                            <div key={idx} className="review-item mb-2 last:mb-0 pb-2 border-b border-slate-100 last:border-0">
+                              <div className="review-comment text-xs text-slate-700 mb-1">
+                                {r.comentario || '(Sin comentario)'}
+                              </div>
+                              <div className="review-user text-[10px] text-slate-500">
+                                {typeof r.usuario === 'object' ? (r.usuario?.nombre || 'Usuario') : 'Usuario'}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                      <button 
+                        className="w-full mt-2 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium cursor-pointer hover:bg-slate-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowAllReviews(false);
+                        }}
+                      >
+                        Ocultar opiniones
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tarjeta derecha: Escribir una reseña */}
+                <div className="bg-gradient-to-br from-[#43A1F2]/5 to-[#43A1F2]/10 rounded-xl p-4 border border-[#43A1F2]/20">
+                  <h3 className="text-base font-bold text-slate-900 mb-2">Comparte tu experiencia</h3>
+                  <p className="text-sm text-slate-700 mb-3">
+                    Ayuda a la comunidad contando cómo fue tu visita a este lugar.
+                  </p>
+                  <button 
+                    className="w-full py-2.5 bg-[#43A1F2] text-white rounded-lg text-sm font-medium cursor-pointer border-none hover:bg-[#2E7BB8]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowReviewForm(!showReviewForm);
+                    }}
+                  >
+                    {showReviewForm ? 'Cancelar' : 'Escribir reseña'}
+                  </button>
+
+                  {/* Formulario de reseña */}
+                  {showReviewForm && (
+                    <div className="bg-white p-3 rounded-lg mt-3">
+                      <div className="rating-stars mb-2">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            className={`star-btn ${n <= resenaForm.puntuacion ? 'active' : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setResenaForm(prev => ({ ...prev, puntuacion: n }));
+                            }}
+                            aria-label={`Calificar con ${n} estrellas`}
+                          >
+                            ★
+                          </button>
+                        ))}
+                      </div>
+                      
+                      <textarea
+                        className="review-textarea mb-2"
+                        placeholder="Escribe tu reseña aquí..."
+                        value={resenaForm.comentario}
+                        onChange={(e) => setResenaForm(prev => ({ ...prev, comentario: e.target.value }))}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      
+                      <button
+                        className="submit-review-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          enviarResenaModal();
+                        }}
+                        disabled={!resenaForm.puntuacion}
+                      >
+                        Enviar reseña
+                      </button>
+                      
+                      {mensaje && (
+                        <p className={`review-message ${mensaje.includes('Error') ? 'error' : 'success'}`}>
+                          {mensaje}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
       )}
-      <LeyendaMapa />
+      {!sheetExpanded && !detalleLugar && <LeyendaMapa />}
     </div>
   </div>
   );

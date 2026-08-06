@@ -19,4 +19,4 @@ const profesionalSchema = new Schema({
   creadoEn: { type: Date, default: Date.now }
 });
 
-export default mongoose.model("Profesional", profesionalSchema);
+export default mongoose.model("Profesional", profesionalSchema, "profesionales");

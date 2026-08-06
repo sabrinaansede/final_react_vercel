@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Home, MapPin, Users, BookOpen, CheckSquare, MessageCircle, Mail, User, UserPlus } from "lucide-react";
+import { Menu, X, Home, MapPin, Users, BookOpen, CheckSquare, MessageCircle, MessagesSquare, Mail, User, UserPlus, Info } from "lucide-react";
 import logo from "../assets/logo.png";
 
 const Navbar = () => {
@@ -83,8 +83,14 @@ const Navbar = () => {
           <NavLink to="/mapa" className="nav-link">
             Mapa
           </NavLink>
+          <NavLink to="/comunidad" className="nav-link">
+            Comunidad
+          </NavLink>
           <NavLink to="/checklist" className="nav-link">
             Checklist
+          </NavLink>
+          <NavLink to="/centro-informacion" className="nav-link">
+            Centro de Información
           </NavLink>
           <NavLink to="/profesionales" className="nav-link">
             Profesionales
@@ -126,6 +132,10 @@ const Navbar = () => {
                 <MapPin size={20} />
                 <span>Mapa</span>
               </NavLink>
+              <NavLink to="/comunidad" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+                <MessagesSquare size={20} />
+                <span>Comunidad</span>
+              </NavLink>
               <NavLink to="/profesionales" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <Users size={20} />
                 <span>Profesionales</span>
@@ -137,6 +147,10 @@ const Navbar = () => {
               <NavLink to="/checklist" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <CheckSquare size={20} />
                 <span>Checklist</span>
+              </NavLink>
+              <NavLink to="/centro-informacion" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+                <Info size={20} />
+                <span>Centro de Información</span>
               </NavLink>
               <NavLink to="/mis-resenas" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <MessageCircle size={20} />
@@ -165,6 +179,10 @@ const Navbar = () => {
                 <MapPin size={20} />
                 <span>Mapa</span>
               </NavLink>
+              <NavLink to="/comunidad" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+                <MessagesSquare size={20} />
+                <span>Comunidad</span>
+              </NavLink>
               <NavLink to="/profesionales" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <Users size={20} />
                 <span>Profesionales</span>
@@ -176,6 +194,10 @@ const Navbar = () => {
               <NavLink to="/checklist" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <CheckSquare size={20} />
                 <span>Checklist</span>
+              </NavLink>
+              <NavLink to="/centro-informacion" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+                <Info size={20} />
+                <span>Centro de Información</span>
               </NavLink>
               <NavLink to="/contacto" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <Mail size={20} />

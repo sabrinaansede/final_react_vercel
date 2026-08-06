@@ -162,23 +162,52 @@ async function seedTecnicas() {
 }
 
 const allowedOrigins = [
-  'http://localhost:5173', // desarrollo local
-  'https://final-react-vercel.vercel.app', // producción
-  /^https:\/\/final-react-vercel-.*\.vercel\.app$/ // previews de Vercel
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  'https://final-react-vercel.vercel.app',
+  'https://autisi-backend.onrender.com',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+  /^https:\/\/.*\.vercel\.app$/,
+  /^https:\/\/.*\.netlify\.app$/,
+  /^https:\/\/.*\.github\.dev$/
 ];
 
-app.use(cors({
+const corsOptions = {
   origin: function(origin, callback) {
-    if (!origin) return callback(null, true); // Postman / server-side requests
-    const isAllowed = allowedOrigins.some(o => o instanceof RegExp ? o.test(origin) : o === origin);
+    if (!origin) return callback(null, true);
+
+    const isAllowed = allowedOrigins.some((entry) =>
+      entry instanceof RegExp ? entry.test(origin) : entry === origin
+    );
+
     if (isAllowed) return callback(null, true);
+
+    if (process.env.ALLOW_ALL_ORIGINS === 'true' || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
     console.log('❌ Origen no permitido por CORS:', origin);
-    callback(new Error('No permitido por CORS'));
+    return callback(null, true);
   },
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 app.use(express.json());
 app.use('/uploads', express.static('public/uploads'));

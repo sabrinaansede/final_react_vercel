@@ -187,10 +187,6 @@ const Navbar = () => {
                 <Users size={20} />
                 <span>Profesionales</span>
               </NavLink>
-              <NavLink to="/profesionales" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <Users size={20} />
-                <span>Profesionales</span>
-              </NavLink>
               <NavLink to="/tecnicas" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <BookOpen size={20} />
                 <span>Técnicas</span>

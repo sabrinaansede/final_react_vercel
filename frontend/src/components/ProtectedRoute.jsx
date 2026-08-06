@@ -4,11 +4,13 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
-  const { user } = useAuth();
-  const isAuthenticated = Boolean(user);
+  const { user, guestMode } = useAuth();
+  const isAuthenticated = Boolean(user) && !guestMode;
+
   if (!isAuthenticated) {
-    return <Navigate to="/" replace state={{ from: location }} />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
+
   return children;
 };
 

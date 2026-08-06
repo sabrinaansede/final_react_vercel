@@ -57,7 +57,7 @@ const App = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
       <Route 
         path="/perfil" 

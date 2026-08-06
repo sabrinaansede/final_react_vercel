@@ -211,10 +211,10 @@ const Profesionales = () => {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 bg-[rgba(27,42,74,0.5)] backdrop-blur-sm flex items-center justify-center p-4 z-[1000]" onClick={() => setSelected(null)}>
-          <div className="bg-white rounded-3xl max-w-[600px] w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-[rgba(27,42,74,0.5)] backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[1000]" onClick={() => setSelected(null)}>
+          <div className="bg-white rounded-3xl max-w-[600px] w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
             {/* Encabezado del modal con imagen */}
-            <div className="relative h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-t-3xl overflow-hidden">
+            <div className="relative h-44 sm:h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-t-3xl overflow-hidden">
               {selected.foto ? (
                 <img src={selected.foto} alt={`${selected.nombre} ${selected.apellido}`} className="w-full h-full object-cover" />
               ) : (
@@ -225,7 +225,11 @@ const Profesionales = () => {
                 </div>
               )}
               
-              <button className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors shadow-md" onClick={() => setSelected(null)}>
+              <button
+                className="absolute top-3 right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-xl font-bold text-gray-700 shadow-lg ring-1 ring-gray-200 transition hover:bg-white"
+                onClick={() => setSelected(null)}
+                aria-label="Cerrar perfil"
+              >
                 ✕
               </button>
 
@@ -236,8 +240,8 @@ const Profesionales = () => {
             </div>
 
             {/* Información del profesional */}
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
                 <div>
                   <h3 className="text-2xl font-bold text-[#1b2a4a] mb-1">{selected.nombre} {selected.apellido}</h3>
                   <div className="text-[#43A1F2] font-semibold">{selected.especialidad}</div>
@@ -249,7 +253,7 @@ const Profesionales = () => {
               </div>
 
               {/* Información clave */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                 <div className="bg-gray-50 rounded-xl p-3">
                   <p className="text-xs font-bold text-[#43A1F2] mb-1">Ubicación</p>
                   <p className="text-sm text-gray-700 flex items-center gap-1">

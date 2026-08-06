@@ -53,12 +53,12 @@ a:hover { text-decoration: underline; }
   min-height: 100vh;
   background: var(--color-bg);
 }
-.home-container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 80px; } /* Extra padding bottom for mobile nav */
-.home-hero { text-align: center; margin-bottom: 24px; }
+.home-container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 80px; display: flex; flex-direction: column; align-items: center; } /* Extra padding bottom for mobile nav */
+.home-hero { width: 100%; max-width: 720px; text-align: center; margin-bottom: 24px; }
 .home-title { font-size: 34px; font-weight: 800; color: var(--color-brand); margin: 0; }
 .home-subtitle { margin-top: 8px; color: #475569; }
 
-.home-tabs { display: flex; justify-content: center; margin-bottom: 20px; }
+.home-tabs { display: flex; justify-content: center; margin-bottom: 20px; width: 100%; }
 .home-tabs-inner { background: #fff; border-radius: 999px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 6px; display: inline-flex; gap: 6px; }
 .tab-btn { border: none; padding: 10px 18px; border-radius: 999px; font-weight: 600; color: #334155; background: transparent; cursor: pointer; }
 .tab-btn:hover { background: #f1f5f9; }
@@ -243,9 +243,9 @@ a:hover { text-decoration: underline; }
   border-radius: 999px;
 }
 
-.home-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+.home-grid { display: grid; grid-template-columns: 1fr; gap: 24px; width: 100%; justify-items: center; }
 @media (min-width: 768px) { .home-grid { grid-template-columns: 1fr 1fr; } }
-.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); transition: transform .15s ease; }
+.card { width: 100%; max-width: 560px; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); transition: transform .15s ease; }
 .card:hover { transform: translateY(-2px); }
 .card-title { font-size: 20px; font-weight: 700; margin: 0 0 12px; }
 
@@ -359,6 +359,14 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (max-width: 768px) {
+  .home-container { padding: 16px 12px 96px; }
+  .home-title { font-size: 28px; }
+  .home-subtitle { font-size: 0.95rem; }
+  .home-grid { gap: 16px; }
+  .card { max-width: 100%; padding: 18px; border-radius: 14px; }
 }
 
 @media (prefers-color-scheme: light) {

@@ -5,7 +5,7 @@ import BullrichApadea from '../assets/Bullrich_apadea.jpg';
 import AbastoApadea from '../assets/abasto_apadea.jpg';
 import CafePosible from '../assets/cafe_posible.jpeg';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://autisi-backend.onrender.com';
 
 const normalizeImageUrl = (src) => {
   if (!src) return '';
@@ -41,7 +41,7 @@ const RecommendedList = ({ places = [] }) => {
     setPreviews((s) => ({ ...s, [placeId]: url }));
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.VITE_API_URL || 'https://autisi-backend.onrender.com';
       const form = new FormData();
       form.append('foto', file);
       

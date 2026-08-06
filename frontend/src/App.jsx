@@ -75,7 +75,14 @@ const App = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/profesionales" element={<Profesionales />} />
+      <Route
+        path="/profesionales"
+        element={
+          <ProtectedRoute>
+            <Profesionales />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/centro-informacion" element={<CentroInformacion />} />
       <Route
         path="/comunidad"

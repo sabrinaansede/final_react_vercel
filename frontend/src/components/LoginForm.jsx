@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "https://final-react-vercel.onrender.com";
+  "https://autisi-backend.onrender.com";
 
 const LoginForm = () => {
   const navigate = useNavigate();

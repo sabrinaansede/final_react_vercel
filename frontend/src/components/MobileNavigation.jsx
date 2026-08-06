@@ -1,16 +1,20 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, MapPin, Users, MessageCircle, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const MobileNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, guestMode } = useAuth();
+
+  const isSignedIn = Boolean(user) && !guestMode;
 
   const navItems = [
     { id: 'home', label: 'Inicio', icon: Home, path: '/' },
     { id: 'comunidad', label: 'Comunidad', icon: MessageCircle, path: '/comunidad' },
     { id: 'mapa', label: 'Mapa', icon: MapPin, path: '/mapa' },
-    { id: 'profesionales', label: 'Profesionales', icon: Users, path: '/profesionales' },
+    ...(isSignedIn ? [{ id: 'profesionales', label: 'Profesionales', icon: Users, path: '/profesionales' }] : []),
     { id: 'perfil', label: 'Perfil', icon: User, path: '/perfil' },
   ];
 

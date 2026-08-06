@@ -8,7 +8,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import apadeaIcon from "../assets/apadea.png";
 
 // Base URL del backend (Vite)
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
 
 const iconoApadea = L.divIcon({
   className: "icono-apadea",

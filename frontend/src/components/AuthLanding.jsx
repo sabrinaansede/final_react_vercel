@@ -4,12 +4,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import LoginForm from "./LoginForm.jsx";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
 
 const AuthLanding = ({ initialTab = "login" }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, enterGuestMode } = useAuth();
 
   const [activeTab, setActiveTab] = useState(initialTab);
 
@@ -73,6 +73,11 @@ const AuthLanding = ({ initialTab = "login" }) => {
     } finally {
       setRegLoading(false);
     }
+  };
+
+  const handleGuestAccess = () => {
+    enterGuestMode();
+    navigate("/", { replace: true });
   };
 
   return (
@@ -190,6 +195,15 @@ const AuthLanding = ({ initialTab = "login" }) => {
               </p>
             )}
           </div>
+        </div>
+
+        <div className="card" style={{ marginTop: 16, maxWidth: 640, marginLeft: "auto", marginRight: "auto" }}>
+          <button type="button" onClick={handleGuestAccess} className="btn btn-primary" style={{ width: "100%" }}>
+            Explorar sin cuenta
+          </button>
+          <p className="msg msg-success" style={{ marginTop: 10, textAlign: "center" }}>
+            Podrás ver información pública, el mapa y recursos educativos sin crear una cuenta.
+          </p>
         </div>
       </div>
     </div>

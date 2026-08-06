@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Heart, Star } from 'lucide-react';
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
 
 const categorias = ["todas", "respiración", "relajación", "enfoque", "movimiento", "sensorial"];
 

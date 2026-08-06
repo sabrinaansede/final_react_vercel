@@ -41,17 +41,17 @@ const DescargarApp = () => {
                 />
               </div>
               <p className="text-sm text-gray-500 mt-3 font-semibold tracking-wide text-center">
-                Escaneá para descargar
+                Escaneá para abrir la app de AutiSi
               </p>
             </div>
 
             {/* Información central */}
             <div className="text-center md:text-left">
               <h2 className="text-3xl sm:text-4xl font-extrabold text-navy mb-4">
-                Descargá la app
+                Descargá AutiSi
               </h2>
               <p className="text-gray-600 text-lg leading-relaxed">
-                Escaneá el código QR o utilizá los botones de descarga para obtener AutiSi en tu dispositivo.
+                Escaneá el código QR o utilizá las opciones de instalación para abrir la app oficial de AutiSi en tu dispositivo.
               </p>
             </div>
 
@@ -72,7 +72,9 @@ const DescargarApp = () => {
                 </button>
               ) : (
                 <a
-                  href="/"
+                  href="https://autisi.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-4 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-all shadow-md hover:shadow-lg duration-300 group hover:-translate-y-0.5 w-full md:w-auto justify-center"
                 >
                   <svg className="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="currentColor">
@@ -86,7 +88,9 @@ const DescargarApp = () => {
               )}
 
               <a
-                href="#"
+                href="https://autisi.app"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-4 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-all shadow-md hover:shadow-lg duration-300 group hover:-translate-y-0.5 w-full md:w-auto justify-center"
               >
                 <svg className="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="currentColor">

@@ -4,7 +4,11 @@ import './index.css'
 import App from './App.jsx'
 import { registerSW } from 'virtual:pwa-register'
 
-registerSW({ immediate: true })
+registerSW({
+  immediate: true,
+  onNeedRefresh() {},
+  onOfflineReady() {},
+})
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.svg'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.svg', 'icons/autisi-icon.svg'],
       manifest: {
         name: 'AutiSi',
         short_name: 'AutiSi',
@@ -20,6 +20,8 @@ export default defineConfig({
         display: 'standalone',
         scope: '/',
         start_url: '/',
+        orientation: 'portrait',
+        categories: ['productivity', 'lifestyle', 'health'],
         icons: [
           {
             src: '/icons/autisi-icon.svg',
@@ -27,7 +29,17 @@ export default defineConfig({
             type: 'image/svg+xml',
             purpose: 'any',
           },
+          {
+            src: '/icons/autisi-icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'maskable',
+          },
         ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff2}'],
+        maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
       },
     }),
   ],

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu, X, Download } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -32,13 +32,6 @@ const Header = () => {
                 {link.label}
               </a>
             ))}
-            <a
-              href="#descargar-app"
-              className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-primary-dark transition-all shadow-md hover:shadow-lg"
-            >
-              <Download size={16} />
-              Descargar App
-            </a>
           </div>
 
           <button
@@ -62,14 +55,6 @@ const Header = () => {
                 {link.label}
               </a>
             ))}
-            <a
-              href="#descargar-app"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-bold"
-            >
-              <Download size={16} />
-              Descargar App
-            </a>
           </div>
         )}
       </nav>

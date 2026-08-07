@@ -53,16 +53,6 @@ const Hero = () => {
             con autismo y sus familias. Explorá, preparate y disfrutá con tranquilidad.
           </p>
 
-          <div className="flex flex-wrap gap-4 mb-8">
-            <button
-              type="button"
-              onClick={handleInstall}
-              className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-primary-dark transition-all shadow-md hover:shadow-lg"
-            >
-              <Download size={18} />
-              Instalar App
-            </button>
-          </div>
           {installMessage && (
             <p className="text-sm text-white/80 max-w-md">{installMessage}</p>
           )}

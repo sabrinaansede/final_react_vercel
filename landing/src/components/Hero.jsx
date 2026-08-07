@@ -28,11 +28,13 @@ const Hero = () => {
 
           <div className="flex flex-wrap gap-4 mb-8">
             <a
-              href="#descargar-app"
+              href="https://autisi-mobile.netlify.app"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-primary text-white px-7 py-3.5 rounded-full font-bold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               <Download size={18} />
-              Descargar App
+              Instalar App
             </a>
           </div>
         </div>

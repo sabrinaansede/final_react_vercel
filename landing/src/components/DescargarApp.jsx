@@ -72,7 +72,7 @@ const DescargarApp = () => {
                 </button>
               ) : (
                 <a
-                  href="https://autisi.app"
+                  href="https://autisi-mobile.netlify.app"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-4 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition-all shadow-md hover:shadow-lg duration-300 group hover:-translate-y-0.5 w-full md:w-auto justify-center"

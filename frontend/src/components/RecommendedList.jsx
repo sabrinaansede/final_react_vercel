@@ -11,8 +11,15 @@ const normalizeImageUrl = (src) => {
   if (!src) return '';
   if (typeof src === 'object' && src.default) return src.default;
   if (typeof src === 'object' && src.src) return src.src;
-  if (src.startsWith('/uploads/')) return `${API_URL}${src}`;
-  if (src.startsWith('uploads/')) return `${API_URL}/${src}`;
+  if (typeof src === 'string') {
+    const trimmed = src.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('data:image')) return trimmed;
+    if (trimmed.startsWith('/uploads/')) return `${API_URL}${trimmed}`;
+    if (trimmed.startsWith('uploads/')) return `${API_URL}/${trimmed}`;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+    return trimmed;
+  }
   return src;
 };
 
@@ -103,9 +110,15 @@ const RecommendedList = ({ places = [] }) => {
                   <div
                     className="w-full h-full bg-cover bg-center bg-slate-100 group-hover:scale-105 transition-transform duration-300"
                     style={{
-                      backgroundImage: `url(${img})`,
+                      backgroundImage: img ? `url(${img})` : undefined,
                     }}
-                  />
+                  >
+                    {!img && (
+                      <div className="w-full h-full flex items-center justify-center text-sm text-slate-400">
+                        Sin imagen
+                      </div>
+                    )}
+                  </div>
                   <div className={`absolute top-2 right-2 w-7 h-7 lg:w-9 lg:h-9 rounded-full flex items-center justify-center text-xs lg:text-sm font-semibold text-white ${isApadea ? 'bg-teal-400' : 'bg-[#43A1F2]'}`}>
                     <Check size={14} lg:size={18} />
                   </div>

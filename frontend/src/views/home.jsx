@@ -83,7 +83,6 @@ const Home = () => {
         {isGuest ? (
           <>
             <QuickAccessGrid items={[
-              { id: 'centro', kicker: 'Información', title: 'Recursos sobre autismo', to: '/centro-informacion' },
               { id: 'mapa', kicker: 'Mapa', title: 'Lugares adaptados', to: '/mapa' },
               { id: 'tecnicas', kicker: 'Técnicas', title: 'Técnicas sensoriales', to: '/tecnicas' },
             ]} />
@@ -126,7 +125,6 @@ const Home = () => {
             </section>
 
             <QuickAccessGrid items={[
-              { id: 'centro', kicker: 'Información', title: 'Recursos sobre autismo', to: '/centro-informacion' },
               { id: 'mapa', kicker: 'Mapa', title: 'Lugares adaptados', to: '/mapa' },
               { id: 'tecnicas', kicker: 'Técnicas', title: 'Técnicas sensoriales', to: '/tecnicas' },
               { id: 'comunidad', kicker: 'Comunidad', title: 'Foro y experiencias', to: '/comunidad' },

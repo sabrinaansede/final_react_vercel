@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  MessageSquare, 
-  Star, 
-  Heart, 
-  MapPin, 
-  Calendar, 
-  ThumbsUp, 
-  User, 
-  Mail, 
-  Clock, 
+import {
+  MessageSquare,
+  Star,
+  Heart,
+  MapPin,
+  Calendar,
+  ThumbsUp,
+  User,
+  Mail,
+  Clock,
   Activity,
   Settings,
   LogOut,
   Plus,
   RefreshCw,
-  ChevronRight
+  ChevronRight,
+  LayoutDashboard
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
 import './Dashboard.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://autisi-backend.onrender.com';
@@ -39,6 +41,7 @@ const LoadingSkeleton = () => (
 );
 
 const Dashboard = () => {
+  const { isAdmin } = useAuth();
   const [userData, setUserData] = useState(null);
   const [stats, setStats] = useState({
     totalResenas: 0,
@@ -235,11 +238,21 @@ const Dashboard = () => {
 
         <div className="quick-actions">
           <h4>Acciones Rápidas</h4>
+          {isAdmin && (
+            <button
+              className="action-btn"
+              style={{ backgroundColor: '#43A1F2', color: 'white' }}
+              onClick={() => navigate('/admin')}
+            >
+              <LayoutDashboard size={18} />
+              <span>Panel Admin</span>
+            </button>
+          )}
           <button className="action-btn">
             <Settings size={18} />
             <span>Configuración</span>
           </button>
-          <button 
+          <button
             className="action-btn text-danger"
             onClick={() => {
               localStorage.removeItem('token');

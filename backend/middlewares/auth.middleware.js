@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-export default function authMiddleware(req, res, next) {
+export function authenticateToken(req, res, next) {
   const authHeader = req.headers.authorization || "";
   const [, token] = authHeader.split(" ");
 
@@ -18,3 +18,5 @@ export default function authMiddleware(req, res, next) {
     return res.status(401).json({ message: "Token inválido o expirado" });
   }
 }
+
+export default authenticateToken;

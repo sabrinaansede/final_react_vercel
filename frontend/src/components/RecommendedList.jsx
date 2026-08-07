@@ -63,7 +63,7 @@ const RecommendedList = ({ places = [] }) => {
   return (
     <div className="mb-5">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="home-section-heading">Recomendados para vos</h2>
+        <h2 className="text-[18px] font-bold text-[#0f172a]">Recomendados para vos</h2>
         {places.length > 3 && !showAll && (
           <button 
             className="bg-[#43A1F2] text-white border-none px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all hover:bg-[#2E7BB8] hover:-translate-y-0.5"
@@ -94,28 +94,35 @@ const RecommendedList = ({ places = [] }) => {
                          (p.nombre || '').toLowerCase().includes('bullrich');
           
           return (
-            <div key={p._id} className="min-w-[240px] flex-shrink-0 lg:min-w-0 lg:flex-1">
+            <div key={p._id} className="min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-1">
               <div
-                className="flex flex-col bg-white rounded-2xl overflow-hidden cursor-pointer shadow-md border border-blue-50 transition-all hover:-translate-y-1 hover:shadow-lg"
+                className="flex flex-col bg-white rounded-2xl overflow-hidden cursor-pointer shadow-md border border-blue-50 transition-all hover:-translate-y-1 hover:shadow-lg group"
                 onClick={() => navigate(`/lugar/${p._id}`)}
               >
-                <div className="relative w-full h-[180px] rounded-t-2xl overflow-hidden">
+                <div className="relative w-full h-[140px] lg:h-[220px] rounded-t-2xl overflow-hidden">
                   <div
-                    className="w-full h-full bg-cover bg-center bg-slate-100"
+                    className="w-full h-full bg-cover bg-center bg-slate-100 group-hover:scale-105 transition-transform duration-300"
                     style={{
                       backgroundImage: `url(${img})`,
                     }}
                   />
-                  <div className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white ${isApadea ? 'bg-teal-400' : 'bg-[#43A1F2]'}`}>
-                    <Check size={16} />
+                  <div className={`absolute top-2 right-2 w-7 h-7 lg:w-9 lg:h-9 rounded-full flex items-center justify-center text-xs lg:text-sm font-semibold text-white ${isApadea ? 'bg-teal-400' : 'bg-[#43A1F2]'}`}>
+                    <Check size={14} lg:size={18} />
+                  </div>
+                  <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 lg:px-2 lg:py-1 rounded-lg">
+                    <div className="text-[#43A1F2] text-[10px] lg:text-xs font-semibold">{p.tipo || 'Categoría'}</div>
                   </div>
                 </div>
-                <div className="p-4 flex-1 flex flex-col">
-                  <div className="font-bold text-base text-[#1b2a4a] mb-1 leading-tight">{p.nombre}</div>
-                  <div className="text-[#43A1F2] text-sm font-semibold mb-2">{p.tipo || 'Categoría'}</div>
-                  <div className="mt-auto flex justify-between items-center text-sm text-gray-500">
-                    <span className="flex items-center gap-1">📍 {distance}</span>
-                    <span className="bg-orange-50 text-orange-500 px-2 py-1 rounded text-sm font-semibold">⭐ {rating.toFixed(1)}</span>
+                <div className="p-3 lg:p-5 flex-1 flex flex-col">
+                  <div className="font-bold text-sm lg:text-lg text-[#1b2a4a] mb-1 leading-tight">{p.nombre}</div>
+                  <div className="mt-auto flex justify-between items-center text-xs lg:text-sm text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <span className="text-sm lg:text-base">📍</span>
+                      <span className="font-medium">{distance}</span>
+                    </span>
+                    <span className="bg-orange-50 text-orange-500 px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-lg text-xs lg:text-sm font-semibold flex items-center gap-1">
+                      ⭐ {rating.toFixed(1)}
+                    </span>
                   </div>
                 </div>
               </div>

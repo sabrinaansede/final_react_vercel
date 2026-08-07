@@ -14,6 +14,41 @@
   --color-navbar-button: #f9f9f9; /* fondo botón navbar (light) */
   --nav-h: 94px; /* navbar-inner 70px + padding vertical */
   --mobile-nav-h: 72px;
+  
+  /* Escala tipográfica Desktop */
+  --font-size-h1-desktop: 44px;
+  --font-size-h2-desktop: 34px;
+  --font-size-h3-desktop: 26px;
+  --font-size-card-title-desktop: 21px;
+  --font-size-text-highlighted-desktop: 18px;
+  --font-size-text-main-desktop: 16px;
+  --font-size-text-secondary-desktop: 14px;
+  --font-size-text-help-desktop: 13px;
+  --font-size-badge-desktop: 12px;
+  --font-size-button-desktop: 16px;
+  --font-size-input-desktop: 16px;
+  
+  /* Escala tipográfica Mobile */
+  --font-size-h1-mobile: 32px;
+  --font-size-h2-mobile: 26px;
+  --font-size-h3-mobile: 21px;
+  --font-size-card-title-mobile: 19px;
+  --font-size-text-highlighted-mobile: 17px;
+  --font-size-text-main-mobile: 16px;
+  --font-size-text-secondary-mobile: 14px;
+  --font-size-text-help-mobile: 13px;
+  --font-size-badge-mobile: 12px;
+  --font-size-button-mobile: 16px;
+  --font-size-input-mobile: 16px;
+  --font-size-navbar-mobile: 12px;
+  
+  /* Line heights */
+  --line-height-title: 125%;
+  --line-height-text: 150%;
+  
+  /* Spacing */
+  --spacing-section: 28px;
+  --padding-card: 18px;
 }
 
 /* Base reset */
@@ -311,12 +346,12 @@ a:hover { text-decoration: underline; }
 .input:focus, .select:focus { border-color: var(--color-brand); }
 
 .btn { border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; }
-/* Botones: blanco por defecto, azul #45a1f3 en hover */
+/* Botones: blanco por defecto, azul #43A1F2 en hover */
 .btn-primary { background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; }
-.btn-primary:hover { background: #45a1f3; color: #fff; border-color: #45a1f3; }
+.btn-primary:hover { background: #43A1F2; color: #fff; border-color: #43A1F2; }
 /* Botón secundario también blanco por defecto */
 .btn-secondary { background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; }
-.btn-secondary:hover { background: #45a1f3; color: #fff; border-color: #45a1f3; }
+.btn-secondary:hover { background: #43A1F2; color: #fff; border-color: #43A1F2; }
 .btn:disabled { opacity: .6; cursor: default; }
 
 .msg { margin-top: 10px; font-weight: 600; }
@@ -337,29 +372,7 @@ body {
   margin: 0 0 0.75rem 0;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+/* Eliminados estilos globales que interfieren con Tailwind CSS */
 
 @media (max-width: 768px) {
   .home-container { padding: 16px 12px 96px; }
@@ -461,15 +474,13 @@ button:focus-visible {
   .mobile-menu-button { display: block !important; }
 
   /* Put hamburger to the left and logo to the right on mobile */
-  .navbar-inner { display: flex; align-items: center; gap: 8px; }
-  .mobile-menu-button { order: 0; margin-left: 4px; }
-  .navbar-brand { order: 1; margin: 0 auto; display: flex; align-items: center; }
-  .navbar-logo { height: 54px; width: auto; max-width: 180px; }
-}
+  .navbar-inner { display: flex; align-items: center; gap: 8px; justify-content: flex-start; }
+  .mobile-menu-button { order: 0; margin-left: 0; }
+  .navbar-brand { order: 1; margin: 0 0 0 auto; display: flex; align-items: center; }
+  .navbar-logo { height: 40px; width: auto; max-width: 140px; }
 
-/* Ocultar los botones principales (Ver mapa, Ver técnicas, Contacto) en móvil
-   porque ya están accesibles desde las mini-cards */
-@media (max-width: 768px) {
+  /* Ocultar los botones principales (Ver mapa, Ver técnicas, Contacto) en móvil
+     porque ya están accesibles desde las mini-cards */
   .home-tabs { display: none !important; }
 }
 
@@ -586,11 +597,16 @@ button:focus-visible {
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 0.75rem 1.25rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .navbar-inner {
+    height: 56px;
   }
   
   .navbar-logo {
     height: 40px;
+    max-width: 140px;
   }
   
   .nav-links {
@@ -738,18 +754,18 @@ button:focus-visible {
 
 /* Botones SOLO de la toolbar: blanco por defecto, hover azul */
 .sidebar-light .toolbar .menu-button { background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; }
-.sidebar-light .toolbar .menu-button:hover { background: #45a1f3; color: #ffffff; border-color: #45a1f3; }
+.sidebar-light .toolbar .menu-button:hover { background: #43A1F2; color: #ffffff; border-color: #43A1F2; }
 
 /* Ítems del menú desplegable: blanco por defecto; hover azul */
 .sidebar-light .menu .menu-item { background: #ffffff; color: #0f172a; }
-.sidebar-light .menu .menu-item:hover { background: #45a1f3; color: #ffffff; border-color: #45a1f3; }
+.sidebar-light .menu .menu-item:hover { background: #43A1F2; color: #ffffff; border-color: #43A1F2; }
 
 .place-list { display: grid; gap: 10px; max-height: 340px; overflow-y: auto; padding-right: 2px; }
 .place-list::-webkit-scrollbar { width: 6px; }
 .place-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 999px; }
 .place-item { display: grid; grid-template-columns: 42px 1fr; gap: 12px; align-items: center; text-align: left; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; cursor: pointer; color: #0f172a; min-height: 56px; transition: background-color .2s, color .2s, border-color .2s, box-shadow .2s; }
-.place-item:focus, .place-item:active { background: #ffffff; color: #0f172a; border-color: #e2e8f0; outline: none; box-shadow: 0 0 0 3px rgba(69,161,243,.2); }
-.place-item:hover { background: #45a1f3; border-color: #45a1f3; color: #ffffff; }
+.place-item:focus, .place-item:active { background: #ffffff; color: #0f172a; border-color: #e2e8f0; outline: none; box-shadow: 0 0 0 3px rgba(67,161,242,.2); }
+.place-item:hover { background: #43A1F2; border-color: #43A1F2; color: #ffffff; }
 .place-item:hover .place-title, .place-item:hover .place-sub { color: #ffffff; }
 .place-item.selected {
   background: #e0f2fe;
@@ -874,7 +890,7 @@ button:focus-visible {
 .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 12px; }
 .toolbar-group { position: relative; }
 .menu-button { border: 1px solid #e2e8f0; background: #ffffff; color: #0f172a; padding: 8px 12px; border-radius: 999px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; }
-.menu-button:hover { background: #45a1f3; color: #fff; border-color: #45a1f3; }
+.menu-button:hover { background: #43A1F2; color: #fff; border-color: #43A1F2; }
 .menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; min-width: 240px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.12); padding: 10px; }
 .menu-item { width: 100%; text-align: left; padding: 8px 10px; border: 1px solid transparent; background: #fff; border-radius: 8px; cursor: pointer; color: #0f172a; }
 .menu-item:hover { background: #f8fafc; border-color: #e2e8f0; }

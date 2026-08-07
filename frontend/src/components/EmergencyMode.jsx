@@ -97,7 +97,7 @@ const EmergencyMode = ({ isOpen, onClose }) => {
               onClick={() => setSelectedOption(null)}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <X size={24} className="text-gray-600" />
+              <X size={20} className="text-gray-600" />
             </button>
           </div>
           
@@ -161,7 +161,7 @@ const EmergencyMode = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[10000] p-4" onClick={onClose}>
-      <div className="bg-white rounded-[24px] max-w-[95%] sm:max-w-[90%] w-full max-h-[95vh] sm:max-h-[85vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-[24px] max-w-[90%] w-full max-h-[85vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <button 
           className="absolute top-4 right-4 text-2xl text-slate-400 hover:text-slate-600 cursor-pointer z-[10001] bg-white/80 rounded-full w-8 h-8 flex items-center justify-center"
           onClick={onClose}
@@ -171,36 +171,38 @@ const EmergencyMode = ({ isOpen, onClose }) => {
         </button>
         
         {/* Encabezado */}
-        <div className="p-4 sm:p-6 text-center border-b border-slate-200">
-          <div className="flex justify-center mb-3 sm:mb-4">
-            <div className="p-3 sm:p-4 bg-gradient-to-br from-red-500 to-orange-500 rounded-full">
-              <AlertTriangle size={32} className="text-white sm:w-10 sm:h-10" />
+        <div className="p-4 md:p-6 text-center border-b border-slate-200">
+          <div className="flex justify-center mb-3 md:mb-4">
+            <div className="p-3 md:p-4 bg-gradient-to-br from-red-500 to-orange-500 rounded-full">
+              <AlertTriangle size={32} className="text-white md:size-40" />
             </div>
           </div>
-          <h2 className="text-2xl sm:text-[38px] font-bold text-slate-800 mb-2">Modo de Emergencia</h2>
-          <p className="text-sm sm:text-[18px] text-slate-600">Seleccioná una opción para recibir ayuda rápidamente.</p>
+          <h2 className="text-2xl md:text-[38px] font-bold text-slate-800 mb-2">Modo de Emergencia</h2>
+          <p className="text-sm md:text-[18px] text-slate-600">Seleccioná una opción para recibir ayuda rápidamente.</p>
         </div>
         
         {/* Opciones de emergencia */}
-        <div className="p-4 sm:p-6">
-          <div className="space-y-3 sm:space-y-4">
+        <div className="p-4 md:p-6">
+          <div className="space-y-3 md:space-y-4">
             {emergencyOptions.map((option) => {
               const Icon = option.icon;
               return (
                 <button
                   key={option.id}
                   onClick={option.onClick}
-                  className="w-full min-h-[96px] sm:h-[130px] bg-white rounded-xl border-2 border-slate-200 shadow-md hover:shadow-lg transition-all duration-300 flex items-center px-4 sm:px-6 hover:border-[#43A1F2]"
+                  className="w-full h-auto min-h-[100px] md:h-[130px] bg-white rounded-xl border-2 border-slate-200 shadow-md hover:shadow-lg transition-all duration-300 flex items-center px-4 md:px-6 py-4 md:py-0 hover:border-[#43A1F2]"
                 >
-                  <div className={`p-3 sm:p-4 rounded-xl ${option.iconColor} bg-white shadow-sm flex-shrink-0`}>
-                    <Icon size={24} className="sm:w-8 sm:h-8" />
+                  <div className={`p-3 md:p-4 rounded-xl ${option.iconColor} bg-white shadow-sm flex-shrink-0`}>
+                    <Icon size={24} className="md:hidden" />
+                    <Icon size={32} className="hidden md:block" />
                   </div>
-                  <div className="flex-1 ml-3 sm:ml-4 text-left min-w-0">
-                    <h3 className="text-base sm:text-xl font-bold text-slate-800 mb-1">{option.title}</h3>
-                    <p className="text-sm sm:text-base text-slate-600 leading-5 sm:leading-6">{option.description}</p>
+                  <div className="flex-1 ml-3 md:ml-4 text-left">
+                    <h3 className="text-base md:text-xl font-bold text-slate-800 mb-1">{option.title}</h3>
+                    <p className="text-xs md:text-base text-slate-600">{option.description}</p>
                   </div>
-                  <div className="p-2 sm:p-3 bg-slate-100 rounded-full flex-shrink-0">
-                    <ChevronRight size={20} className="sm:w-6 sm:h-6 text-slate-600" />
+                  <div className="p-2 md:p-3 bg-slate-100 rounded-full ml-2 flex-shrink-0">
+                    <ChevronRight size={20} className="text-slate-600 md:hidden" />
+                    <ChevronRight size={24} className="hidden md:block text-slate-600" />
                   </div>
                 </button>
               );
@@ -209,10 +211,10 @@ const EmergencyMode = ({ isOpen, onClose }) => {
         </div>
 
         {/* Botón cancelar */}
-        <div className="p-4 sm:p-6 border-t border-slate-200">
+        <div className="p-4 md:p-6 border-t border-slate-200">
           <button
             onClick={onClose}
-            className="w-full py-3 sm:py-4 bg-white border-2 border-red-500 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-colors text-base sm:text-lg"
+            className="w-full py-3 md:py-4 bg-white border-2 border-red-500 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-colors text-base md:text-lg"
           >
             Cancelar
           </button>

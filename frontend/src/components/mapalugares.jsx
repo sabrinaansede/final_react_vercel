@@ -6,6 +6,7 @@ import "../App.css";
 import LeyendaMapa from "./LeyendaMapa";
 import { useAuth } from "../context/AuthContext.jsx";
 import apadeaIcon from "../assets/apadea.png";
+import { MapPin, CheckCircle, Star, Check } from 'lucide-react';
 
 // Base URL del backend (Vite)
 const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
@@ -23,8 +24,9 @@ const iconoComunidad = L.divIcon({
   html: `
     <div class="pin">
       <div class="badge">
-        <svg class="glyph" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path fill="currentColor" d="M12 12c2.761 0 5-2.686 5-6s-2.239-6-5-6-5 2.686-5 6 2.239 6 5 6zm0 2c-3.866 0-7 2.239-7 5v3h14v-3c0-2.761-3.134-5-7-5z"/>
+        <svg class="glyph" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
         </svg>
       </div>
     </div>
@@ -531,9 +533,7 @@ export default function MapaLugares() {
                     </div>
                     <div className="marker-popup-body">
                       <div className="address">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="12" height="12">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
+                        <MapPin size={12} className="text-gray-500" />
                         <span>{lugar.direccion || 'Sin dirección'}</span>
                       </div>
                       
@@ -545,9 +545,7 @@ export default function MapaLugares() {
                           )}
                           {getCert(lugar) === 'APADEA' && (
                             <span className="tag apadea-tag">
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginRight: '4px'}}>
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#1e40af"/>
-                              </svg>
+                              <CheckCircle size={12} className="text-[#1e40af]" style={{marginRight: '4px'}} />
                               Certificado APADEA
                             </span>
                           )}
@@ -555,7 +553,7 @@ export default function MapaLugares() {
                       )}
                       
                       <button 
-                        className="details-button"
+                        className="w-full bg-[#43A1F2] text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-[#2E7BB8] transition-colors"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -574,10 +572,10 @@ export default function MapaLugares() {
           </MapContainer>
 
           <div className={`map-controls ${detalleLugar ? 'hidden' : ''}`}>
-            <button type="button" className="map-control-btn" onClick={centrarUbicacionActual}>
+            <button type="button" className="!bg-white text-[#0f172a] border border-[#e2e8f0] px-[14px] py-[10px] !rounded-full shadow-[0_12px_28px_rgba(15,23,42,0.16)] cursor-pointer font-bold min-w-[170px] transition-transform hover:-translate-y-px hover:bg-[#f8fbff]" onClick={centrarUbicacionActual}>
               Mi ubicación
             </button>
-            <button type="button" className="map-control-btn map-control-add" onClick={abrirPanelAgregar}>
+            <button type="button" className="!bg-[#43A1F2] !text-white !border-transparent px-[14px] py-[10px] !rounded-full shadow-[0_12px_28px_rgba(15,23,42,0.16)] cursor-pointer font-bold min-w-[170px] transition-transform hover:-translate-y-px hover:!bg-[#1f6ed8]" onClick={abrirPanelAgregar}>
               + Agregar lugar
             </button>
           </div>
@@ -588,7 +586,7 @@ export default function MapaLugares() {
           <div className="preview-title">Explorar lugares</div>
           <div className="preview-subtitle">Abrí el panel para ver lugares y agregar uno nuevo.</div>
         </div>
-        <button type="button" className="preview-open">Abrir</button>
+        <button type="button" className="bg-[#43A1F2] text-white rounded-full px-4 py-2.5 border-none font-bold hover:bg-[#2E7BB8] transition-colors">Abrir</button>
       </div>
 
       <div ref={panelRef} className={`formulario-lugar ${sheetExpanded ? 'sheet-open' : 'sheet-closed'}`}>
@@ -712,7 +710,14 @@ export default function MapaLugares() {
         </div>
         
         {showAddForm && (
-          <div className="card">
+          <div className="card pb-56 md:pb-0 relative">
+            <button 
+              className="absolute top-2 right-2 text-2xl text-slate-400 hover:text-slate-600 cursor-pointer bg-white/80 rounded-full w-8 h-8 flex items-center justify-center z-10"
+              onClick={() => setShowAddForm(false)}
+              aria-label="Cerrar formulario"
+            >
+              &times;
+            </button>
             <div className="card-title">Agregar nuevo lugar</div>
             <p className="label">
               Podés escribir la dirección real y el sistema la geocodificará automáticamente.
@@ -811,7 +816,7 @@ export default function MapaLugares() {
               />
             </div>
             <button
-              className="btn btn-primary"
+              className="w-full bg-[#43A1F2] text-white px-4 py-2.5 rounded-lg font-medium text-sm hover:bg-[#2E7BB8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               type="submit"
               disabled={!nuevoLugar.nombre || !nuevoLugar.direccion}
             >
@@ -872,9 +877,13 @@ export default function MapaLugares() {
                     <div className="flex items-center gap-2">
                       <div className="flex text-yellow-400 text-sm">
                         {[1, 2, 3, 4, 5].map((n) => (
-                          <svg key={n} width={18} height={18} viewBox="0 0 24 24" fill={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "currentColor" : "none"} stroke={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "none" : "currentColor"} strokeWidth="2">
-                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                          </svg>
+                          <Star 
+                            key={n} 
+                            size={18} 
+                            fill={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "currentColor" : "none"} 
+                            stroke={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "none" : "currentColor"}
+                            strokeWidth={2}
+                          />
                         ))}
                       </div>
                       <span className="text-sm font-semibold text-slate-700">
@@ -896,9 +905,7 @@ export default function MapaLugares() {
                   <div className="flex gap-3">
                     {detalleLugar.certificadoPor === 'APADEA' && (
                       <div className="flex items-center gap-2 px-3 py-2 bg-white border border-[#43A1F2]/30 rounded-lg shadow-sm">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#43A1F2"/>
-                        </svg>
+                        <CheckCircle size={18} className="text-[#43A1F2]" />
                         <div>
                           <div className="text-xs font-bold text-[#43A1F2]">Certificado APADEA</div>
                           <div className="text-[10px] text-[#43A1F2]/70">Validación oficial</div>
@@ -906,9 +913,7 @@ export default function MapaLugares() {
                       </div>
                     )}
                     <div className="flex items-center gap-2 px-3 py-2 bg-white border border-[#43A1F2]/30 rounded-lg shadow-sm">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-[#43A1F2]">
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                      </svg>
+                      <Star size={18} className="text-[#43A1F2]" fill="currentColor" />
                       <div>
                         <div className="text-xs font-bold text-[#43A1F2]">Validado por comunidad</div>
                       </div>

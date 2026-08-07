@@ -3,25 +3,29 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const usuarioSchema = new Schema({
-  nombre: { 
-    type: String, 
+  nombre: {
+    type: String,
   },
-  email: { 
-    type: String, 
-    required: true, 
+  email: {
+    type: String,
+    required: true,
     unique: true,
   },
-  password: { 
-    type: String, 
+  password: {
+    type: String,
     required: true,
   },
-  telefono: { 
-    type: String, 
+  telefono: {
+    type: String,
   },
-  tipoUsuario: { 
-    type: String, 
-    enum: ['padre', 'persona', 'local'], 
-    default: 'persona' 
+  tipoUsuario: {
+    type: String,
+    enum: ['padre', 'persona', 'local'],
+    default: 'persona'
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
   },
 }, { timestamps: true });
 

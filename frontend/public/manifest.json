@@ -1,0 +1,35 @@
+{
+  "name": "AutiSi - Lugares Seguros",
+  "short_name": "AutiSi",
+  "description": "Plataforma para encontrar lugares adaptados y seguros para personas con autismo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#43A1F2",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/autisi-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["health", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Mapa",
+      "short_name": "Mapa",
+      "description": "Ver mapa de lugares adaptados",
+      "url": "/mapa",
+      "icons": [{ "src": "/icons/autisi-icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Comunidad",
+      "short_name": "Comunidad",
+      "description": "Ver comunidad y experiencias",
+      "url": "/comunidad",
+      "icons": [{ "src": "/icons/autisi-icon.svg", "sizes": "any" }]
+    }
+  ]
+}

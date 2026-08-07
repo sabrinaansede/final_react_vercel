@@ -4,7 +4,6 @@ import {
   Bell,
   Heart,
   ImagePlus,
-  Menu,
   MessageCircle,
   Bookmark,
   MoreHorizontal,
@@ -174,14 +173,6 @@ const Comunidad = () => {
   return (
     <div className="comunidad-page">
       <header className="comunidad-header">
-        <button
-          type="button"
-          className="comunidad-header-btn"
-          aria-label="Menú"
-          onClick={() => navigate('/')}
-        >
-          <Menu size={22} />
-        </button>
         <div className="comunidad-logo">
           <span className="comunidad-logo-line">Comunidad</span>
           <span className="comunidad-logo-brand">AutiSi</span>

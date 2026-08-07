@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Home, MapPin, Users, BookOpen, CheckSquare, MessageCircle, MessagesSquare, Mail, User, UserPlus, Info } from "lucide-react";
+import { Menu, X, Home, MapPin, Users, BookOpen, CheckSquare, MessageCircle, MessagesSquare, Mail, User, UserPlus, Info, LayoutDashboard } from "lucide-react";
 import logo from "../assets/logo.png";
 
 const Navbar = () => {
@@ -95,13 +95,24 @@ const Navbar = () => {
           <NavLink to="/profesionales" className="nav-link">
             Profesionales
           </NavLink>
-          <NavLink to="/perfil" className="nav-link">
-            Perfil
-          </NavLink>
-          {usuario && (
-            <button onClick={handleLogout} className="nav-button danger">
-              Salir
-            </button>
+          {usuario?.isAdmin && (
+            <NavLink to="/admin" className="nav-link" style={{ color: '#43A1F2', fontWeight: 'bold' }}>
+              Panel Admin
+            </NavLink>
+          )}
+          {usuario ? (
+            <>
+              <NavLink to="/perfil" className="nav-link">
+                Perfil
+              </NavLink>
+              <button onClick={handleLogout} className="nav-button danger">
+                Salir
+              </button>
+            </>
+          ) : (
+            <Link to="/login" className="nav-button">
+              Ingresar
+            </Link>
           )}
         </div>
         
@@ -164,6 +175,12 @@ const Navbar = () => {
                 <User size={20} />
                 <span>Perfil</span>
               </NavLink>
+              {usuario?.isAdmin && (
+                <NavLink to="/admin" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+                  <LayoutDashboard size={20} />
+                  <span>Panel Admin</span>
+                </NavLink>
+              )}
 
               <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="nav-button danger">
                 Salir

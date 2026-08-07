@@ -9,7 +9,6 @@ import ActiveChecklist from "../components/ActiveChecklist";
 import EmergencyMode from "../components/EmergencyMode";
 import { AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
-import './home.css';
 
 const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
 
@@ -70,11 +69,11 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-slate-50 px-4 pt-2 pb-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-4">
-          <h1 className="home-greeting-title">
+        <div className="mb-3 lg:mb-4">
+          <h1 className="text-[19px] lg:text-[22px] font-bold text-[#1b2a4a] leading-[1.3] mb-1">
             {isGuest ? "Explorá AutiSi sin cuenta" : `Hola, ${usuario?.nombre || ""} 👋`}
           </h1>
-          <p className="home-greeting-subtitle">
+          <p className="text-[14px] lg:text-[15px] text-[#64748b] leading-[1.4] max-w-[42rem]">
             {isGuest
               ? "Conocé información pública, el mapa de lugares adaptados y recursos educativos antes de registrarte."
               : "Este es tu espacio seguro para descubrir lugares preparados y recursos que acompañan el bienestar diario."}
@@ -82,8 +81,15 @@ const Home = () => {
         </div>
 
         {isGuest ? (
-          <section className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
-            <h2 className="home-section-heading mb-2">Contenido disponible para explorar</h2>
+          <>
+            <QuickAccessGrid items={[
+              { id: 'centro', kicker: 'Información', title: 'Recursos sobre autismo', to: '/centro-informacion' },
+              { id: 'mapa', kicker: 'Mapa', title: 'Lugares adaptados', to: '/mapa' },
+              { id: 'tecnicas', kicker: 'Técnicas', title: 'Técnicas sensoriales', to: '/tecnicas' },
+            ]} />
+
+          <section className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-5">
+            <h2 className="text-[18px] font-bold text-[#0f172a] mb-2">Contenido disponible para explorar</h2>
             <p className="text-sm text-gray-600 mb-4">
               Podés navegar por información general, recursos educativos y el mapa de lugares adaptados sin iniciar sesión.
             </p>
@@ -106,19 +112,12 @@ const Home = () => {
               <button type="button" onClick={() => navigate('/registro')} className="rounded-full border border-[#43A1F2] px-4 py-2 text-sm font-semibold text-[#43A1F2]">Crear cuenta</button>
             </div>
           </section>
+          </>
         ) : (
           <>
-            <button
-              onClick={() => setEmergencyModeOpen(true)}
-              className="w-full mb-4 p-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
-            >
-              <AlertTriangle size={22} />
-              <span className="text-base font-bold">Modo de Emergencia</span>
-            </button>
-
-            <section className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
-              <div className="mb-3">
-                <h2 className="home-section-heading mb-0.5">¿Cómo te sentís hoy?</h2>
+            <section className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 mb-5">
+              <div className="mb-2">
+                <h2 className="text-[16px] font-bold text-[#0f172a] mb-0.5">¿Cómo te sentís hoy?</h2>
                 <p className="text-xs text-gray-500">Elegí una carita para registrar tu estado de ánimo de hoy.</p>
                 {estadoAnimo && (
                   <span className="inline-block mt-2 text-sm text-[#43A1F2] font-semibold">
@@ -137,7 +136,7 @@ const Home = () => {
                   <button
                     key={m.id}
                     type="button"
-                    className={`flex flex-col items-center justify-center gap-1 p-2.5 rounded-lg border-2 transition-all min-w-[74px] ${
+                    className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg border-2 transition-all min-w-[70px] ${
                       estadoAnimo?.id === m.id 
                         ? "border-[#43A1F2] bg-blue-50" 
                         : "border-gray-200 hover:border-[#43A1F2] hover:bg-gray-50"
@@ -151,23 +150,29 @@ const Home = () => {
               </div>
             </section>
 
+            <QuickAccessGrid items={[
+              { id: 'centro', kicker: 'Información', title: 'Recursos sobre autismo', to: '/centro-informacion' },
+              { id: 'mapa', kicker: 'Mapa', title: 'Lugares adaptados', to: '/mapa' },
+              { id: 'tecnicas', kicker: 'Técnicas', title: 'Técnicas sensoriales', to: '/tecnicas' },
+              { id: 'comunidad', kicker: 'Comunidad', title: 'Foro y experiencias', to: '/comunidad' },
+              { id: 'checklist', kicker: 'Checklist', title: 'Checklist personalizado', to: '/checklist' },
+              { id: 'mislugares', kicker: 'Mis lugares', title: 'Lugares guardados', to: '/perfil' },
+              { id: 'resenas', kicker: 'Reseñas', title: 'Mis reseñas', to: '/mis-resenas' },
+            ]} />
+
+            <button
+              onClick={() => setEmergencyModeOpen(true)}
+              className="w-full mb-5 p-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
+            >
+              <AlertTriangle size={20} />
+              <span className="text-base font-semibold">Modo de Emergencia</span>
+            </button>
+
             <ActiveChecklist />
           </>
         )}
 
         <MainExploreCard subtitle="Buscá espacios preparados y recomendaciones de la comunidad." />
-
-        <QuickAccessGrid items={[
-          { id: 'centro', kicker: 'Información', title: 'Recursos sobre autismo', to: '/centro-informacion' },
-          { id: 'mapa', kicker: 'Mapa', title: 'Lugares adaptados', to: '/mapa' },
-          { id: 'tecnicas', kicker: 'Técnicas', title: 'Técnicas sensoriales', to: '/tecnicas' },
-          ...(isGuest ? [] : [
-            { id: 'comunidad', kicker: 'Comunidad', title: 'Foro y experiencias', to: '/comunidad' },
-            { id: 'checklist', kicker: 'Checklist', title: 'Checklist personalizado', to: '/checklist' },
-            { id: 'mislugares', kicker: 'Mis lugares', title: 'Lugares guardados', to: '/perfil' },
-            { id: 'resenas', kicker: 'Reseñas', title: 'Mis reseñas', to: '/mis-resenas' },
-          ])
-        ]} />
 
         <RecommendedList places={lugaresMostrar} />
       </div>

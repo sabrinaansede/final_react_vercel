@@ -65,8 +65,10 @@ export function AuthProvider({ children }) {
     window.dispatchEvent(new Event("storage"));
   };
 
+  const isAdmin = user?.isAdmin === true;
+
   return (
-    <AuthContext.Provider value={{ user, token, guestMode, login, logout, enterGuestMode }}>
+    <AuthContext.Provider value={{ user, token, guestMode, isAdmin, login, logout, enterGuestMode }}>
       {children}
     </AuthContext.Provider>
   );

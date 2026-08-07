@@ -1,174 +1,105 @@
-import React, { useMemo, useState } from 'react';
-import { ArrowLeft, Search } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { ArrowLeft, Search, Info, Book, Heart, Brain, Star, Lightbulb, Users, X } from 'lucide-react';
 
-const CONTENT = [
-  {
-    id: 'que-es-autismo',
-    title: '¿Qué es el autismo?',
-    icon: '🧠',
-    intro: 'El autismo es una forma de desarrollo neurológico que influye en la forma de percibir, comunicar y relacionarse con el entorno.',
-    sections: [
-      {
-        title: 'Idea clave',
-        text: 'Cada persona autista tiene características propias. Algunas necesitan apoyo en la comunicación, otras en la regulación sensorial o en la interacción social.',
-      },
-      {
-        title: 'Qué puede ayudar',
-        list: [
-          'Hablar con respeto y claridad.',
-          'Respetar los ritmos y preferencias de cada persona.',
-          'Brindar espacios predecibles y acompañados.',
-        ],
-      },
-    ],
-    highlight: 'El autismo no es una enfermedad, sino una forma de desarrollo distinta.',
-    related: ['Cómo apoyar a una persona autista', 'Mitos y realidades'],
+const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
+
+const ICON_MAP = {
+  Info,
+  Book,
+  Heart,
+  Brain,
+  Star,
+  Lightbulb,
+};
+
+const CATEGORY_INFO = {
+  'Comprender el TEA': {
+    description: 'Información fundamental sobre el Trastorno del Espectro Autista, sus características y cómo comprender mejor a las personas con TEA.',
+    articles: ['¿Qué es el Autismo?', 'Características del TEA', 'El espectro autista']
   },
-  {
-    id: 'apoyar-persona-autista',
-    title: '¿Cómo apoyar a una persona autista?',
-    icon: '🤝',
-    intro: 'El apoyo más útil suele ser cercano, respetuoso y adaptado a las necesidades individuales.',
-    sections: [
-      {
-        title: 'Recomendaciones prácticas',
-        list: [
-          'Ofrecer información concreta y sencilla.',
-          'Permitir pausas o tiempos de regulación.',
-          'Evitar presiones innecesarias cuando la persona está sobrecargada.',
-        ],
-      },
-      {
-        title: 'En la vida cotidiana',
-        text: 'Un ambiente predecible, con rutinas claras y un lenguaje comprensible, suele ayudar mucho a sentir seguridad.',
-      },
-    ],
-    highlight: 'Escuchar antes de interpretar facilita la conexión.',
-    related: ['Familias', 'Escuelas e inclusión'],
+  'Detección temprana': {
+    description: 'Señales de alerta, diagnóstico temprano y la importancia de la intervención oportuna en el desarrollo infantil.',
+    articles: ['Señales de alerta', 'Diagnóstico temprano', 'Intervención temprana']
   },
-  {
-    id: 'familias',
-    title: 'Familias',
-    icon: '👨‍👩‍👧',
-    intro: 'Las familias suelen ser parte esencial del acompañamiento, y también necesitan información, contención y redes de apoyo.',
-    sections: [
-      {
-        title: 'Qué puede ayudar',
-        list: [
-          'Buscar apoyo emocional y educativo.',
-          'Conectar con otros familiares y profesionales.',
-          'Reconocer los propios límites y necesidades.',
-        ],
-      },
-    ],
-    highlight: 'No estás solo/a: pedir ayuda es una forma de cuidado.',
-    related: ['Profesionales', 'Consejos para el día a día'],
+  'Educación inclusiva': {
+    description: 'Estrategias educativas, adaptaciones escolares y cómo fomentar un ambiente inclusivo para estudiantes con TEA.',
+    articles: ['Adaptaciones escolares', 'Estrategias educativas', 'Inclusión en el aula']
   },
-  {
-    id: 'escuelas-inclusion',
-    title: 'Escuelas e inclusión',
-    icon: '🏫',
-    intro: 'La inclusión escolar mejora cuando hay adaptación, comprensión y acompañamiento activo.',
-    sections: [
-      {
-        title: 'Para docentes y equipos',
-        list: [
-          'Proponer rutinas claras.',
-          'Utilizar lenguaje simple y visual.',
-          'Trabajar en colaboración con la familia.',
-        ],
-      },
-    ],
-    highlight: 'Las adaptaciones pequeñas pueden generar grandes cambios.',
-    related: ['Derechos y recursos', 'Mitos y realidades'],
+  'Terapias y apoyos': {
+    description: 'Diferentes tipos de terapias, tratamientos y apoyos disponibles para personas con autismo y sus familias.',
+    articles: ['Terapia ABA', 'Terapia del habla', 'Terapia ocupacional']
   },
-  {
-    id: 'profesionales',
-    title: 'Profesionales',
-    icon: '🧑‍⚕️',
-    intro: 'Los profesionales de la salud, educación y acompañamiento pueden aportar herramientas valiosas al desarrollo de la persona.',
-    sections: [
-      {
-        title: 'Enfoque recomendado',
-        text: 'La mirada integral, la escucha activa y la colaboración interdisciplinaria fortalecen el acompañamiento.',
-      },
-    ],
-    highlight: 'La información confiable y la actualización constante mejoran la calidad del apoyo.',
-    related: ['Qué es el autismo?', 'Familias'],
+  'Familias y cuidadores': {
+    description: 'Recursos y guías para familias, cuidadores y personas cercanas a alguien con TEA.',
+    articles: ['Guía para familias', 'Apoyo a cuidadores', 'Redes de apoyo']
   },
-  {
-    id: 'mitos-realidades',
-    title: 'Mitos y realidades',
-    icon: '🌟',
-    intro: 'Muchos prejuicios sobre el autismo surgen de ideas incompletas o erróneas.',
-    sections: [
-      {
-        title: 'Realidad',
-        list: [
-          'No todas las personas autistas se comportan igual.',
-          'El autismo no implica falta de inteligencia.',
-          'La inclusión requiere adaptación y respeto.',
-        ],
-      },
-    ],
-    highlight: 'Conocer para comprender, y comprender para incluir.',
-    related: ['Qué es el autismo?', 'Escuelas e inclusión'],
+  'Derechos e inclusión': {
+    description: 'Derechos legales, inclusión social y laboral de las personas con Trastorno del Espectro Autista.',
+    articles: ['Derechos legales', 'Inclusión laboral', 'Accesibilidad']
   },
-  {
-    id: 'derechos-recursos',
-    title: 'Derechos y recursos',
-    icon: '⚖️',
-    intro: 'El acceso a información, salud, educación y servicios es un derecho que debe promoverse en todos los espacios.',
-    sections: [
-      {
-        title: 'Recursos útiles',
-        list: [
-          'Organizaciones de apoyo y defensa.',
-          'Programas educativos y comunitarios.',
-          'Herramientas de acompañamiento y orientación.',
-        ],
-      },
-    ],
-    highlight: 'La información también es una forma de protección y acceso.',
-    related: ['Profesionales', 'Familias'],
+  'Vida cotidiana': {
+    description: 'Consejos prácticos para la vida diaria, rutinas, habilidades de vida y autonomía.',
+    articles: ['Rutinas diarias', 'Habilidades de vida', 'Autonomía personal']
   },
-  {
-    id: 'consejos-dia-dia',
-    title: 'Consejos para el día a día',
-    icon: '💡',
-    intro: 'Pequeños cambios en la rutina y en el entorno pueden mejorar mucho la tranquilidad y el bienestar.',
-    sections: [
-      {
-        title: 'A tener en cuenta',
-        list: [
-          'Mantener rutinas simples y claras.',
-          'Reducir estímulos innecesarios.',
-          'Acompañar con paciencia y flexibilidad.',
-        ],
-      },
-    ],
-    highlight: 'La sostenibilidad del apoyo también depende del cuidado de quien acompaña.',
-    related: ['Cómo apoyar a una persona autista', 'Escuelas e inclusión'],
-  },
-];
+  'Recursos y organizaciones': {
+    description: 'Organizaciones, asociaciones y recursos disponibles para la comunidad autista en Argentina.',
+    articles: ['Organizaciones TEA', 'Recursos locales', 'Asociaciones']
+  }
+};
 
 const CentroInformacion = () => {
-  const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(null);
+  const [query, setQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categoryModal, setCategoryModal] = useState(null);
+  const [content, setContent] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/articulos`);
+      const data = await response.json();
+      setContent(Array.isArray(data) ? data : data.data || []);
+    } catch (error) {
+      console.error('Error al cargar contenido:', error);
+      // Usar contenido de fallback si falla el backend
+      setContent([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return CONTENT;
-    return CONTENT.filter((item) =>
-      `${item.title} ${item.intro} ${item.related.join(' ')}`.toLowerCase().includes(q)
-    );
-  }, [query]);
+    let result = content;
+    
+    // Filtrar por categoría
+    if (selectedCategory) {
+      result = result.filter(item => item.icon === selectedCategory);
+    }
+    
+    // Filtrar por búsqueda
+    if (query) {
+      const q = query.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.title?.toLowerCase().includes(q) ||
+          item.intro?.toLowerCase().includes(q)
+      );
+    }
+    
+    return result;
+  }, [content, query, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-[#f7faff] px-4 pb-24 pt-5 sm:px-5">
       <div className="mx-auto max-w-6xl">
         {!selected ? (
           <>
+            {console.log('Mostrando listado, artículos:', filtered.length)}
             <section className="mb-4 rounded-[24px] border border-[#dfefff] bg-gradient-to-br from-[#eef7ff] to-[#f9fcff] p-5 shadow-[0_10px_24px_rgba(67,161,242,0.08)] sm:p-6">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#e7f3ff] px-3 py-1 text-[0.78rem] font-bold uppercase tracking-[0.04em] text-[#2b7fd6]">
                 Centro de Información
@@ -182,71 +113,257 @@ const CentroInformacion = () => {
               <p className="m-0 text-[0.95rem] leading-6 text-[#5b6882]">
                 Esta sección educativa de AutiSi ofrece contenidos claros y accesibles para personas autistas, familias, docentes, profesionales y la comunidad.
               </p>
-              <div className="mt-4 flex items-center gap-2 rounded-full border border-[#e2ebf7] bg-white px-4 py-2.5">
-                <Search size={18} color="#43A1F2" />
+              <div className="mt-4 flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+                <Search size={18} className="text-gray-400" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Buscar artículos por palabra clave"
-                  className="flex-1 border-none bg-transparent text-[0.95rem] text-[#1f2937] outline-none placeholder:text-[#94a3b8]"
+                  className="flex-1 border-none bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
                 />
               </div>
             </section>
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {filtered.map((item) => (
-                <button key={item.id} className="cursor-pointer rounded-[18px] border border-[#e7eef7] bg-white p-4 text-left shadow-[0_6px_16px_rgba(17,24,39,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-[#43A1F2] hover:shadow-[0_10px_24px_rgba(67,161,242,0.12)]" type="button" onClick={() => setSelected(item)}>
-                  <div className="mb-2 grid h-11 w-11 place-items-center rounded-[12px] bg-gradient-to-br from-[#e8f4ff] to-[#d8efff] text-[1.2rem]">
-                    {item.icon}
-                  </div>
-                  <h3 className="mb-1.5 text-[1rem] font-bold text-[#1b2a4a]">{item.title}</h3>
-                  <p className="m-0 text-[0.9rem] leading-6 text-[#64748b]">{item.intro}</p>
-                </button>
-              ))}
-            </div>
+            {/* Categories Section */}
+            <section className="mb-8">
+              <h2 className="mb-4 text-xl font-bold text-gray-900">Categorías de Información</h2>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  { icon: Brain, label: 'Comprender el TEA', color: 'from-[#e8f4ff] to-[#d8efff]' },
+                  { icon: Lightbulb, label: 'Detección temprana', color: 'from-[#fff7ed] to-[#ffedd5]' },
+                  { icon: Book, label: 'Educación inclusiva', color: 'from-[#f0fdf4] to-[#dcfce7]' },
+                  { icon: Heart, label: 'Terapias y apoyos', color: 'from-[#fef2f2] to-[#fee2e2]' },
+                  { icon: Users, label: 'Familias y cuidadores', color: 'from-[#faf5ff] to-[#f3e8ff]' },
+                  { icon: Star, label: 'Derechos e inclusión', color: 'from-[#eff6ff] to-[#dbeafe]' },
+                  { icon: Info, label: 'Vida cotidiana', color: 'from-[#f0fdfa] to-[#ccfbf1]' },
+                  { icon: Lightbulb, label: 'Recursos y organizaciones', color: 'from-[#fffbeb] to-[#fef3c7]' },
+                ].map((category, index) => {
+                  const Icon = category.icon;
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => setCategoryModal(category.label)}
+                      className="flex flex-col items-center gap-2 rounded-xl border border-gray-200 bg-white p-4 text-center shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:border-[#43A1F2] hover:shadow-md"
+                      type="button"
+                    >
+                      <div className={`grid h-12 w-12 place-items-center rounded-lg bg-gradient-to-br ${category.color}`}>
+                        <Icon size={24} className="text-[#43A1F2]" />
+                      </div>
+                      <span className="text-xs font-semibold text-gray-900 sm:text-sm">{category.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* Articles List */}
+            <section>
+              <h2 className="mb-4 text-xl font-bold text-gray-900">Todos los Artículos</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.map((item) => {
+                  const Icon = ICON_MAP[item.icon] || Brain;
+                  return (
+                    <button 
+                      key={item.id || item._id} 
+                      className="group cursor-pointer rounded-xl border border-gray-200 bg-white p-5 text-left shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-all hover:-translate-y-1 hover:border-[#43A1F2] hover:shadow-md" 
+                      type="button" 
+                      onClick={() => {
+                        console.log('Artículo seleccionado:', item);
+                        setSelected(item);
+                      }}
+                    >
+                      <div className="mb-3 flex items-center justify-between">
+                        <div className="grid h-12 w-12 place-items-center rounded-lg bg-gradient-to-br from-[#e8f4ff] to-[#d8efff]">
+                          <Icon size={22} className="text-[#43A1F2]" />
+                        </div>
+                        <span className="rounded-full bg-[#f0f8ff] px-3 py-1 text-xs font-semibold text-[#43A1F2]">
+                          {item.icon}
+                        </span>
+                      </div>
+                      <h3 className="mb-2 text-lg font-bold text-gray-900 group-hover:text-[#43A1F2] transition-colors">{item.title}</h3>
+                      <p className="mb-4 text-sm leading-6 text-gray-600 line-clamp-2">{item.intro}</p>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <Book size={14} />
+                          <span>3-5 min</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-[#43A1F2] font-medium">
+                          Leer más
+                          <ArrowLeft size={14} className="rotate-180" />
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
             {filtered.length === 0 && (
-              <div className="mt-4 rounded-[20px] border border-dashed border-[#dbe8f7] bg-white p-7 text-center text-[#64748b]">
+              <div className="mt-4 rounded-lg border border-dashed border-gray-200 bg-white p-7 text-center text-gray-600">
                 No encontramos artículos para esa búsqueda. Probá con otra palabra.
               </div>
             )}
           </>
         ) : (
-          <section className="overflow-hidden rounded-[24px] border border-[#e7eef7] bg-white shadow-[0_10px_24px_rgba(17,24,39,0.05)]">
-            <div className="p-5 sm:p-6">
-              <div className="mb-4 flex min-h-[140px] items-end justify-between rounded-[18px] bg-[#43A1F2] p-5 text-white">
+          <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+            <div className="p-6 sm:p-8">
+              {/* Article Header */}
+              <div className="mb-6 flex min-h-[160px] items-end justify-between rounded-xl bg-gradient-to-br from-[#43A1F2] to-[#2E7BB8] p-6 text-white">
                 <div>
-                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-[0.78rem] font-bold uppercase tracking-[0.04em] text-white">
-                    Centro de Información
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider">
+                    {React.createElement(ICON_MAP[selected.icon] || Brain, { size: 14 })}
+                    {selected.icon}
                   </div>
-                  <h2 className="m-0 text-[1.25rem] font-extrabold text-white sm:text-[1.35rem]">{selected.title}</h2>
+                  <h2 className="m-0 text-2xl font-extrabold text-white sm:text-3xl">{selected.title}</h2>
                 </div>
-                <span className="text-[2rem]">{selected.icon}</span>
+                <div className="bg-white/20 rounded-full p-4">
+                  {React.createElement(ICON_MAP[selected.icon] || Brain, { size: 40, className: "text-white" })}
+                </div>
               </div>
+
+              {/* Back Button */}
+              <button className="mb-6 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-[#f3f8ff] px-4 py-2.5 text-sm font-bold text-[#2b7fd6] transition-all hover:bg-[#e7f3ff]" type="button" onClick={() => setSelected(null)}>
+                <ArrowLeft size={16} />
+                Volver al listado
+              </button>
+
+              {/* Article Content */}
               <div className="px-1 pb-1">
-                <button className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#d7ebff] bg-[#f3f8ff] px-3 py-2 text-[0.88rem] font-bold text-[#2b7fd6]" type="button" onClick={() => setSelected(null)}>
-                  <ArrowLeft size={16} /> Volver
-                </button>
-                <p className="mb-4 text-[0.95rem] leading-7 text-[#5f6b7a]">{selected.intro}</p>
-                {selected.sections.map((section) => (
-                  <div key={section.title} className="mb-3">
-                    <h3 className="mb-2 text-[1rem] font-extrabold text-[#1b2a4a]">{section.title}</h3>
-                    {section.text && <p className="text-[0.94rem] leading-7 text-[#5b6678]">{section.text}</p>}
-                    {section.list && <ul className="ml-5 list-disc space-y-2 text-[0.94rem] leading-7 text-[#5b6678]">{section.list.map((item) => <li key={item}>{item}</li>)}</ul>}
+                <p className="mb-6 text-lg leading-8 text-gray-600">{selected.intro}</p>
+                
+                {selected.sections && selected.sections.map((section, index) => (
+                  <div key={section.title || index} className="mb-6">
+                    <h3 className="mb-3 text-xl font-extrabold text-gray-900">{section.title}</h3>
+                    {section.text && <p className="text-base leading-7 text-gray-600">{section.text}</p>}
+                    {section.list && (
+                      <ul className="ml-6 list-disc space-y-2 text-base leading-7 text-gray-600">
+                        {section.list.map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}
+                      </ul>
+                    )}
                   </div>
                 ))}
-                <div className="my-4 rounded-[14px] border border-[#dceeff] bg-[#f7fbff] p-3 text-[0.95rem] text-[#3b5a79]">{selected.highlight}</div>
-                <div className="mt-4">
-                  <h3 className="mb-2 text-[1rem] font-extrabold text-[#1b2a4a]">También te puede interesar</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selected.related.map((item) => (
-                      <span key={item} className="rounded-full border border-[#d7ebff] bg-[#f0f8ff] px-2.5 py-1 text-[0.8rem] font-bold text-[#2b7fd6]">{item}</span>
-                    ))}
+
+                {/* Highlight Box */}
+                {selected.highlight && (
+                  <div className="my-6 rounded-lg border border-gray-200 bg-gradient-to-br from-[#f7fbff] to-[#f0f8ff] p-5 text-base text-gray-700">
+                    <div className="mb-2 flex items-center gap-2 font-bold text-[#43A1F2]">
+                      <Star size={18} />
+                      Destacado
+                    </div>
+                    {selected.highlight}
+                  </div>
+                )}
+
+                {/* Related Articles */}
+                {selected.related && selected.related.length > 0 && (
+                  <div className="mt-8 rounded-lg border border-gray-200 bg-[#f8fafc] p-6">
+                    <h3 className="mb-4 text-lg font-extrabold text-gray-900">También te puede interesar</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selected.related.map((item) => (
+                        <span key={item} className="rounded-full border border-gray-200 bg-[#f0f8ff] px-4 py-2 text-sm font-bold text-[#2b7fd6] transition-all hover:bg-[#e7f3ff] hover:border-[#43A1F2] cursor-pointer">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Additional Resources Section */}
+                <div className="mt-8 rounded-lg border border-gray-200 bg-[#f8fafc] p-6">
+                  <h3 className="mb-4 text-lg font-extrabold text-gray-900">Recursos Adicionales</h3>
+                  <div className="space-y-3">
+                    <a href="#" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-[#43A1F2] hover:shadow-md">
+                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-[#e8f4ff] to-[#d8efff]">
+                        <Book size={20} className="text-[#43A1F2]" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">Guías descargables</h4>
+                        <p className="text-sm text-gray-500">Material educativo para descargar</p>
+                      </div>
+                      <ArrowLeft size={18} className="rotate-180 text-[#43A1F2]" />
+                    </a>
+                    <a href="#" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-[#43A1F2] hover:shadow-md">
+                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7]">
+                        <Users size={20} className="text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">Organizaciones y asociaciones</h4>
+                        <p className="text-sm text-gray-500">Enlaces a organizaciones de TEA</p>
+                      </div>
+                      <ArrowLeft size={18} className="rotate-180 text-[#43A1F2]" />
+                    </a>
+                    <a href="#" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-[#43A1F2] hover:shadow-md">
+                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-[#fef2f2] to-[#fee2e2]">
+                        <Heart size={20} className="text-red-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">Recursos para familias</h4>
+                        <p className="text-sm text-gray-500">Apoyo y orientación para cuidadores</p>
+                      </div>
+                      <ArrowLeft size={18} className="rotate-180 text-[#43A1F2]" />
+                    </a>
                   </div>
                 </div>
               </div>
             </div>
           </section>
+        )}
+
+        {/* Category Modal */}
+        {categoryModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/50 backdrop-blur-sm">
+            <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900">{categoryModal}</h3>
+                <button
+                  onClick={() => setCategoryModal(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={24} className="text-gray-500" />
+                </button>
+              </div>
+              <div className="p-4 sm:p-6">
+                <p className="text-base text-gray-600 leading-7 mb-6">
+                  {CATEGORY_INFO[categoryModal]?.description}
+                </p>
+                <div className="mb-6">
+                  <h4 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Artículos relacionados</h4>
+                  <div className="space-y-2">
+                    {CATEGORY_INFO[categoryModal]?.articles.map((article, index) => {
+                      const relatedArticle = content.find(item => 
+                        item.title?.toLowerCase().includes(article.toLowerCase()) ||
+                        article.toLowerCase().includes(item.title?.toLowerCase())
+                      );
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            if (relatedArticle) {
+                              setCategoryModal(null);
+                              setSelected(relatedArticle);
+                            }
+                          }}
+                          className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-[#f8fafc] hover:border-[#43A1F2] hover:bg-[#f0f8ff] transition-colors cursor-pointer text-left"
+                          type="button"
+                        >
+                          <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#e8f4ff]">
+                            <Book size={16} className="text-[#43A1F2]" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-900">{article}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setCategoryModal(null)}
+                  className="w-full py-3 bg-gradient-to-r from-[#43A1F2] to-[#2E7BB8] text-white font-semibold rounded-lg transition-all hover:from-[#2E7BB8] hover:to-[#43A1F2]"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

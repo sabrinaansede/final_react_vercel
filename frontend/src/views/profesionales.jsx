@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import ProfessionalsList from '../components/ProfessionalsList'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Bell, Shield, Search, Filter, Star, CheckCircle, Clock, Heart, Users, MapPin, Mail, Phone } from 'lucide-react'
+import { Shield, Search, Filter, Star, CheckCircle, Clock, Heart, Users, MapPin, Mail, Phone, Brain, Target, MessageSquare, Activity, BookOpen, Baby } from 'lucide-react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://autisi-backend.onrender.com'
 
@@ -60,11 +60,11 @@ const Profesionales = () => {
               <button className="bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 cursor-pointer hover:bg-gray-200" onClick={() => navigate('/')}>← Volver</button>
               <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Premium</span>
             </div>
-            <h1 className="text-4xl font-extrabold text-[#1b2a4a] mb-3">Profesionales</h1>
-            <p className="text-gray-600 text-lg max-w-2xl">Encuentra profesionales especializados en acompañamiento para personas con TEA y sus familias, verificados por nuestra comunidad.</p>
+            <h1 className="text-[32px] lg:text-[44px] font-bold text-[#1b2a4a] mb-3 leading-[125%]">Profesionales</h1>
+            <p className="text-gray-600 text-[16px] max-w-2xl leading-[150%]">Encuentra profesionales especializados en acompañamiento para personas con TEA y sus familias, verificados por nuestra comunidad.</p>
           </div>
 
-          {/* Sector derecho - Tarjeta de verificación y perfil */}
+          {/* Sector derecho - Tarjeta de verificación */}
           <div className="flex flex-col gap-4 items-start lg:items-end w-full lg:w-auto">
             {/* Tarjeta informativa de verificación */}
             <div className="bg-white border border-blue-100 rounded-2xl p-4 shadow-sm w-full lg:max-w-md">
@@ -79,19 +79,6 @@ const Profesionales = () => {
                 </div>
               </div>
             </div>
-
-            {/* Icono de notificaciones y perfil */}
-            <div className="flex items-center gap-3 w-full justify-start lg:justify-end">
-              <button className="bg-white border border-gray-200 rounded-full p-2.5 hover:bg-gray-50 transition-colors">
-                <Bell className="w-5 h-5 text-gray-600" />
-              </button>
-              <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-full px-4 py-2">
-                <div className="w-8 h-8 bg-[#43A1F2] rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  {user?.nombre?.[0] || 'U'}
-                </div>
-                <span className="text-sm font-medium text-gray-700">{user?.nombre || 'Usuario'}</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -102,11 +89,11 @@ const Profesionales = () => {
           <div className="flex flex-col gap-4">
             {/* Barra de búsqueda */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Buscar por nombre, especialidad o palabras clave..."
-                className="w-full pl-16 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43A1F2] focus:border-transparent"
+                className="w-full pl-14 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43A1F2] focus:border-transparent"
               />
             </div>
 
@@ -159,55 +146,39 @@ const Profesionales = () => {
       </div>
 
       {/* Sección Explorar por especialidad */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <h2 className="text-lg font-bold text-[#1b2a4a] mb-4">Explorar por especialidad</h2>
+      <div className="max-w-7xl mx-auto mb-8 mt-12">
+        <h2 className="text-[26px] lg:text-[34px] font-bold text-[#1b2a4a] mb-4 leading-[125%]">Explorar por especialidad</h2>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {[
-            { icon: '🧠', name: 'Psicología', count: 12 },
-            { icon: '🎯', name: 'Terapia Ocupacional', count: 8 },
-            { icon: '🗣️', name: 'Fonoaudiología', count: 6 },
-            { icon: '🏃', name: 'Psicomotricidad', count: 4 },
-            { icon: '📚', name: 'Psicopedagogía', count: 5 },
-            { icon: '👶', name: 'Neuropediatría', count: 3 }
-          ].map((especialidad, index) => (
-            <button
-              key={index}
-              className="flex-shrink-0 bg-white border border-gray-200 rounded-2xl p-4 hover:border-[#43A1F2] hover:shadow-md transition-all min-w-[180px]"
-              onClick={() => setFilters({...filters, especialidad: especialidad.name})}
-            >
-              <div className="text-3xl mb-2">{especialidad.icon}</div>
-              <div className="font-semibold text-[#1b2a4a] text-sm">{especialidad.name}</div>
-              <div className="text-xs text-gray-500 mt-1">{especialidad.count} profesionales</div>
-            </button>
-          ))}
+            { icon: Brain, name: 'Psicología', count: 12 },
+            { icon: Target, name: 'Terapia Ocupacional', count: 8 },
+            { icon: MessageSquare, name: 'Fonoaudiología', count: 6 },
+            { icon: Activity, name: 'Psicomotricidad', count: 4 },
+            { icon: BookOpen, name: 'Psicopedagogía', count: 5 },
+            { icon: Baby, name: 'Neuropediatría', count: 3 }
+          ].map((especialidad, index) => {
+            const Icon = especialidad.icon;
+            return (
+              <button
+                key={index}
+                className="flex-shrink-0 bg-white border border-gray-200 rounded-2xl p-4 hover:border-[#43A1F2] hover:shadow-md transition-all min-w-[180px] flex flex-col items-center text-center"
+                onClick={() => setFilters({...filters, especialidad: especialidad.name})}
+              >
+                <div className="mb-2 flex items-center justify-center">
+                  <Icon size={32} className="text-[#43A1F2]" />
+                </div>
+                <div className="font-semibold text-[#1b2a4a] text-[18px] lg:text-[16px]">{especialidad.name}</div>
+                <div className="text-[14px] lg:text-[13px] text-gray-500 mt-1">{especialidad.count} profesionales</div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Sección de profesionales destacados */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <h2 className="text-lg font-bold text-[#1b2a4a] mb-4">Profesionales destacados</h2>
+      <div className="max-w-7xl mx-auto mb-8 mt-12">
+        <h2 className="text-[26px] lg:text-[34px] font-bold text-[#1b2a4a] mb-4 leading-[125%]">Profesionales destacados</h2>
         <ProfessionalsList professionals={profesionales} onView={handleView} />
-      </div>
-
-      {/* Sección de Beneficios Premium */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <h2 className="text-lg font-bold text-[#1b2a4a] mb-4">Beneficios Premium</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            { icon: <CheckCircle className="w-5 h-5" />, title: 'Perfiles Verificados', desc: 'Profesionales evaluados por la comunidad' },
-            { icon: <Clock className="w-5 h-5" />, title: 'Turnos Más Rápidos', desc: 'Acceso prioritario a agendamiento' },
-            { icon: <Users className="w-5 h-5" />, title: 'Especialistas en TEA', desc: 'Expertos en Trastorno del Espectro Autista' },
-            { icon: <Star className="w-5 h-5" />, title: 'Recomendados', desc: 'Top rated por familias como tú' }
-          ].map((beneficio, index) => (
-            <div key={index} className="bg-white border border-gray-200 rounded-xl p-2.5 hover:shadow-md transition-shadow">
-              <div className="bg-blue-50 w-9 h-9 rounded-lg flex items-center justify-center text-[#43A1F2] mb-1.5">
-                {beneficio.icon}
-              </div>
-              <h3 className="font-bold text-[#1b2a4a] mb-0.5 text-sm">{beneficio.title}</h3>
-              <p className="text-xs text-gray-600 leading-4">{beneficio.desc}</p>
-            </div>
-          ))}
-        </div>
       </div>
 
       {selected && (
@@ -282,7 +253,7 @@ const Profesionales = () => {
               </div>
 
               {/* Contacto */}
-              <div className="mb-4">
+              <div className="mb-6 pb-4">
                 <a href={`mailto:${selected.email}`} className="flex items-center gap-2 text-sm text-gray-600 mb-2 no-underline hover:text-[#43A1F2] transition-colors">
                   <Mail className="w-4 h-4" />
                   Enviar mensaje
@@ -291,19 +262,6 @@ const Profesionales = () => {
                   <Phone className="w-4 h-4" />
                   {selected.telefono}
                 </a>
-              </div>
-
-              {/* Botones de acción */}
-              <div className="flex flex-col gap-3">
-                <button className="w-full bg-[#43A1F2] text-white font-bold py-3 rounded-xl cursor-pointer hover:bg-[#2e7bb8] transition-colors shadow-md">
-                  Solicitar turno
-                </button>
-                <button className="w-full border-2 border-[#43A1F2] text-[#43A1F2] font-bold py-3 rounded-xl cursor-pointer hover:bg-[#43A1F2] hover:text-white transition-colors">
-                  Más información
-                </button>
-                <button className="w-full bg-gray-100 text-gray-600 font-bold py-3 rounded-xl cursor-pointer hover:bg-gray-200 transition-colors" onClick={() => setSelected(null)}>
-                  Cerrar
-                </button>
               </div>
             </div>
           </div>

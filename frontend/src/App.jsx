@@ -14,11 +14,22 @@ import ChecklistPersonalizado from "./views/checklist.jsx";
 import Profesionales from "./views/profesionales";
 import Comunidad from "./views/comunidad.jsx";
 import CentroInformacion from "./views/CentroInformacion.jsx";
+import Notificaciones from "./views/Notificaciones.jsx";
 import MobileNavigation from "./components/MobileNavigation";
+import AdminLayout from "./admin/AdminLayout";
+import AdminPageLayout from "./admin/AdminPageLayout";
+import Dashboard from "./admin/Dashboard";
+import AdminProfesionales from "./admin/Profesionales";
+import AdminContenido from "./admin/Contenido";
+import Notifications from "./admin/Notifications";
+import { useAuth } from "./context/AuthContext.jsx";
+import NotificationPermission from "./components/NotificationPermission.jsx";
 
 const App = () => {
   const location = useLocation();
+  const { isAdmin } = useAuth();
   const isComunidadRoute = location.pathname.startsWith("/comunidad");
+  const isAdminRoute = location.pathname.startsWith("/admin");
   const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth >= 768 : false
   );
@@ -30,8 +41,16 @@ const App = () => {
   }, []);
 
   const showMainNavbar = true;
-  const showMobileNav = !isDesktop && !location.pathname.startsWith("/login") && !location.pathname.startsWith("/registro");
+  const showMobileNav = !isDesktop && !location.pathname.startsWith("/login") && !location.pathname.startsWith("/registro") && !isAdminRoute;
   const isMapRoute = location.pathname === "/mapa";
+
+  // Componente para proteger rutas de admin
+  const AdminRoute = ({ children }) => {
+    if (!isAdmin) {
+      return <Navigate to="/" replace />;
+    }
+    return children;
+  };
 
   return (
     <>
@@ -85,6 +104,14 @@ const App = () => {
       />
       <Route path="/centro-informacion" element={<CentroInformacion />} />
       <Route
+        path="/notificaciones"
+        element={
+          <ProtectedRoute>
+            <Notificaciones />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/comunidad"
         element={
           <ProtectedRoute>
@@ -100,9 +127,73 @@ const App = () => {
           </ProtectedRoute>
         }
       />
+      {/* Rutas del Panel de Administración */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <Dashboard />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/lugares"
+        element={
+          <AdminRoute>
+            <AdminPageLayout title="Gestión de Lugares" description="Administra los lugares cargados en la plataforma">
+              <div className="p-8">Gestión de Lugares - Próximamente</div>
+            </AdminPageLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/profesionales"
+        element={
+          <AdminRoute>
+            <AdminProfesionales />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/comunidad"
+        element={
+          <AdminRoute>
+            <AdminPageLayout title="Comunidad" description="Gestiona las publicaciones de la comunidad">
+              <div className="p-8">Comunidad - Próximamente</div>
+            </AdminPageLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/usuarios"
+        element={
+          <AdminRoute>
+            <AdminPageLayout title="Gestión de Usuarios" description="Administra los usuarios de la plataforma">
+              <div className="p-8">Usuarios - Próximamente</div>
+            </AdminPageLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/notificaciones"
+        element={
+          <AdminRoute>
+            <Notifications />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/contenido"
+        element={
+          <AdminRoute>
+            <AdminContenido />
+          </AdminRoute>
+        }
+      />
     </Routes>
       </main>
     {showMobileNav && <MobileNavigation />}
+    <NotificationPermission />
   </>
   );
 };

@@ -108,13 +108,11 @@ const AuthLanding = ({ initialTab = "login" }) => {
         </div>
 
         <div className="home-grid">
-          {/* Card Login */}
           <div className="card" style={{ opacity: activeTab === "login" ? 1 : 0.6 }}>
             <h2 className="card-title">Ingresá a tu cuenta</h2>
             <LoginForm />
           </div>
 
-          {/* Card Registro */}
           <div className="card" style={{ opacity: activeTab === "registro" ? 1 : 0.6 }}>
             <h2 className="card-title">Creá tu cuenta</h2>
             <form onSubmit={submitRegistro} className="form">
@@ -179,7 +177,7 @@ const AuthLanding = ({ initialTab = "login" }) => {
                   <option value="local">Local</option>
                 </select>
               </div>
-              <button type="submit" disabled={regLoading} className="btn btn-secondary">
+              <button type="submit" disabled={regLoading} className="w-full bg-[#43A1F2] text-white px-4 py-2.5 rounded-lg font-medium text-sm hover:bg-[#2E7BB8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {regLoading ? "Creando..." : "Crear cuenta"}
               </button>
             </form>
@@ -198,7 +196,7 @@ const AuthLanding = ({ initialTab = "login" }) => {
         </div>
 
         <div className="card" style={{ marginTop: 16, maxWidth: 640, marginLeft: "auto", marginRight: "auto" }}>
-          <button type="button" onClick={handleGuestAccess} className="btn btn-primary" style={{ width: "100%" }}>
+          <button type="button" onClick={handleGuestAccess} className="w-full bg-[#43A1F2] text-white px-4 py-2.5 rounded-lg font-medium text-sm hover:bg-[#2E7BB8] transition-colors">
             Explorar sin cuenta
           </button>
           <p className="msg msg-success" style={{ marginTop: 10, textAlign: "center" }}>

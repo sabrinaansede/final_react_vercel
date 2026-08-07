@@ -63,11 +63,11 @@ const ActiveChecklist = () => {
           <CheckSquare size={20} className="text-[#43A1F2]" />
           <span>{activeChecklist.nombre}</span>
         </div>
-        <button 
+        <button
           className="bg-gray-100 border-none rounded-lg w-7 h-7 flex items-center justify-center cursor-pointer text-gray-500 hover:bg-gray-200 hover:text-[#1B2A4A] transition-all"
           onClick={handleDismiss}
         >
-          <X size={16} />
+          <X size={18} />
         </button>
       </div>
 
@@ -104,12 +104,12 @@ const ActiveChecklist = () => {
         )}
       </div>
 
-      <button 
+      <button
         className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#43A1F2] to-[#2E7BB8] text-white border-none rounded-xl py-3 text-sm font-semibold cursor-pointer hover:-translate-y-0.5 hover:shadow-lg transition-all"
         onClick={() => window.location.href = '/checklist'}
       >
         Ver checklist completo
-        <ChevronRight size={16} />
+        <ChevronRight size={18} />
       </button>
     </div>
   );

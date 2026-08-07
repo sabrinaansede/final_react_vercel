@@ -92,14 +92,15 @@ router.post("/login", async (req, res) => {
     if (!esValido) {
       return res.status(400).json({ message: "Credenciales inválidas" });
     }
-    const { _id, nombre, telefono, tipoUsuario } = usuario;
-    const payload = { id: _id.toString(), email, tipoUsuario };
+
+    const { _id, nombre, telefono, tipoUsuario, isAdmin } = usuario;
+    const payload = { id: _id.toString(), email, tipoUsuario, isAdmin };
     const secret = process.env.JWT_SECRET || "dev_secret_autisi";
     const token = jwt.sign(payload, secret, { expiresIn: "8h" });
 
     res.json({
       message: "Login exitoso",
-      user: { _id, nombre, email, telefono, tipoUsuario },
+      user: { _id, nombre, email, telefono, tipoUsuario, isAdmin },
       token,
     });
   } catch (error) {

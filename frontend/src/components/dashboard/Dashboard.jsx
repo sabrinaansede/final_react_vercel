@@ -226,14 +226,6 @@ const Dashboard = () => {
             <Activity />
             <span>Resumen</span>
           </button>
-          <button className="nav-item">
-            <Heart />
-            <span>Favoritos</span>
-          </button>
-          <button className="nav-item">
-            <User />
-            <span>Perfil</span>
-          </button>
         </nav>
 
         <div className="quick-actions">
@@ -405,18 +397,6 @@ const Dashboard = () => {
             <MapPin size={24} />
             <h3>Explorar Mapa</h3>
             <p>Descubre nuevos lugares cerca de ti</p>
-          </div>
-
-          <div className="quick-action-card" onClick={() => navigate('/favoritos')}>
-            <Heart size={24} />
-            <h3>Favoritos</h3>
-            <p>Tus lugares guardados</p>
-          </div>
-
-          <div className="quick-action-card" onClick={() => navigate('/contacto')}>
-            <MessageSquare size={24} />
-            <h3>Ayuda</h3>
-            <p>Contáctanos si necesitas asistencia</p>
           </div>
         </section>
       </main>

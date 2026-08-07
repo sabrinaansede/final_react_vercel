@@ -1,6 +1,33 @@
+import { useEffect, useState } from 'react'
 import { Download } from 'lucide-react'
 
 const Hero = () => {
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [installMessage, setInstallMessage] = useState('')
+
+  useEffect(() => {
+    const handler = (event) => {
+      event.preventDefault()
+      setDeferredPrompt(event)
+      setInstallMessage('')
+    }
+
+    window.addEventListener('beforeinstallprompt', handler)
+
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) {
+      setInstallMessage('Abrí esta página en Chrome o Safari y elegí “Agregar a pantalla de inicio”.')
+      return
+    }
+
+    deferredPrompt.prompt()
+    await deferredPrompt.userChoice
+    setDeferredPrompt(null)
+  }
+
   return (
     <section className="relative pt-20 pb-32 overflow-hidden">
       {/* Background image with overlay */}
@@ -27,16 +54,18 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-wrap gap-4 mb-8">
-            <a
-              href="https://autisi-mobile.netlify.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-primary text-white px-7 py-3.5 rounded-full font-bold hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            <button
+              type="button"
+              onClick={handleInstall}
+              className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-primary-dark transition-all shadow-md hover:shadow-lg"
             >
               <Download size={18} />
               Instalar App
-            </a>
+            </button>
           </div>
+          {installMessage && (
+            <p className="text-sm text-white/80 max-w-md">{installMessage}</p>
+          )}
         </div>
       </div>
     </section>

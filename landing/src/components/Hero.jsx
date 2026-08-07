@@ -1,4 +1,4 @@
-import { Download, Play } from 'lucide-react'
+import { Download } from 'lucide-react'
 
 const Hero = () => {
   return (
@@ -33,35 +33,6 @@ const Hero = () => {
             >
               <Download size={18} />
               Descargar App
-            </a>
-            <a
-              href="#conoce-la-app"
-              className="inline-flex items-center gap-2 border-2 border-white text-white px-7 py-3.5 rounded-full font-bold hover:bg-white/10 transition-all"
-            >
-              <Play size={18} fill="currentColor" />
-              Ver cómo funciona
-            </a>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <a href="#descargar-app" className="opacity-80 hover:opacity-100 transition-opacity">
-              <svg className="h-10" viewBox="0 0 120 40" fill="none">
-                <rect width="120" height="40" rx="8" fill="#1B2A4A" />
-                <text x="48" y="16" fill="white" fontSize="8" fontFamily="Nunito">Disponible en</text>
-                <text x="48" y="28" fill="white" fontSize="12" fontWeight="bold" fontFamily="Nunito">App Store</text>
-                <path d="M28 12c0-2 1-3 2-3.5-.5 1.5-1.5 2.5-2.5 3 1-.5 2-1.5 2.5-3-.5 0-1.5.5-2 1.5-.5-1.5-2-2.5-3.5-2.5 2.5 0 4 1.5 4.5 3.5-2 1-3.5 3-3.5 5.5 0 1 .5 2 1 2.5 1.5-1 2.5-3 2.5-5 0-1.5-.5-2.5-1.5-3.5z" fill="white" transform="translate(8,8) scale(1.2)" />
-              </svg>
-            </a>
-            <a href="#descargar-app" className="opacity-80 hover:opacity-100 transition-opacity">
-              <svg className="h-10" viewBox="0 0 120 40" fill="none">
-                <rect width="120" height="40" rx="8" fill="#1B2A4A" />
-                <text x="48" y="16" fill="white" fontSize="8" fontFamily="Nunito">Disponible en</text>
-                <text x="48" y="28" fill="white" fontSize="12" fontWeight="bold" fontFamily="Nunito">Google Play</text>
-                <path d="M12 10 L12 30 L22 20 Z M24 18 L34 12 L34 28 L24 22 Z M36 12 L46 20 L36 28 Z" fill="#34A853" transform="translate(0,0)" />
-                <path d="M12 10 L22 20 L12 30 Z" fill="#EA4335" />
-                <path d="M22 20 L34 12 L24 18 Z" fill="#FBBC04" />
-                <path d="M22 20 L24 22 L34 28 L34 12 Z" fill="#4285F4" transform="translate(-2,0)" />
-              </svg>
             </a>
           </div>
         </div>

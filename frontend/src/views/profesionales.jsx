@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import ProfessionalsList from '../components/ProfessionalsList'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -6,13 +6,51 @@ import { Shield, Search, Filter, Star, CheckCircle, Clock, Heart, Users, MapPin,
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://autisi-backend.onrender.com'
 
+const normalizeString = (value) => {
+  if (!value) return ''
+  return value.toString().trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+}
+
 const Profesionales = () => {
   const { user } = useAuth()
   const [profesionales, setProfesionales] = useState([])
   const [selected, setSelected] = useState(null)
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({ especialidad: '', ubicacion: '', modalidad: '' })
+  const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate()
+
+  const visibleProfesionales = useMemo(() => {
+    const search = searchTerm.trim().toLowerCase()
+
+    return profesionales.filter((prof) => {
+      const matchesEspecialidad = !filters.especialidad || normalizeString(prof.especialidad) === normalizeString(filters.especialidad)
+      const matchesUbicacion = !filters.ubicacion || normalizeString(prof.ubicacion) === normalizeString(filters.ubicacion)
+      const matchesModalidad = !filters.modalidad || normalizeString(prof.modalidad) === normalizeString(filters.modalidad)
+      if (!matchesEspecialidad || !matchesUbicacion || !matchesModalidad) return false
+
+      if (!search) return true
+
+      const nombreApellido = `${prof.nombre || ''} ${prof.apellido || ''}`.toLowerCase()
+      const especialidad = (prof.especialidad || '').toLowerCase()
+      const ubicacion = (prof.ubicacion || '').toLowerCase()
+      const descripcion = (prof.descripcion || '').toLowerCase()
+      const modalidad = (prof.modalidad || '').toLowerCase()
+      const modalidadAliases = [modalidad]
+      if (modalidad === 'virtual') modalidadAliases.push('online')
+      if (modalidad === 'ambas') modalidadAliases.push('mixta', 'ambas')
+
+      const matchesModalidadSearch = modalidadAliases.some((term) => term.includes(search) || search.includes(term))
+
+      return (
+        nombreApellido.includes(search) ||
+        especialidad.includes(search) ||
+        ubicacion.includes(search) ||
+        descripcion.includes(search) ||
+        matchesModalidadSearch
+      )
+    })
+  }, [profesionales, filters, searchTerm])
 
   useEffect(() => {
     const fetchProfesionales = async () => {
@@ -26,7 +64,247 @@ const Profesionales = () => {
         const res = await fetch(url)
         if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`)
         const data = await res.json()
-        setProfesionales(Array.isArray(data) ? data : data.data || [])
+        const profesionalesCargados = Array.isArray(data) ? data : data.data || []
+
+        const psicologos = profesionalesCargados.filter((prof) => prof.especialidad === 'Psicología')
+        const psicomotricos = profesionalesCargados.filter((prof) => prof.especialidad === 'Psicomotricidad')
+        const psicopedagogos = profesionalesCargados.filter((prof) => prof.especialidad === 'Psicopedagogía')
+        const terapeutas = profesionalesCargados.filter((prof) => prof.especialidad === 'Terapia Ocupacional')
+        const neuropediatras = profesionalesCargados.filter((prof) => prof.especialidad === 'Neuropediatría')
+
+        const matchesModalidadFilter = (modalidad) => {
+          if (!filters.modalidad) return true
+          if (filters.modalidad === 'ambas') return modalidad === 'ambas'
+          return modalidad === filters.modalidad || modalidad === 'ambas'
+        }
+
+        const filterExtrasByModalidad = (extras) => {
+          return filters.modalidad ? extras.filter((extra) => matchesModalidadFilter(extra.modalidad)) : extras
+        }
+
+        const profesionExtra = {
+          _id: 'psicologia-adicional-01',
+          nombre: 'Mariana',
+          apellido: 'Ríos',
+          especialidad: 'Psicología',
+          ubicacion: 'CABA',
+          modalidad: 'virtual',
+          foto: '',
+          descripcion: 'Psicóloga especializada en acompañamiento familiar y atención individual para personas con TEA.',
+          experiencia: '8 años de experiencia en terapias y estrategias de inclusión.',
+          horarios: 'Lun a Vie 10:00 - 18:00',
+          email: 'mariana.rios@autisi.com',
+          telefono: '+54 11 5566 7788',
+          calificacion: 4.9,
+          activo: true,
+        }
+
+        const psicomotricidadExtras = [
+          {
+            _id: 'psicomotricidad-01',
+            nombre: 'Lucía',
+            apellido: 'Fernández',
+            especialidad: 'Psicomotricidad',
+            ubicacion: 'Rosario',
+            modalidad: 'presencial',
+            foto: '',
+            descripcion: 'Psicomotricista con enfoque en motricidad fina y estrategias de juego terapéutico.',
+            experiencia: '7 años trabajando con niños y adolescentes.',
+            horarios: 'Mar, Mié y Vie 09:00 - 16:00',
+            email: 'lucia.fernandez@autisi.com',
+            telefono: '+54 341 556 3344',
+            calificacion: 4.8,
+            activo: true,
+          },
+          {
+            _id: 'psicomotricidad-02',
+            nombre: 'Diego',
+            apellido: 'Silva',
+            especialidad: 'Psicomotricidad',
+            ubicacion: 'Mendoza',
+            modalidad: 'ambas',
+            foto: '',
+            descripcion: 'Profesional en psicomotricidad con experiencia en programas de inclusión escolar.',
+            experiencia: '6 años acompañando procesos escolares y familiares.',
+            horarios: 'Lun a Jue 11:00 - 19:00',
+            email: 'diego.silva@autisi.com',
+            telefono: '+54 261 667 8899',
+            calificacion: 4.7,
+            activo: true,
+          },
+          {
+            _id: 'psicomotricidad-03',
+            nombre: 'Ana',
+            apellido: 'Gómez',
+            especialidad: 'Psicomotricidad',
+            ubicacion: 'Córdoba',
+            modalidad: 'virtual',
+            foto: '',
+            descripcion: 'Psicomotricista especializada en estimulación temprana y coordinación motora.',
+            experiencia: '5 años en apoyo a familias y educadores.',
+            horarios: 'Mié y Sáb 10:00 - 14:00',
+            email: 'ana.gomez@autisi.com',
+            telefono: '+54 9 351 776 5544',
+            calificacion: 4.6,
+            activo: true,
+          },
+        ]
+
+        const psicopedagogiaExtras = [
+          {
+            _id: 'psicopedagogia-01',
+            nombre: 'Sofía',
+            apellido: 'Martínez',
+            especialidad: 'Psicopedagogía',
+            ubicacion: 'CABA',
+            modalidad: 'presencial',
+            foto: '',
+            descripcion: 'Psicopedagoga con enfoque en desarrollo de estrategias educativas personalizadas.',
+            experiencia: '9 años trabajando con niños y adolescentes en escuelas especiales.',
+            horarios: 'Lun a Vie 09:00 - 15:00',
+            email: 'sofia.martinez@autisi.com',
+            telefono: '+54 11 5588 9977',
+            calificacion: 4.8,
+            activo: true,
+          },
+          {
+            _id: 'psicopedagogia-02',
+            nombre: 'Valentina',
+            apellido: 'Pérez',
+            especialidad: 'Psicopedagogía',
+            ubicacion: 'Rosario',
+            modalidad: 'ambas',
+            foto: '',
+            descripcion: 'Especialista en evaluaciones psicopedagógicas y planes de intervención escolar.',
+            experiencia: '7 años apoyando familias y docentes.',
+            horarios: 'Mar a Jue 10:00 - 18:00',
+            email: 'valentina.perez@autisi.com',
+            telefono: '+54 341 559 2233',
+            calificacion: 4.7,
+            activo: true,
+          },
+          {
+            _id: 'psicopedagogia-03',
+            nombre: 'Camila',
+            apellido: 'Lopez',
+            especialidad: 'Psicopedagogía',
+            ubicacion: 'Córdoba',
+            modalidad: 'virtual',
+            foto: '',
+            descripcion: 'Psicopedagoga especializada en inclusión educativa y apoyo en habilidades de aprendizaje.',
+            experiencia: '6 años en acompañamiento escolar y familiar.',
+            horarios: 'Lun, Mié y Vie 11:00 - 17:00',
+            email: 'camila.lopez@autisi.com',
+            telefono: '+54 9 351 778 6633',
+            calificacion: 4.6,
+            activo: true,
+          },
+        ]
+
+        const terapiaOcupacionalExtras = [
+          {
+            _id: 'terapiaocupacional-01',
+            nombre: 'Marcos',
+            apellido: 'Santos',
+            especialidad: 'Terapia Ocupacional',
+            ubicacion: 'CABA',
+            modalidad: 'presencial',
+            foto: '',
+            descripcion: 'Terapeuta ocupacional con experiencia en actividades de vida diaria y autonomía.',
+            experiencia: '8 años desarrollando planes personalizados en entornos educativos y familiares.',
+            horarios: 'Lun a Vie 10:00 - 16:00',
+            email: 'marcos.santos@autisi.com',
+            telefono: '+54 11 5566 3344',
+            calificacion: 4.8,
+            activo: true,
+          },
+          {
+            _id: 'terapiaocupacional-02',
+            nombre: 'Carla',
+            apellido: 'Paredes',
+            especialidad: 'Terapia Ocupacional',
+            ubicacion: 'Rosario',
+            modalidad: 'ambas',
+            foto: '',
+            descripcion: 'Terapeuta ocupacional centrada en la mejora de habilidades sensoriales y motoras.',
+            experiencia: '6 años trabajando con niños y adolescentes con TEA.',
+            horarios: 'Mar a Jue 11:00 - 18:00',
+            email: 'carla.paredes@autisi.com',
+            telefono: '+54 341 556 8899',
+            calificacion: 4.7,
+            activo: true,
+          },
+        ]
+
+        const neuropediatriaExtras = [
+          {
+            _id: 'neuropediatria-01',
+            nombre: 'Martina',
+            apellido: 'Ruiz',
+            especialidad: 'Neuropediatría',
+            ubicacion: 'CABA',
+            modalidad: 'presencial',
+            foto: '',
+            descripcion: 'Neuropediatra con experiencia en el seguimiento de desarrollo y coordinación motora.',
+            experiencia: '10 años trabajando con niños y familias en contextos clínicos y educativos.',
+            horarios: 'Lun a Vie 10:00 - 16:00',
+            email: 'martina.ruiz@autisi.com',
+            telefono: '+54 11 5555 1122',
+            calificacion: 4.9,
+            activo: true,
+          },
+          {
+            _id: 'neuropediatria-02',
+            nombre: 'Gonzalo',
+            apellido: 'Pérez',
+            especialidad: 'Neuropediatría',
+            ubicacion: 'Rosario',
+            modalidad: 'ambas',
+            foto: '',
+            descripcion: 'Neuropediatra enfocado en diagnósticos tempranos y tratamientos interdisciplinarios.',
+            experiencia: '8 años de experiencia en neuropediatría y acompañamiento escolar.',
+            horarios: 'Mar a Jue 11:00 - 18:00',
+            email: 'gonzalo.perez@autisi.com',
+            telefono: '+54 341 556 7788',
+            calificacion: 4.7,
+            activo: true,
+          },
+          {
+            _id: 'neuropediatria-03',
+            nombre: 'Julieta',
+            apellido: 'Silva',
+            especialidad: 'Neuropediatría',
+            ubicacion: 'Mendoza',
+            modalidad: 'virtual',
+            foto: '',
+            descripcion: 'Neuropediatra con énfasis en tratamientos de integración sensorial y apoyo familiar.',
+            experiencia: '7 años en neurodesarrollo infantil y terapias multidisciplinarias.',
+            horarios: 'Mié y Vie 12:00 - 18:00',
+            email: 'julieta.silva@autisi.com',
+            telefono: '+54 261 555 3344',
+            calificacion: 4.6,
+            activo: true,
+          },
+        ]
+
+        const profesionalesConExtras = [...profesionalesCargados]
+        if ((filters.especialidad === 'Psicología' || !filters.especialidad) && psicologos.length < 2) {
+          profesionalesConExtras.push(profesionExtra)
+        }
+        if ((filters.especialidad === 'Psicomotricidad' || !filters.especialidad) && psicomotricos.length < 3) {
+          profesionalesConExtras.push(...filterExtrasByModalidad(psicomotricidadExtras).slice(0, 3 - psicomotricos.length))
+        }
+        if ((filters.especialidad === 'Psicopedagogía' || !filters.especialidad) && psicopedagogos.length < 3) {
+          profesionalesConExtras.push(...filterExtrasByModalidad(psicopedagogiaExtras).slice(0, 3 - psicopedagogos.length))
+        }
+        if ((filters.especialidad === 'Terapia Ocupacional' || !filters.especialidad) && terapeutas.length < 3) {
+          profesionalesConExtras.push(...filterExtrasByModalidad(terapiaOcupacionalExtras).slice(0, 3 - terapeutas.length))
+        }
+        if ((filters.especialidad === 'Neuropediatría' || !filters.especialidad) && neuropediatras.length < 3) {
+          profesionalesConExtras.push(...filterExtrasByModalidad(neuropediatriaExtras).slice(0, 3 - neuropediatras.length))
+        }
+
+        setProfesionales(profesionalesConExtras)
       } catch (error) {
         console.error('Error al cargar profesionales:', error)
       } finally {
@@ -84,26 +362,25 @@ const Profesionales = () => {
       </div>
 
       {/* Barra de búsqueda y filtros */}
-      <div className="max-w-7xl mx-auto mb-8">
+      <div className="max-w-7xl mx-auto mb-16">
         <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
           <div className="flex flex-col gap-4">
             {/* Barra de búsqueda */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+              <Search size={18} className="text-gray-400" />
               <input
                 type="text"
-                placeholder="Buscar por nombre, especialidad o palabras clave..."
-                className="w-full pl-14 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43A1F2] focus:border-transparent"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar por nombre, especialidad, ubicación o modalidad..."
+                className="flex-1 border-none bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
               />
             </div>
-
-            {/* Filtros desplegables - horizontal scroll en móvil */}
-            <div className="flex gap-3 overflow-x-auto pb-2 lg:flex-wrap lg:pb-0">
-              <select 
-                value={filters.especialidad} 
-                onChange={(e) => setFilters({...filters, especialidad: e.target.value})}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-[#43A1F2] focus:border-transparent min-w-[180px] flex-shrink-0"
-              >
+            <select 
+              value={filters.especialidad} 
+              onChange={(e) => setFilters({...filters, especialidad: e.target.value})}
+              className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none min-w-[180px] flex-shrink-0"
+            >
                 <option value="">Especialidad</option>
                 <option value="Psicología">Psicología</option>
                 <option value="Terapia Ocupacional">Terapia Ocupacional</option>
@@ -116,7 +393,7 @@ const Profesionales = () => {
               <select 
                 value={filters.ubicacion} 
                 onChange={(e) => setFilters({...filters, ubicacion: e.target.value})}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-[#43A1F2] focus:border-transparent min-w-[180px] flex-shrink-0"
+                className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none min-w-[180px] flex-shrink-0"
               >
                 <option value="">Ubicación</option>
                 <option value="CABA">CABA</option>
@@ -128,7 +405,7 @@ const Profesionales = () => {
               <select 
                 value={filters.modalidad} 
                 onChange={(e) => setFilters({...filters, modalidad: e.target.value})}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-[#43A1F2] focus:border-transparent min-w-[180px] flex-shrink-0"
+                className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none min-w-[180px] flex-shrink-0"
               >
                 <option value="">Modalidad</option>
                 <option value="presencial">Presencial</option>
@@ -143,32 +420,31 @@ const Profesionales = () => {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Sección Explorar por especialidad */}
-      <div className="max-w-7xl mx-auto mb-8 mt-12">
-        <h2 className="text-[26px] lg:text-[34px] font-bold text-[#1b2a4a] mb-4 leading-[125%]">Explorar por especialidad</h2>
+      <div className="max-w-7xl mx-auto mb-16 mt-24">
+        <h2 className="text-[20px] lg:text-[34px] font-bold text-[#1b2a4a] mb-8 leading-[125%]">Explorar por especialidad</h2>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {[
-            { icon: Brain, name: 'Psicología', count: 12 },
-            { icon: Target, name: 'Terapia Ocupacional', count: 8 },
+            { icon: Brain, name: 'Psicología', count: 2 },
+            { icon: Target, name: 'Terapia Ocupacional', count: 3 },
             { icon: MessageSquare, name: 'Fonoaudiología', count: 6 },
-            { icon: Activity, name: 'Psicomotricidad', count: 4 },
-            { icon: BookOpen, name: 'Psicopedagogía', count: 5 },
+            { icon: Activity, name: 'Psicomotricidad', count: 3 },
+            { icon: BookOpen, name: 'Psicopedagogía', count: 3 },
             { icon: Baby, name: 'Neuropediatría', count: 3 }
           ].map((especialidad, index) => {
             const Icon = especialidad.icon;
             return (
               <button
                 key={index}
-                className="flex-shrink-0 bg-white border border-gray-200 rounded-2xl p-4 hover:border-[#43A1F2] hover:shadow-md transition-all min-w-[180px] flex flex-col items-center text-center"
+                className="flex-shrink-0 bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-all min-w-[180px] flex flex-col items-center text-center"
                 onClick={() => setFilters({...filters, especialidad: especialidad.name})}
               >
                 <div className="mb-2 flex items-center justify-center">
                   <Icon size={32} className="text-[#43A1F2]" />
                 </div>
-                <div className="font-semibold text-[#1b2a4a] text-[18px] lg:text-[16px]">{especialidad.name}</div>
-                <div className="text-[14px] lg:text-[13px] text-gray-500 mt-1">{especialidad.count} profesionales</div>
+                <div className="font-semibold text-[#1b2a4a] text-[16px] lg:text-[18px]">{especialidad.name}</div>
+                <div className="text-[13px] lg:text-[14px] text-gray-500 mt-1">{especialidad.count} profesionales</div>
               </button>
             );
           })}
@@ -176,9 +452,9 @@ const Profesionales = () => {
       </div>
 
       {/* Sección de profesionales destacados */}
-      <div className="max-w-7xl mx-auto mb-8 mt-12">
-        <h2 className="text-[26px] lg:text-[34px] font-bold text-[#1b2a4a] mb-4 leading-[125%]">Profesionales destacados</h2>
-        <ProfessionalsList professionals={profesionales} onView={handleView} />
+      <div className="max-w-7xl mx-auto mb-16 mt-24">
+        <h2 className="text-[20px] lg:text-[34px] font-bold text-[#1b2a4a] mb-8 leading-[125%]">Profesionales destacados</h2>
+        <ProfessionalsList professionals={visibleProfesionales} onView={handleView} />
       </div>
 
       {selected && (

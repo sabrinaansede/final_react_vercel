@@ -5,6 +5,7 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { registerSW } from 'virtual:pwa-register'
+import { SocketProvider } from './context/SocketContext.jsx'
 
 registerSW({ immediate: true })
 
@@ -12,7 +13,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <SocketProvider>
+          <App />
+        </SocketProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

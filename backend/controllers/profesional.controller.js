@@ -1,5 +1,10 @@
 import Profesional from "../models/profesional.model.js";
 
+const escapeRegex = (text) => {
+  if (!text) return ''
+  return text.toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export const crearProfesional = async (req, res) => {
   try {
     const nuevoProfesional = new Profesional(req.body);
@@ -20,9 +25,9 @@ export const listarProfesionales = async (req, res) => {
       ],
     };
     
-    if (especialidad) filtro.especialidad = especialidad;
-    if (ubicacion) filtro.ubicacion = ubicacion;
-    if (modalidad) filtro.modalidad = modalidad;
+    if (especialidad) filtro.especialidad = { $regex: `^${escapeRegex(especialidad)}$`, $options: 'i' };
+    if (ubicacion) filtro.ubicacion = { $regex: `^${escapeRegex(ubicacion)}$`, $options: 'i' };
+    if (modalidad) filtro.modalidad = { $regex: `^${escapeRegex(modalidad)}$`, $options: 'i' };
     
     const profesionales = await Profesional.find(filtro)
       .populate("resenas")

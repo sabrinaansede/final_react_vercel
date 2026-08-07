@@ -6,7 +6,6 @@ const Header = () => {
 
   const links = [
     { href: '#que-es', label: '¿Qué es?' },
-    { href: '#conoce-la-app', label: 'Funciones' },
     { href: '#blog', label: 'Blog' },
     { href: '#faq', label: 'FAQ' },
     { href: '#contacto', label: 'Contacto' },

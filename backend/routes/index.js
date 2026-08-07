@@ -7,6 +7,7 @@ import tecnicaRouter from './tecnica.router.js';
 import registroEmocionalRouter from './registroEmocional.router.js';
 import notificacionesRouter from './notificaciones.router.js';
 import articuloRouter from './articulo.router.js';
+import comunidadRouter from './comunidad.router.js';
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use('/tecnicas', tecnicaRouter);
 router.use('/registros-emocionales', registroEmocionalRouter);
 router.use('/notifications', notificacionesRouter);
 router.use('/articulos', articuloRouter);
+router.use('/comunidad', comunidadRouter);
 
 export default router;

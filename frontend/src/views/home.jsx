@@ -7,7 +7,7 @@ import QuickAccessGrid from "../components/QuickAccessGrid";
 import RecommendedList from "../components/RecommendedList";
 import ActiveChecklist from "../components/ActiveChecklist";
 import EmergencyMode from "../components/EmergencyMode";
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Frown, Meh, Smile, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
@@ -73,11 +73,11 @@ const Home = () => {
           <h1 className="text-[19px] lg:text-[22px] font-bold text-[#1b2a4a] leading-[1.3] mb-1">
             {isGuest ? "Explorá AutiSi sin cuenta" : `Hola, ${usuario?.nombre || ""} 👋`}
           </h1>
-          <p className="text-[14px] lg:text-[15px] text-[#64748b] leading-[1.4] max-w-[42rem]">
-            {isGuest
-              ? "Conocé información pública, el mapa de lugares adaptados y recursos educativos antes de registrarte."
-              : "Este es tu espacio seguro para descubrir lugares preparados y recursos que acompañan el bienestar diario."}
-          </p>
+          {!isGuest && (
+            <p className="text-[14px] lg:text-[15px] text-[#64748b] leading-[1.4] max-w-[42rem]">
+              Este es tu espacio seguro para descubrir lugares preparados y recursos que acompañan el bienestar diario.
+            </p>
+          )}
         </div>
 
         {isGuest ? (
@@ -87,31 +87,6 @@ const Home = () => {
               { id: 'mapa', kicker: 'Mapa', title: 'Lugares adaptados', to: '/mapa' },
               { id: 'tecnicas', kicker: 'Técnicas', title: 'Técnicas sensoriales', to: '/tecnicas' },
             ]} />
-
-          <section className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-5">
-            <h2 className="text-[18px] font-bold text-[#0f172a] mb-2">Contenido disponible para explorar</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Podés navegar por información general, recursos educativos y el mapa de lugares adaptados sin iniciar sesión.
-            </p>
-            <div className="grid gap-3 md:grid-cols-2">
-              <button type="button" onClick={() => navigate('/centro-informacion')} className="rounded-2xl border border-[#dfefff] bg-[#f7fbff] p-4 text-left shadow-sm transition hover:border-[#43A1F2]">
-                <div className="text-sm font-bold text-[#1b2a4a]">Información sobre el autismo</div>
-                <div className="text-sm text-gray-600 mt-1">Artículos y recursos educativos para comprender mejor el autismo.</div>
-              </button>
-              <button type="button" onClick={() => navigate('/mapa')} className="rounded-2xl border border-[#dfefff] bg-[#f7fbff] p-4 text-left shadow-sm transition hover:border-[#43A1F2]">
-                <div className="text-sm font-bold text-[#1b2a4a]">Mapa de lugares adaptados</div>
-                <div className="text-sm text-gray-600 mt-1">Explorá espacios registrados con información general de accesibilidad.</div>
-              </button>
-              <button type="button" onClick={() => navigate('/tecnicas')} className="rounded-2xl border border-[#dfefff] bg-[#f7fbff] p-4 text-left shadow-sm transition hover:border-[#43A1F2]">
-                <div className="text-sm font-bold text-[#1b2a4a]">Técnicas y recursos</div>
-                <div className="text-sm text-gray-600 mt-1">Accedé a herramientas de apoyo y orientación general.</div>
-              </button>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button type="button" onClick={() => navigate('/login')} className="rounded-full bg-[#43A1F2] px-4 py-2 text-sm font-semibold text-white">Iniciar sesión</button>
-              <button type="button" onClick={() => navigate('/registro')} className="rounded-full border border-[#43A1F2] px-4 py-2 text-sm font-semibold text-[#43A1F2]">Crear cuenta</button>
-            </div>
-          </section>
           </>
         ) : (
           <>

@@ -1,6 +1,8 @@
 // index.js
 import 'dotenv/config'; // Carga variables de entorno desde .env
 import express from "express";
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import connectDB from "./config/db.js";
 import routerAPI from "./routes/index.js";
 import Profesional from "./models/profesional.model.js";
@@ -227,4 +229,58 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000; 
-app.listen(PORT, () => console.log(`🔥 Servidor corriendo en puerto ${PORT}`));
+
+// Crear servidor HTTP y configurar Socket.IO
+const server = createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const isAllowed = allowedOrigins.some((entry) =>
+        entry instanceof RegExp ? entry.test(origin) : entry === origin
+      );
+      return callback(null, isAllowed);
+    },
+    credentials: true,
+    methods: ['GET', 'POST']
+  }
+});
+
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log('🔌 Cliente socket conectado:', socket.id);
+  // Notify others that a user connected (optional payload can include user id)
+  socket.broadcast.emit('usuario-conectado', { socketId: socket.id });
+
+  // Relay community events from clients to all other clients
+  socket.on('nuevo-post', (payload) => {
+    socket.broadcast.emit('nuevo-post', payload);
+  });
+
+  socket.on('editar-post', (payload) => {
+    socket.broadcast.emit('editar-post', payload);
+  });
+
+  socket.on('eliminar-post', (payload) => {
+    socket.broadcast.emit('eliminar-post', payload);
+  });
+
+  socket.on('nuevo-comentario', (payload) => {
+    // payload may include postId and comment data
+    socket.broadcast.emit('nuevo-comentario', payload);
+  });
+
+  socket.on('nuevo-like', (payload) => {
+    // payload: { postId, liked, likes }
+    socket.broadcast.emit('nuevo-like', payload);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('🔌 Cliente socket desconectado:', socket.id);
+    socket.broadcast.emit('usuario-desconectado', { socketId: socket.id });
+  });
+});
+
+server.listen(PORT, () => console.log(`🔥 Servidor corriendo en puerto ${PORT}`));

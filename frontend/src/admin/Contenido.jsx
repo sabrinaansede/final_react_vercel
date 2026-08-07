@@ -49,7 +49,6 @@ const AdminContenido = () => {
       related: formData.get('related')?.split(',').map(s => s.trim()).filter(s => s) || [],
     };
 
-    // Parse sections
     const sectionCount = parseInt(formData.get('sectionCount') || '0');
     for (let i = 0; i < sectionCount; i++) {
       const sectionTitle = formData.get(`section_${i}_title`);
@@ -150,7 +149,6 @@ const AdminContenido = () => {
       }
     >
       <div className="space-y-8">
-        {/* Search Bar */}
         <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
           <div className="flex gap-4">
             <div className="flex-1 relative">
@@ -166,7 +164,6 @@ const AdminContenido = () => {
           </div>
         </div>
 
-        {/* Form Card */}
         {showForm && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
             <div className="p-6 border-b border-gray-200">
@@ -280,7 +277,6 @@ const AdminContenido = () => {
           </div>
         )}
 
-        {/* Articles List */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-bold text-gray-900">Listado de Artículos</h3>

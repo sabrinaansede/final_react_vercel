@@ -127,6 +127,14 @@ export const sendNotification = async (req, res) => {
 
     await newNotificacion.save();
 
+    // Emitir evento en tiempo real a través de Socket.IO
+    try {
+      const io = req.app && req.app.get && req.app.get('io');
+      if (io) io.emit('new-notification', newNotificacion);
+    } catch (e) {
+      console.warn('No se pudo emitir evento socket (notificación):', e.message);
+    }
+
     res.status(200).json({
       message: "Notificaciones enviadas",
       successful,

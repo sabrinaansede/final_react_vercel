@@ -18,6 +18,14 @@ const crearReseña = async (req, res) => {
     }
     const nuevaReseña = new Reseña(data);
     await nuevaReseña.save();
+    // Emitir evento 'new-review' para actualización en tiempo real
+    try {
+      const io = req.app && req.app.get && req.app.get('io');
+      if (io) io.emit('new-review', nuevaReseña);
+    } catch (e) {
+      console.warn('No se pudo emitir evento socket (reseña):', e.message);
+    }
+
     res.status(201).json({ message: "Reseña creada", data: nuevaReseña });
   } catch (err) {
     res.status(400).json({ error: err.message });

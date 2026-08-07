@@ -75,7 +75,6 @@ const Navbar = () => {
             }}
           />
         </Link>
-        {/* Desktop simplified nav */}
         <div className="nav-links-desktop">
           <NavLink to="/" className="nav-link" end>
             Inicio
@@ -88,9 +87,6 @@ const Navbar = () => {
           </NavLink>
           <NavLink to="/checklist" className="nav-link">
             Checklist
-          </NavLink>
-          <NavLink to="/centro-informacion" className="nav-link">
-            Centro de Información
           </NavLink>
           <NavLink to="/profesionales" className="nav-link">
             Profesionales
@@ -159,10 +155,6 @@ const Navbar = () => {
                 <CheckSquare size={20} />
                 <span>Checklist</span>
               </NavLink>
-              <NavLink to="/centro-informacion" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <Info size={20} />
-                <span>Centro de Información</span>
-              </NavLink>
               <NavLink to="/mis-resenas" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <MessageCircle size={20} />
                 <span>Mis reseñas</span>
@@ -211,10 +203,6 @@ const Navbar = () => {
               <NavLink to="/checklist" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <CheckSquare size={20} />
                 <span>Checklist</span>
-              </NavLink>
-              <NavLink to="/centro-informacion" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <Info size={20} />
-                <span>Centro de Información</span>
               </NavLink>
               <NavLink to="/contacto" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <Mail size={20} />

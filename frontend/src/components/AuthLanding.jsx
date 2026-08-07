@@ -85,9 +85,6 @@ const AuthLanding = ({ initialTab = "login" }) => {
       <div className="home-container">
         <div className="home-hero">
           <h1 className="home-title">Bienvenid@ a Lugares Seguros</h1>
-          <p className="home-subtitle">
-            Iniciá sesión o creá tu cuenta para acceder al mapa y contribuir con la comunidad.
-          </p>
         </div>
 
         <div className="home-tabs">
@@ -196,12 +193,21 @@ const AuthLanding = ({ initialTab = "login" }) => {
         </div>
 
         <div className="card" style={{ marginTop: 16, maxWidth: 640, marginLeft: "auto", marginRight: "auto" }}>
-          <button type="button" onClick={handleGuestAccess} className="w-full bg-[#43A1F2] text-white px-4 py-2.5 rounded-lg font-medium text-sm hover:bg-[#2E7BB8] transition-colors">
-            Explorar sin cuenta
-          </button>
-          <p className="msg msg-success" style={{ marginTop: 10, textAlign: "center" }}>
-            Podrás ver información pública, el mapa y recursos educativos sin crear una cuenta.
-          </p>
+          <h3 className="card-title" style={{ textAlign: "center", marginBottom: 16 }}>Funciones disponibles sin cuenta</h3>
+          <div className="grid gap-3">
+            <button type="button" onClick={() => { handleGuestAccess(); setTimeout(() => navigate('/centro-informacion'), 100); }} className="w-full text-left p-4 rounded-lg border border-gray-200 bg-white hover:border-[#43A1F2] hover:bg-[#f8fbff] transition-colors">
+              <div className="font-semibold text-[#1b2a4a]">📚 Centro de Información</div>
+              <div className="text-sm text-gray-600 mt-1">Artículos y recursos sobre autismo</div>
+            </button>
+            <button type="button" onClick={() => { handleGuestAccess(); setTimeout(() => navigate('/mapa'), 100); }} className="w-full text-left p-4 rounded-lg border border-gray-200 bg-white hover:border-[#43A1F2] hover:bg-[#f8fbff] transition-colors">
+              <div className="font-semibold text-[#1b2a4a]">🗺️ Mapa de Lugares</div>
+              <div className="text-sm text-gray-600 mt-1">Espacios adaptados y accesibles</div>
+            </button>
+            <button type="button" onClick={() => { handleGuestAccess(); setTimeout(() => navigate('/tecnicas'), 100); }} className="w-full text-left p-4 rounded-lg border border-gray-200 bg-white hover:border-[#43A1F2] hover:bg-[#f8fbff] transition-colors">
+              <div className="font-semibold text-[#1b2a4a]">🎯 Técnicas y Recursos</div>
+              <div className="text-sm text-gray-600 mt-1">Herramientas de apoyo sensorial</div>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -17,7 +17,6 @@ const Footer = () => {
             <h4 className="font-extrabold mb-4 text-sm uppercase tracking-wide text-white/90">Navegación</h4>
             <ul className="space-y-2 text-sm text-white/70">
               <li><a href="#que-es" className="hover:text-white transition-colors">¿Qué es?</a></li>
-              <li><a href="#conoce-la-app" className="hover:text-white transition-colors">Funciones</a></li>
               <li><a href="#descargar-app" className="hover:text-white transition-colors">Descargar</a></li>
             </ul>
           </div>

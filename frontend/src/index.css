@@ -13,7 +13,7 @@
   --color-navbar-bg: #ffffffcc; /* fondo translúcido navbar */
   --color-navbar-button: #f9f9f9; /* fondo botón navbar (light) */
   --nav-h: 94px; /* navbar-inner 70px + padding vertical */
-  --mobile-nav-h: 72px;
+  --mobile-nav-h: 64px;
   
   /* Escala tipográfica Desktop */
   --font-size-h1-desktop: 44px;
@@ -389,9 +389,6 @@ body {
   }
   a:hover {
     color: #ffffff;
-  }
-  button {
-    background-color: var(--color-navbar-button);
   }
 }
 /* === NAVBAR GENERAL === */

@@ -4,6 +4,13 @@ import { Check } from 'lucide-react';
 import BullrichApadea from '../assets/Bullrich_apadea.jpg';
 import AbastoApadea from '../assets/abasto_apadea.jpg';
 import CafePosible from '../assets/cafe_posible.jpeg';
+import Alcorta from '../assets/alcorta.jpg';
+import Palermo from '../assets/palermo.jpg';
+import Dot from '../assets/dot.jpg';
+import JardinJapones from '../assets/jardin_japones.jpg';
+import Teatro from '../assets/teatro.jpg';
+import Mafalda from '../assets/mafalda.jpg';
+import Escuela from '../assets/escuela.jpg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://autisi-backend.onrender.com';
 
@@ -28,6 +35,13 @@ const getFallbackPlaceImage = (name) => {
   if (lower.includes('bullrich') || lower.includes('burrlirch')) return BullrichApadea;
   if (lower.includes('abasto')) return AbastoApadea;
   if (lower.includes('cafe') && lower.includes('posible')) return CafePosible;
+  if (lower.includes('alcorta')) return Alcorta;
+  if (lower.includes('palermo')) return Palermo;
+  if (lower.includes('dot')) return Dot;
+  if (lower.includes('jardin') || lower.includes('japones') || lower.includes('japonés')) return JardinJapones;
+  if (lower.includes('teatro')) return Teatro;
+  if (lower.includes('mafalda')) return Mafalda;
+  if (lower.includes('escuela')) return Escuela;
   if (lower.includes('apadea')) return BullrichApadea;
   return '';
 };
@@ -87,6 +101,13 @@ const RecommendedList = ({ places = [] }) => {
             if (name.includes('bullrich') || name.includes('burrlirch')) return BullrichApadea;
             if (name.includes('abasto')) return AbastoApadea;
             if (name.includes('cafe') && name.includes('posible')) return CafePosible;
+            if (name.includes('alcorta')) return Alcorta;
+            if (name.includes('palermo')) return Palermo;
+            if (name.includes('dot')) return Dot;
+            if (name.includes('jardin') || name.includes('japones') || name.includes('japonés')) return JardinJapones;
+            if (name.includes('teatro')) return Teatro;
+            if (name.includes('mafalda')) return Mafalda;
+            if (name.includes('escuela')) return Escuela;
             return '';
           })();
 
@@ -104,7 +125,7 @@ const RecommendedList = ({ places = [] }) => {
             <div key={p._id} className="min-w-[200px] lg:min-w-0 flex-shrink-0 lg:flex-1">
               <div
                 className="flex flex-col bg-white rounded-2xl overflow-hidden cursor-pointer shadow-md border border-blue-50 transition-all hover:-translate-y-1 hover:shadow-lg group"
-                onClick={() => navigate(`/lugar/${p._id}`)}
+                onClick={() => navigate('/mapa')}
               >
                 <div className="relative w-full h-[140px] lg:h-[220px] rounded-t-2xl overflow-hidden">
                   <div

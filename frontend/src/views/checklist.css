@@ -33,20 +33,21 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
+  background: var(--color-brand);
   color: white;
-  border: none;
+  border: 1px solid var(--color-brand);
   border-radius: 10px;
   padding: 12px 20px;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .new-checklist-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(67, 161, 242, 0.3);
+  background: var(--color-brand-dark);
+  box-shadow: 0 6px 16px rgba(67, 161, 242, 0.25);
 }
 
 /* Grid de checklists - Tarjetas horizontales */
@@ -280,13 +281,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
+  background: var(--color-brand);
   color: white;
-  border: none;
+  border: 1px solid var(--color-brand);
   border-radius: 10px;
   padding: 12px 20px;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
   width: fit-content;
@@ -294,7 +295,8 @@
 
 .add-item-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(67, 161, 242, 0.3);
+  background: var(--color-brand-dark);
+  box-shadow: 0 6px 16px rgba(67, 161, 242, 0.25);
 }
 
 .item-row {
@@ -502,13 +504,15 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
+  background: var(--color-brand);
   color: white;
+  border: 1px solid var(--color-brand);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(67, 161, 242, 0.3);
+  background: var(--color-brand-dark);
+  box-shadow: 0 6px 16px rgba(67, 161, 242, 0.25);
 }
 
 .btn-secondary {

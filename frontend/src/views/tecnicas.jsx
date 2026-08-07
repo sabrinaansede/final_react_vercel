@@ -6,6 +6,27 @@ const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender
 
 const categorias = ["todas", "respiración", "relajación", "enfoque", "movimiento", "sensorial"];
 
+const DEFAULT_TECHNIQUE_IMAGE = "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80";
+const TECHNIQUE_IMAGES = {
+  respiracion: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
+  presion: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80",
+  ruido: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80",
+  estir: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80",
+  foco: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1200&q=80",
+  caminata: "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1200&q=80",
+};
+
+const getTechniqueImage = (tech) => {
+  const title = (tech?.titulo || "").toLowerCase();
+  if (title.includes("respir")) return TECHNIQUE_IMAGES.respiracion;
+  if (title.includes("presión") || title.includes("presion")) return TECHNIQUE_IMAGES.presion;
+  if (title.includes("ruido")) return TECHNIQUE_IMAGES.ruido;
+  if (title.includes("estir")) return TECHNIQUE_IMAGES.estir;
+  if (title.includes("foco") || title.includes("objeto")) return TECHNIQUE_IMAGES.foco;
+  if (title.includes("caminata")) return TECHNIQUE_IMAGES.caminata;
+  return tech?.img || DEFAULT_TECHNIQUE_IMAGE;
+};
+
 const Tecnicas = () => {
   const [tecnicas, setTecnicas] = useState([]);
   const [favs, setFavs] = useState(() => {
@@ -134,7 +155,7 @@ const Tecnicas = () => {
             {tecnicasFiltradas.map((t) => (
               <div key={t._id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                 <div className="relative h-28 overflow-hidden">
-                  <img src={t.img} alt={t.titulo} className="w-full h-full object-cover" />
+                  <img src={getTechniqueImage(t)} alt={t.titulo} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = DEFAULT_TECHNIQUE_IMAGE; }} />
                   <button
                     className="absolute top-2 right-2 bg-white/90 border-none w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all hover:bg-white hover:scale-110 shadow-md p-0"
                     onClick={() => toggleFav(t._id)}
@@ -194,7 +215,7 @@ const Tecnicas = () => {
               </button>
             </div>
             <div className="p-5">
-              <img className="w-full h-45 object-cover rounded-xl mb-4" src={openTec.img} alt={openTec.titulo} />
+              <img className="w-full h-45 object-cover rounded-xl mb-4" src={getTechniqueImage(openTec)} alt={openTec.titulo} onError={(e) => { e.currentTarget.src = DEFAULT_TECHNIQUE_IMAGE; }} />
               <div>
                 <p className="text-slate-600 mb-3 leading-relaxed text-sm">{openTec.desc}</p>
                 <div className="mb-3">

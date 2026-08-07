@@ -430,9 +430,9 @@ body {
 
 /* Estilos específicos para el logo en la barra de navegación */
 .navbar .navbar-brand .navbar-logo {
-  height: 64px;
+  height: 92px;
   width: auto;
-  max-width: 220px;
+  max-width: 260px;
   transition: height 0.3s ease;
   object-fit: contain;
   display: block;
@@ -474,7 +474,7 @@ body {
   .navbar-inner { display: flex; align-items: center; gap: 8px; justify-content: flex-start; }
   .mobile-menu-button { order: 0; margin-left: 0; }
   .navbar-brand { order: 1; margin: 0 0 0 auto; display: flex; align-items: center; }
-  .navbar-logo { height: 40px; width: auto; max-width: 140px; }
+  .navbar-logo { height: 56px; width: auto; max-width: 180px; }
 
   /* Ocultar los botones principales (Ver mapa, Ver técnicas, Contacto) en móvil
      porque ya están accesibles desde las mini-cards */
@@ -602,8 +602,8 @@ body {
   }
   
   .navbar-logo {
-    height: 40px;
-    max-width: 140px;
+    height: 56px;
+    max-width: 180px;
   }
   
   .nav-links {
@@ -664,7 +664,7 @@ body {
     display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid #eef2f7;margin-bottom:12px
   }
 
-  .mobile-drawer-logo{height:64px;width:auto;max-width:180px;object-fit:contain;display:block}
+  .mobile-drawer-logo{height:84px;width:auto;max-width:220px;object-fit:contain;display:block}
 
   .mobile-user-name{font-weight:800;color:var(--color-ink);font-size:16px}
 

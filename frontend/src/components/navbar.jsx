@@ -97,14 +97,9 @@ const Navbar = () => {
             </NavLink>
           )}
           {usuario ? (
-            <>
-              <NavLink to="/perfil" className="nav-link">
-                Perfil
-              </NavLink>
-              <button onClick={handleLogout} className="nav-button danger">
-                Salir
-              </button>
-            </>
+            <NavLink to="/perfil" className="nav-link">
+              Perfil
+            </NavLink>
           ) : (
             <Link to="/login" className="nav-button">
               Ingresar
@@ -129,85 +124,44 @@ const Navbar = () => {
               <img src={logo} alt="Autisi" className="mobile-drawer-logo" />
             </div>
           </div>
+          <NavLink to="/" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+            <Home size={20} />
+            <span>Inicio</span>
+          </NavLink>
+          <NavLink to="/mapa" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+            <MapPin size={20} />
+            <span>Mapa</span>
+          </NavLink>
+          <NavLink to="/comunidad" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+            <MessageCircle size={20} />
+            <span>Comunidad</span>
+          </NavLink>
+          <NavLink to="/checklist" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+            <CheckSquare size={20} />
+            <span>Checklist</span>
+          </NavLink>
+          <NavLink to="/profesionales" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+            <Users size={20} />
+            <span>Profesionales</span>
+          </NavLink>
+          {usuario?.isAdmin && (
+            <NavLink to="/admin" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+              <LayoutDashboard size={20} />
+              <span>Panel Admin</span>
+            </NavLink>
+          )}
           {usuario ? (
             <>
-              <NavLink to="/" className="nav-link mobile-nav-item" end onClick={() => setMobileMenuOpen(false)}>
-                <Home size={20} />
-                <span>Inicio</span>
-              </NavLink>
-              <NavLink to="/mapa" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <MapPin size={20} />
-                <span>Mapa</span>
-              </NavLink>
-              <NavLink to="/comunidad" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <MessagesSquare size={20} />
-                <span>Comunidad</span>
-              </NavLink>
-              <NavLink to="/profesionales" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <Users size={20} />
-                <span>Profesionales</span>
-              </NavLink>
-              <NavLink to="/tecnicas" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <BookOpen size={20} />
-                <span>Técnicas</span>
-              </NavLink>
-              <NavLink to="/checklist" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <CheckSquare size={20} />
-                <span>Checklist</span>
-              </NavLink>
-              <NavLink to="/mis-resenas" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <MessageCircle size={20} />
-                <span>Mis reseñas</span>
-              </NavLink>
-              <NavLink to="/contacto" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <Mail size={20} />
-                <span>Contacto</span>
-              </NavLink>
               <NavLink to="/perfil" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <User size={20} />
                 <span>Perfil</span>
               </NavLink>
-              {usuario?.isAdmin && (
-                <NavLink to="/admin" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                  <LayoutDashboard size={20} />
-                  <span>Panel Admin</span>
-                </NavLink>
-              )}
-
               <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="nav-button danger">
                 Salir
               </button>
             </>
           ) : (
             <>
-              <NavLink to="/" className="nav-link mobile-nav-item" end onClick={() => setMobileMenuOpen(false)}>
-                <Home size={20} />
-                <span>Inicio</span>
-              </NavLink>
-              <NavLink to="/mapa" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <MapPin size={20} />
-                <span>Mapa</span>
-              </NavLink>
-              <NavLink to="/comunidad" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <MessagesSquare size={20} />
-                <span>Comunidad</span>
-              </NavLink>
-              <NavLink to="/profesionales" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <Users size={20} />
-                <span>Profesionales</span>
-              </NavLink>
-              <NavLink to="/tecnicas" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <BookOpen size={20} />
-                <span>Técnicas</span>
-              </NavLink>
-              <NavLink to="/checklist" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <CheckSquare size={20} />
-                <span>Checklist</span>
-              </NavLink>
-              <NavLink to="/contacto" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
-                <Mail size={20} />
-                <span>Contacto</span>
-              </NavLink>
               <NavLink to="/login" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
                 <UserPlus size={20} />
                 <span>Iniciar sesión</span>

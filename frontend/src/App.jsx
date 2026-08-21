@@ -24,6 +24,11 @@ import AdminContenido from "./admin/Contenido";
 import Notifications from "./admin/Notifications";
 import { useAuth } from "./context/AuthContext.jsx";
 import NotificationPermission from "./components/NotificationPermission.jsx";
+import OnboardingWelcome from "./components/OnboardingWelcome";
+import OnboardingIntro from "./components/OnboardingIntro";
+import OnboardingProfileType from "./components/OnboardingProfileType";
+import OnboardingPreferences from "./components/OnboardingPreferences";
+import AuthLanding from "./components/AuthLanding";
 
 const App = () => {
   const location = useLocation();
@@ -40,9 +45,10 @@ const App = () => {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const showMainNavbar = true;
-  const showMobileNav = !isDesktop && !location.pathname.startsWith("/login") && !location.pathname.startsWith("/registro") && !isAdminRoute;
+  const showMainNavbar = !location.pathname.startsWith("/onboarding") && !location.pathname.startsWith("/login") && !location.pathname.startsWith("/registro");
+  const showMobileNav = !isDesktop && !location.pathname.startsWith("/login") && !location.pathname.startsWith("/registro") && !location.pathname.startsWith("/onboarding") && !isAdminRoute;
   const isMapRoute = location.pathname === "/mapa";
+  const isAuthRoute = location.pathname.startsWith("/login") || location.pathname.startsWith("/registro");
 
   // Componente para proteger rutas de admin
   const AdminRoute = ({ children }) => {
@@ -55,9 +61,15 @@ const App = () => {
   return (
     <>
       {showMainNavbar && <Navbar />}
-      <main className={`app-main${isMapRoute ? " app-main--flush" : ""}`}>
+      <main className={`app-main${isMapRoute ? " app-main--flush" : ""}${isAuthRoute ? " app-main--no-navbar" : ""}`}>
       <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/onboarding" element={<OnboardingWelcome />} />
+      <Route path="/onboarding/intro" element={<OnboardingIntro />} />
+      <Route path="/onboarding/profile-type" element={<OnboardingProfileType />} />
+      <Route path="/onboarding/preferences" element={<OnboardingPreferences />} />
+      <Route path="/login" element={<AuthLanding initialTab="login" />} />
+      <Route path="/registro" element={<AuthLanding initialTab="registro" />} />
       <Route path="/mapa" element={<MapaLugares />} />
       <Route
         path="/contacto"
@@ -76,8 +88,6 @@ const App = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<Registro />} />
       <Route 
         path="/perfil" 
         element={

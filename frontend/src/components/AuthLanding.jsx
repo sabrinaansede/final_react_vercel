@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import LoginForm from "./LoginForm.jsx";
+import logo from "../assets/logo.png";
+import "./AuthLanding.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
 
@@ -24,9 +25,22 @@ const AuthLanding = ({ initialTab = "login" }) => {
   const [regLoading, setRegLoading] = useState(false);
   const [regMsg, setRegMsg] = useState("");
 
+  // Estados Login
+  const [loginForm, setLoginForm] = useState({
+    email: "",
+    password: "",
+  });
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginMsg, setLoginMsg] = useState("");
+
   const onRegChange = (e) => {
     const { name, value } = e.target;
     setRegForm((p) => ({ ...p, [name]: value }));
+  };
+
+  const onLoginChange = (e) => {
+    const { name, value } = e.target;
+    setLoginForm((p) => ({ ...p, [name]: value }));
   };
 
   const submitRegistro = async (e) => {
@@ -57,8 +71,7 @@ const AuthLanding = ({ initialTab = "login" }) => {
             password: regForm.password,
           });
           login(data.user, data.token);
-          const redirectTo = location.state?.from?.pathname || "/";
-          setTimeout(() => navigate(redirectTo, { replace: true }), 500);
+          setTimeout(() => navigate('/onboarding/profile-type', { replace: true }), 500);
         } catch (loginErr) {
           console.error('Error en auto-login:', loginErr);
           setRegMsg("Cuenta creada, pero hubo un error al iniciar sesión automáticamente. Por favor inicia sesión manualmente.");
@@ -75,139 +88,190 @@ const AuthLanding = ({ initialTab = "login" }) => {
     }
   };
 
+  const submitLogin = async (e) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    setLoginMsg("");
+    try {
+      const { data } = await axios.post(`${API_URL}/api/usuarios/login`, {
+        email: loginForm.email,
+        password: loginForm.password,
+      });
+      login(data.user, data.token);
+      
+      // Check if user has completed onboarding
+      const hasProfileType = localStorage.getItem('userProfileType');
+      const redirectTo = location.state?.from?.pathname || 
+                        (hasProfileType ? "/" : "/onboarding/profile-type");
+      
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      console.error('Error en login:', err);
+      const errorMessage = err.response?.data?.message || 
+                         "Email o contraseña incorrectos";
+      setLoginMsg(errorMessage);
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
   const handleGuestAccess = () => {
     enterGuestMode();
     navigate("/", { replace: true });
   };
 
   return (
-    <div className="home-page">
-      <div className="home-container">
-        <div className="home-hero">
-          <h1 className="home-title">Bienvenid@ a Lugares Seguros</h1>
+    <div className="auth-landing-container">
+      <div className="auth-landing-wrapper">
+        {/* Logo */}
+        <div className="auth-logo-section">
+          <img 
+            src={logo} 
+            alt="AutiSi Logo" 
+            className="auth-logo"
+          />
+          <h1 className="auth-title">
+            {activeTab === "registro" ? "Comenzá tu experiencia en AutiSi" : "Bienvenido de nuevo"}
+          </h1>
         </div>
 
-        <div className="home-tabs">
-          <div className="home-tabs-inner">
-            <button
-              className={`tab-btn ${activeTab === "login" ? "active" : ""}`}
-              onClick={() => setActiveTab("login")}
-            >
-              Iniciar sesión
-            </button>
-            <button
-              className={`tab-btn ${activeTab === "registro" ? "active" : ""}`}
-              onClick={() => setActiveTab("registro")}
-            >
-              Crear cuenta
-            </button>
-          </div>
-        </div>
-
-        <div className="home-grid">
-          <div className="card" style={{ opacity: activeTab === "login" ? 1 : 0.6 }}>
-            <h2 className="card-title">Ingresá a tu cuenta</h2>
-            <LoginForm />
-          </div>
-
-          <div className="card" style={{ opacity: activeTab === "registro" ? 1 : 0.6 }}>
-            <h2 className="card-title">Creá tu cuenta</h2>
-            <form onSubmit={submitRegistro} className="form">
-              <div className="form-group">
-                <label className="label">Nombre</label>
+        {/* Card */}
+        <div className="auth-card">
+          {activeTab === "registro" ? (
+            <form onSubmit={submitRegistro} className="auth-form">
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Nombre
+                </label>
                 <input
                   type="text"
                   name="nombre"
                   value={regForm.nombre}
                   onChange={onRegChange}
                   required
-                  className="input"
+                  className="auth-input"
                 />
               </div>
-              <div className="form-group">
-                <label className="label">Email</label>
+
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Email
+                </label>
                 <input
                   type="email"
                   name="email"
                   value={regForm.email}
                   onChange={onRegChange}
                   required
-                  className="input"
+                  className="auth-input"
                 />
               </div>
-              <div
-                className="form-group"
-                style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
-              >
-                <div className="form-group">
-                  <label className="label">Contraseña</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={regForm.password}
-                    onChange={onRegChange}
-                    required
-                    className="input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="label">Teléfono</label>
-                  <input
-                    type="text"
-                    name="telefono"
-                    value={regForm.telefono}
-                    onChange={onRegChange}
-                    className="input"
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="label">Tipo de usuario</label>
-                <select
-                  name="tipoUsuario"
-                  value={regForm.tipoUsuario}
+
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Contraseña
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={regForm.password}
                   onChange={onRegChange}
-                  className="select"
-                >
-                  <option value="padre">Padre</option>
-                  <option value="persona">Persona</option>
-                  <option value="local">Local</option>
-                </select>
+                  required
+                  className="auth-input"
+                />
               </div>
-              <button type="submit" disabled={regLoading} className="w-full bg-[#43A1F2] text-white px-4 py-2.5 rounded-lg font-medium text-sm hover:bg-[#2E7BB8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                {regLoading ? "Creando..." : "Crear cuenta"}
-              </button>
-            </form>
-            {regMsg && (
-              <p
-                className={`msg ${
-                  regMsg.includes("cuenta") || regMsg.includes("Ingresando")
-                    ? "msg-success"
-                    : "msg-error"
-                }`}
+
+              <button 
+                type="submit" 
+                disabled={regLoading}
+                className="auth-button"
               >
-                {regMsg}
-              </p>
-            )}
+                {regLoading ? "Creando cuenta..." : "Crear cuenta"}
+              </button>
+
+              {regMsg && (
+                <p className={`auth-message ${
+                  regMsg.includes("cuenta") || regMsg.includes("Ingresando")
+                    ? "success"
+                    : "error"
+                }`}>
+                  {regMsg}
+                </p>
+              )}
+            </form>
+          ) : (
+            <form onSubmit={submitLogin} className="auth-form">
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={loginForm.email}
+                  onChange={onLoginChange}
+                  required
+                  className="auth-input"
+                />
+              </div>
+
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Contraseña
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={loginForm.password}
+                  onChange={onLoginChange}
+                  required
+                  className="auth-input"
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={loginLoading}
+                className="auth-button"
+              >
+                {loginLoading ? "Iniciando sesión..." : "Iniciar sesión"}
+              </button>
+
+              {loginMsg && (
+                <p className="auth-message error">
+                  {loginMsg}
+                </p>
+              )}
+            </form>
+          )}
+
+          {/* Switch between login/register */}
+          <div className="auth-switch">
+            <p className="auth-switch-text">
+              {activeTab === "registro" ? "¿Ya tenés una cuenta?" : "¿No tenés una cuenta?"}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab(activeTab === "registro" ? "login" : "registro");
+                setRegMsg("");
+                setLoginMsg("");
+              }}
+              className="auth-switch-button"
+            >
+              {activeTab === "registro" ? "Iniciar sesión" : "Crear cuenta"}
+            </button>
           </div>
         </div>
 
-        <div className="card" style={{ marginTop: 16, maxWidth: 640, marginLeft: "auto", marginRight: "auto" }}>
-          <h3 className="card-title" style={{ textAlign: "center", marginBottom: 16 }}>Funciones disponibles sin cuenta</h3>
-          <div className="grid gap-3">
-            <button type="button" onClick={() => { handleGuestAccess(); setTimeout(() => navigate('/centro-informacion'), 100); }} className="w-full text-left p-4 rounded-lg border border-gray-200 bg-white hover:border-[#43A1F2] hover:bg-[#f8fbff] transition-colors">
-              <div className="font-semibold text-[#1b2a4a]">📚 Centro de Información</div>
-              <div className="text-sm text-gray-600 mt-1">Artículos y recursos sobre autismo</div>
-            </button>
-            <button type="button" onClick={() => { handleGuestAccess(); setTimeout(() => navigate('/mapa'), 100); }} className="w-full text-left p-4 rounded-lg border border-gray-200 bg-white hover:border-[#43A1F2] hover:bg-[#f8fbff] transition-colors">
-              <div className="font-semibold text-[#1b2a4a]">🗺️ Mapa de Lugares</div>
-              <div className="text-sm text-gray-600 mt-1">Espacios adaptados y accesibles</div>
-            </button>
-            <button type="button" onClick={() => { handleGuestAccess(); setTimeout(() => navigate('/tecnicas'), 100); }} className="w-full text-left p-4 rounded-lg border border-gray-200 bg-white hover:border-[#43A1F2] hover:bg-[#f8fbff] transition-colors">
-              <div className="font-semibold text-[#1b2a4a]">🎯 Técnicas y Recursos</div>
-              <div className="text-sm text-gray-600 mt-1">Herramientas de apoyo sensorial</div>
-            </button>
-          </div>
+        {/* Guest access */}
+        <div className="auth-guest-access">
+          <button
+            onClick={handleGuestAccess}
+            className="auth-guest-button"
+          >
+            Explorar sin cuenta
+          </button>
         </div>
       </div>
     </div>

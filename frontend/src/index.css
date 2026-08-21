@@ -2,18 +2,68 @@
 @import "tailwindcss";
 
 :root {
-  --color-brand: #43a1f2;   /* azul principal */
-  --color-brand-dark: #2E7BB8; /* azul principal oscuro para degradados */
-  --color-ink: #444443;     /* texto principal */
-  --color-bg: #F5F5F5;      /* fondo app */
-  --color-accent: #fdc647;  /* acento / warning */
-  --color-teal: #59c2ba;    /* secundario */
-  --color-danger: #f36b49;  /* error */
-  --color-success-soft: #c8e6c9; /* éxito suave */
-  --color-navbar-bg: #ffffffcc; /* fondo translúcido navbar */
-  --color-navbar-button: #f9f9f9; /* fondo botón navbar (light) */
-  --nav-h: 94px; /* navbar-inner 70px + padding vertical */
+  /* Colores oficiales del logo AutiSi */
+  --color-bg: #F5F5F5;           /* fondo general */
+  --color-brand: #43A1F2;        /* azul principal - identidad general */
+  --color-brand-dark: #2E7BB8;   /* azul oscuro para hover/degradados */
+  --color-teal: #59C2BA;         /* turquesa - sección Mapa */
+  --color-coral: #EC7054;        /* coral - sección Emociones/Bienestar */
+  --color-violet: #961E67;       /* violeta - sección Comunidad */
+  --color-yellow: #FFC83D;       /* amarillo - sección Actividades */
+  
+  /* Colores de texto y UI */
+  --color-ink: #444443;          /* texto principal */
+  --color-text-secondary: #6B7280;
+  --color-text-light: #9CA3AF;
+  --color-white: #FFFFFF;
+  --color-accent: #FFC83D;       /* acento */
+  --color-danger: #EF4444;       /* error */
+  --color-success: #10B981;      /* éxito */
+  
+  /* Colores por sección */
+  --section-home: #43A1F2;       /* azul - Inicio */
+  --section-map: #59C2BA;        /* turquesa - Mapa */
+  --section-community: #961E67;  /* violeta - Comunidad */
+  --section-emotions: #EC7054;   /* coral - Emociones/Bienestar */
+  --section-activities: #FFC83D; /* amarillo - Actividades */
+  --section-config: #94A3B8;     /* neutro - Configuración */
+  
+  /* Paleta pastel unificada para onboarding y Home */
+  --pastel-blue: #E0F2FE;        /* celeste pastel */
+  --pastel-blue-dark: #BAE6FD;   /* celeste pastel oscuro */
+  --pastel-green: #D1FAE5;       /* verde pastel */
+  --pastel-green-dark: #A7F3D0;  /* verde pastel oscuro */
+  --pastel-coral: #FED7AA;       /* coral pastel */
+  --pastel-coral-dark: #FDBA74;  /* coral pastel oscuro */
+  --pastel-yellow: #FEF3C7;      /* amarillo pastel */
+  --pastel-yellow-dark: #FDE68A; /* amarillo pastel oscuro */
+  --pastel-pink: #FCE7F3;        /* rosa pastel */
+  --pastel-pink-dark: #FBCFE8;   /* rosa pastel oscuro */
+  --pastel-purple: #E9D5FF;      /* violeta pastel */
+  --pastel-purple-dark: #D8B4FE; /* violeta pastel oscuro */
+  --pastel-gray: #F3F4F6;        /* gris pastel */
+  --pastel-gray-dark: #E5E7EB;   /* gris pastel oscuro */
+  
+  /* Sistema de diseño unificado */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.1);
+  
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.4s ease;
+  
+  --nav-h: 94px;
   --mobile-nav-h: 64px;
+  --bottom-nav-h: 70px;
   
   /* Escala tipográfica Desktop */
   --font-size-h1-desktop: 44px;
@@ -74,6 +124,10 @@ a:hover { text-decoration: underline; }
 }
 
 .app-main--flush {
+  padding-top: 0;
+}
+
+.app-main--no-navbar {
   padding-top: 0;
 }
 

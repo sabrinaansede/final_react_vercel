@@ -15,7 +15,6 @@
   }
 }
 
-/* Hero Header */
 .comunidad-hero {
   margin-bottom: 40px;
   border-radius: 16px;
@@ -44,7 +43,7 @@
   align-items: center;
   gap: 8px;
   border-radius: 9999px;
-  background-color: #e8f4ff;
+  background-color: rgba(150, 30, 103, 0.15);
   padding: 8px 16px;
   margin-bottom: 16px;
 }
@@ -58,7 +57,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #43A1F2;
+  color: #961E67;
 }
 
 .comunidad-hero-title {
@@ -100,19 +99,19 @@
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background-color: #43A1F2;
+  background-color: #961E67;
   padding: 16px 32px;
   font-size: 16px;
   font-weight: 600;
   color: white;
   border: none;
   cursor: pointer;
-  box-shadow: 0 10px 15px -3px rgba(67, 161, 242, 0.3);
+  box-shadow: 0 10px 15px -3px rgba(150, 30, 103, 0.3);
   transition: background 0.2s;
 }
 
 .comunidad-btn-primary:hover {
-  background-color: #2E7BB8;
+  background-color: #7D1656;
 }
 
 .comunidad-btn-secondary {

@@ -1,0 +1,641 @@
+.home-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  padding: 40px 48px;
+}
+
+.home-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.home-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.home-greeting {
+  font-size: 36px;
+  font-weight: 700;
+  color: #444443;
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+.home-subtitle {
+  font-size: 20px;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.home-description {
+  font-size: 16px;
+  color: #9CA3AF;
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+/* Wellness Card */
+.home-wellness-card {
+  background: linear-gradient(135deg, var(--pastel-coral) 0%, var(--pastel-coral-dark) 100%);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-wellness-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(236, 112, 84, 0.2);
+}
+
+.home-wellness-illustration {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+}
+
+.home-wellness-illustration svg {
+  width: 80px;
+  height: 80px;
+  color: #EC7054;
+}
+
+.home-wellness-content {
+  flex: 1;
+}
+
+.home-wellness-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #444443;
+  margin: 0 0 12px;
+}
+
+.home-wellness-text {
+  font-size: 15px;
+  color: #6B7280;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.home-wellness-button {
+  padding: 14px 28px;
+  border-radius: 16px;
+  background-color: #EC7054;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(236, 112, 84, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-wellness-button:hover {
+  background-color: #E05A3A;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(236, 112, 84, 0.3);
+}
+
+/* Needs Section */
+.home-needs-section {
+  margin-bottom: 32px;
+}
+
+.home-needs-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #444443;
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+.home-needs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.home-needs-card {
+  position: relative;
+  padding: 32px 24px;
+  border-radius: var(--radius-xl);
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 220px;
+  box-shadow: var(--shadow-sm);
+}
+
+.home-needs-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.home-needs-card.explore {
+  background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-blue-dark) 100%);
+}
+
+.home-needs-card.prepare {
+  background: linear-gradient(135deg, var(--pastel-yellow) 0%, var(--pastel-yellow-dark) 100%);
+}
+
+.home-needs-card.community {
+  background: linear-gradient(135deg, var(--pastel-pink) 0%, var(--pastel-pink-dark) 100%);
+}
+
+.home-needs-card.checklist {
+  background: linear-gradient(135deg, var(--pastel-coral) 0%, var(--pastel-coral-dark) 100%);
+}
+
+.home-needs-card.prepare:hover {
+  background: linear-gradient(135deg, #FDE68A 0%, #FCD34D 100%);
+  border-color: #F1E067;
+}
+
+.home-needs-card.community {
+  background: linear-gradient(135deg, #FCE7F3 0%, #FBCFE8 100%);
+}
+
+.home-needs-card.community:hover {
+  background: linear-gradient(135deg, #FBCFE8 0%, #F9A8D4 100%);
+  border-color: #961E67;
+}
+
+.home-needs-card.checklist {
+  background: linear-gradient(135deg, #FED7AA 0%, #FDBA74 100%);
+}
+
+.home-needs-card.checklist:hover {
+  background: linear-gradient(135deg, #FDBA74 0%, #FB923C 100%);
+  border-color: #EC7054;
+}
+
+.home-needs-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-needs-icon svg {
+  width: 64px;
+  height: 64px;
+}
+
+.home-needs-card.explore .home-needs-icon svg {
+  color: #43A1F2;
+}
+
+.home-needs-card.prepare .home-needs-icon svg {
+  color: #F1E067;
+}
+
+.home-needs-card.community .home-needs-icon svg {
+  color: #961E67;
+}
+
+.home-needs-card.checklist .home-needs-icon svg {
+  color: #EC7054;
+}
+
+.home-needs-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #444443;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.home-needs-description {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Recommended Section */
+.home-recommended-section {
+  margin-bottom: 40px;
+}
+
+.home-recommended-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #444443;
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+.home-recommended-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-recommended-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.home-recommended-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.home-recommended-image svg {
+  width: 64px;
+  height: 64px;
+  color: #43A1F2;
+}
+
+.home-recommended-content {
+  flex: 1;
+}
+
+.home-recommended-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #444443;
+  margin: 0 0 8px;
+}
+
+.home-recommended-location {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0 0 8px;
+}
+
+.home-recommended-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #059669;
+}
+
+/* Emergency Card */
+.home-emergency-card {
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  border-radius: 20px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-emergency-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.15);
+}
+
+.home-emergency-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.home-emergency-icon svg {
+  width: 28px;
+  height: 28px;
+  color: #EF4444;
+}
+
+.home-emergency-content {
+  flex: 1;
+}
+
+.home-emergency-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #444443;
+  margin: 0 0 4px;
+}
+
+.home-emergency-text {
+  font-size: 13px;
+  color: #6B7280;
+  margin: 0;
+}
+
+.home-emergency-button {
+  padding: 10px 20px;
+  border-radius: 12px;
+  background-color: #EF4444;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-emergency-button:hover {
+  background-color: #DC2626;
+}
+
+/* Tablet Responsive */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .home-container {
+    padding: 32px 32px;
+  }
+
+  .home-wrapper {
+    max-width: 900px;
+  }
+
+  .home-header {
+    margin-bottom: 28px;
+  }
+
+  .home-greeting {
+    font-size: 28px;
+  }
+
+  .home-subtitle {
+    font-size: 18px;
+  }
+
+  .home-description {
+    font-size: 15px;
+  }
+
+  .home-wellness-card {
+    padding: 32px;
+    margin-bottom: 28px;
+    gap: 24px;
+  }
+
+  .home-wellness-illustration {
+    width: 100px;
+    height: 100px;
+  }
+
+  .home-wellness-illustration svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .home-wellness-title {
+    font-size: 20px;
+  }
+
+  .home-wellness-text {
+    font-size: 14px;
+  }
+
+  .home-needs-section {
+    margin-bottom: 28px;
+  }
+
+  .home-needs-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .home-needs-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .home-needs-card {
+    padding: 28px 20px;
+    min-height: 180px;
+  }
+
+  .home-needs-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .home-needs-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .home-needs-title {
+    font-size: 16px;
+  }
+
+  .home-needs-description {
+    font-size: 13px;
+  }
+
+  .home-recommended-section {
+    margin-bottom: 28px;
+  }
+
+  .home-recommended-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .home-container {
+    padding: 20px 16px 100px;
+  }
+
+  .home-wrapper {
+    max-width: 100%;
+  }
+
+  .home-header {
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .home-greeting {
+    font-size: 24px;
+  }
+
+  .home-subtitle {
+    font-size: 16px;
+  }
+
+  .home-description {
+    font-size: 14px;
+  }
+
+  /* Wellness Card - Horizontal Compact */
+  .home-wellness-card {
+    padding: 20px;
+    margin-bottom: 24px;
+    gap: 16px;
+    border-radius: 20px;
+  }
+
+  .home-wellness-illustration {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+  }
+
+  .home-wellness-illustration svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .home-wellness-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .home-wellness-text {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .home-wellness-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  /* Needs Section - 2x2 Grid */
+  .home-needs-section {
+    margin-bottom: 32px;
+  }
+
+  .home-needs-title {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .home-needs-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .home-needs-card {
+    padding: 20px 16px;
+    min-height: 140px;
+    border-radius: 18px;
+  }
+
+  .home-needs-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+  }
+
+  .home-needs-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .home-needs-title {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .home-needs-description {
+    display: none;
+  }
+
+  /* Recommended Section */
+  .home-recommended-section {
+    margin-bottom: 32px;
+  }
+
+  .home-recommended-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .home-recommended-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .home-recommended-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+  }
+
+  .home-recommended-image svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .home-recommended-name {
+    font-size: 15px;
+  }
+
+  .home-recommended-location {
+    font-size: 12px;
+  }
+
+  .home-recommended-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  /* Emergency Card */
+  .home-emergency-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .home-emergency-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .home-emergency-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .home-emergency-title {
+    font-size: 14px;
+  }
+
+  .home-emergency-text {
+    font-size: 12px;
+  }
+
+  .home-emergency-button {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}

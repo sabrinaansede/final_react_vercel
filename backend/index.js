@@ -74,7 +74,7 @@ async function seedTecnicas() {
         {
           titulo: "Respiración 4-7-8",
           desc: "Inhalá 4s, retené 7s, exhalá 8s para reducir ansiedad.",
-          img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1200&auto=format&fit=crop",
+          img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
           categoria: "respiración",
           tags: ["respiración", "calma"],
           steps: [
@@ -89,7 +89,7 @@ async function seedTecnicas() {
         {
           titulo: "Presión profunda",
           desc: "Usá mantas pesadas o un chaleco para aportar contención.",
-          img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1200&auto=format&fit=crop",
+          img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80",
           categoria: "sensorial",
           tags: ["sensorial", "propiocepción"],
           steps: [
@@ -103,7 +103,7 @@ async function seedTecnicas() {
         {
           titulo: "Ruido blanco",
           desc: "Auriculares con ruido blanco o sonidos suaves.",
-          img: "https://images.unsplash.com/photo-1518441902110-9f89f7e83cd0?q=80&w=1200&auto=format&fit=crop",
+          img: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80",
           categoria: "sensorial",
           tags: ["auditivo", "calma"],
           steps: [
@@ -116,7 +116,7 @@ async function seedTecnicas() {
         {
           titulo: "Estiramientos suaves",
           desc: "Movimientos lentos para liberar tensión muscular.",
-          img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1200&auto=format&fit=crop",
+          img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80",
           categoria: "movimiento",
           tags: ["movimiento", "relajación"],
           steps: [
@@ -130,7 +130,7 @@ async function seedTecnicas() {
         {
           titulo: "Foco en un objeto",
           desc: "Concentrá la atención en un solo objeto visual.",
-          img: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?q=80&w=1200&auto=format&fit=crop",
+          img: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1200&q=80",
           categoria: "enfoque",
           tags: ["visual", "atención"],
           steps: [
@@ -144,7 +144,7 @@ async function seedTecnicas() {
         {
           titulo: "Caminata consciente",
           desc: "Caminá prestando atención a cada paso.",
-          img: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?q=80&w=1200&auto=format&fit=crop",
+          img: "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1200&q=80",
           categoria: "movimiento",
           tags: ["movimiento", "atención"],
           steps: [

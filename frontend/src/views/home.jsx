@@ -7,8 +7,9 @@ import QuickAccessGrid from "../components/QuickAccessGrid";
 import RecommendedList from "../components/RecommendedList";
 import ActiveChecklist from "../components/ActiveChecklist";
 import EmergencyMode from "../components/EmergencyMode";
-import { AlertTriangle, Frown, Meh, Smile, Star } from 'lucide-react';
+import { AlertTriangle, Frown, Meh, Smile, Star, Map, MessageSquare, Heart, CheckSquare, Lightbulb, Cloud, Sun } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import './home.css';
 
 const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
 
@@ -67,15 +68,19 @@ const Home = () => {
 
   // Vista de inicio para usuario autenticado o visitante
   return (
-    <div className="min-h-screen bg-slate-50 px-4 pt-2 pb-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-3 lg:mb-4">
-          <h1 className="text-[19px] lg:text-[22px] font-bold text-[#1b2a4a] leading-[1.3] mb-1">
-            {isGuest ? "Explorá AutiSi sin cuenta" : `Hola, ${usuario?.nombre || ""} 👋`}
+    <div className="home-container">
+      <div className="home-wrapper">
+        {/* Header Section */}
+        <div className="home-header">
+          <h1 className="home-greeting">
+            {isGuest ? "Explorá AutiSi" : `Hola, ${usuario?.nombre?.split(' ')[0] || ""} 👋`}
           </h1>
+          <p className="home-subtitle">
+            ¿Cómo podemos acompañarte hoy?
+          </p>
           {!isGuest && (
-            <p className="text-[14px] lg:text-[15px] text-[#64748b] leading-[1.4] max-w-[42rem]">
-              Este es tu espacio seguro para descubrir lugares preparados y recursos que acompañan el bienestar diario.
+            <p className="home-description">
+              Encontrá herramientas y recursos pensados para vos.
             </p>
           )}
         </div>
@@ -89,65 +94,135 @@ const Home = () => {
           </>
         ) : (
           <>
-            <section className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 mb-5">
-              <div className="mb-2">
-                <h2 className="text-[16px] font-bold text-[#0f172a] mb-0.5">¿Cómo te sentís hoy?</h2>
-                <p className="text-xs text-gray-500">Elegí una carita para registrar tu estado de ánimo de hoy.</p>
-                {estadoAnimo && (
-                  <span className="inline-block mt-2 text-sm text-[#43A1F2] font-semibold">
-                    Hoy te sentís: <strong>{estadoAnimo.label}</strong>
-                  </span>
+            {/* Wellness Card */}
+            <div className="home-wellness-card">
+              <div className="home-wellness-illustration">
+                <Cloud size={80} />
+              </div>
+              <div className="home-wellness-content">
+                <h2 className="home-wellness-title">¿Cómo te sentís hoy?</h2>
+                <p className="home-wellness-text">
+                  Registrá cómo te sentís y llevá un seguimiento de tu bienestar.
+                </p>
+                {estadoAnimo ? (
+                  <div className="px-6 py-3 rounded-full mb-4" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}>
+                    <span className="text-white font-semibold">
+                      Hoy te sentís: <strong>{estadoAnimo.label}</strong>
+                    </span>
+                  </div>
+                ) : (
+                  <button className="home-wellness-button">
+                    Registrar
+                  </button>
                 )}
               </div>
+            </div>
 
-              <div className="flex justify-center gap-2 flex-wrap">
-                {[
-                  { id: "muy-mal", emoji: "☹️", label: "Mal" },
-                  { id: "asi-asi", emoji: "😐", label: "Más o menos" },
-                  { id: "bien", emoji: "🙂", label: "Bien" },
-                  { id: "genial", emoji: "😄", label: "Genial" },
-                ].map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg border-2 transition-all min-w-[70px] ${
-                      estadoAnimo?.id === m.id 
-                        ? "border-[#43A1F2] bg-blue-50" 
-                        : "border-gray-200 hover:border-[#43A1F2] hover:bg-gray-50"
-                    }`}
-                    onClick={() => setEstadoAnimo(m)}
-                  >
-                    <span className="text-2xl leading-none">{m.emoji}</span>
-                    <span className="text-[11px] font-medium text-gray-700 text-center">{m.label}</span>
-                  </button>
-                ))}
+            {/* Needs Section */}
+            <div className="home-needs-section">
+              <h2 className="home-needs-title">¿Qué necesitás hoy?</h2>
+              <div className="home-needs-grid">
+                {/* Explorar */}
+                <button
+                  onClick={() => navigate('/mapa')}
+                  className="home-needs-card explore"
+                >
+                  <div className="home-needs-icon">
+                    <Map size={64} />
+                  </div>
+                  <h3 className="home-needs-title">Explorar lugares</h3>
+                  <p className="home-needs-description">
+                    Encontrá espacios adaptados para vos.
+                  </p>
+                </button>
+
+                {/* Comunidad */}
+                <button
+                  onClick={() => navigate('/comunidad')}
+                  className="home-needs-card community"
+                >
+                  <div className="home-needs-icon">
+                    <MessageSquare size={64} />
+                  </div>
+                  <h3 className="home-needs-title">Comunidad</h3>
+                  <p className="home-needs-description">
+                    Compartí y conectá con otras personas.
+                  </p>
+                </button>
+
+                {/* Checklist */}
+                <button
+                  onClick={() => navigate('/checklist')}
+                  className="home-needs-card checklist"
+                >
+                  <div className="home-needs-icon">
+                    <CheckSquare size={64} />
+                  </div>
+                  <h3 className="home-needs-title">Checklist</h3>
+                  <p className="home-needs-description">
+                    Prepará lo que necesitás llevar.
+                  </p>
+                </button>
+
+                {/* Profesionales */}
+                <button
+                  onClick={() => navigate('/profesionales')}
+                  className="home-needs-card prepare"
+                >
+                  <div className="home-needs-icon">
+                    <Sun size={64} />
+                  </div>
+                  <h3 className="home-needs-title">Profesionales</h3>
+                  <p className="home-needs-description">
+                    Encontrá terapeutas y especialistas.
+                  </p>
+                </button>
               </div>
-            </section>
+            </div>
 
-            <QuickAccessGrid items={[
-              { id: 'mapa', kicker: 'Mapa', title: 'Lugares adaptados', to: '/mapa' },
-              { id: 'tecnicas', kicker: 'Técnicas', title: 'Técnicas sensoriales', to: '/tecnicas' },
-              { id: 'comunidad', kicker: 'Comunidad', title: 'Foro y experiencias', to: '/comunidad' },
-              { id: 'checklist', kicker: 'Checklist', title: 'Checklist personalizado', to: '/checklist' },
-              { id: 'mislugares', kicker: 'Mis lugares', title: 'Lugares guardados', to: '/perfil' },
-              { id: 'resenas', kicker: 'Reseñas', title: 'Mis reseñas', to: '/mis-resenas' },
-            ]} />
+            {/* Recommended Section */}
+            <div className="home-recommended-section">
+              <h2 className="home-recommended-title">Recomendado para vos</h2>
+              <div className="home-recommended-card">
+                <div className="home-recommended-image">
+                  <Map size={64} />
+                </div>
+                <div className="home-recommended-content">
+                  <h3 className="home-recommended-name">
+                    {lugaresMostrar[0]?.nombre || "Bullrich APADEA"}
+                  </h3>
+                  <p className="home-recommended-location">
+                    📍 Buenos Aires
+                  </p>
+                  <span className="home-recommended-badge">
+                    Espacio adaptado
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            <button
-              onClick={() => setEmergencyModeOpen(true)}
-              className="w-full mb-5 p-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
-            >
-              <AlertTriangle size={20} />
-              <span className="text-base font-semibold">Modo de Emergencia</span>
-            </button>
+            {/* Emergency Card */}
+            <div className="home-emergency-card">
+              <div className="home-emergency-icon">
+                <AlertTriangle size={28} />
+              </div>
+              <div className="home-emergency-content">
+                <h3 className="home-emergency-title">Modo de emergencia</h3>
+                <p className="home-emergency-text">
+                  Accedé rápidamente a tus contactos y lugares de ayuda.
+                </p>
+              </div>
+              <button
+                onClick={() => setEmergencyModeOpen(true)}
+                className="home-emergency-button"
+              >
+                Activar
+              </button>
+            </div>
 
             <ActiveChecklist />
           </>
         )}
-
-        <MainExploreCard subtitle="Buscá espacios preparados y recomendaciones de la comunidad." />
-
-        <RecommendedList places={lugaresMostrar} />
       </div>
       
       {!isGuest && <EmergencyMode isOpen={emergencyModeOpen} onClose={() => setEmergencyModeOpen(false)} />}

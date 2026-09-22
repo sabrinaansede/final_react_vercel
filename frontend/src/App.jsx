@@ -9,12 +9,13 @@ import Home from "./views/home";
 import MisResenas from "./views/misresenas";
 import Contacto from "./views/contacto.jsx";
 import Perfil from "./components/dashboard/Dashboard";
-import Tecnicas from "./views/tecnicas.jsx";
+import TecnicasAutorregulacion from "./views/tecnicas-autorregulacion.jsx";
 import ChecklistPersonalizado from "./views/checklist.jsx";
 import Profesionales from "./views/profesionales";
 import Comunidad from "./views/comunidad.jsx";
 import CentroInformacion from "./views/CentroInformacion.jsx";
 import Notificaciones from "./views/Notificaciones.jsx";
+import InformacionAutismo from "./views/informacion-autismo.jsx";
 import MobileNavigation from "./components/MobileNavigation";
 import AdminLayout from "./admin/AdminLayout";
 import AdminPageLayout from "./admin/AdminPageLayout";
@@ -79,7 +80,7 @@ const App = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/tecnicas" element={<Tecnicas />} />
+      <Route path="/tecnicas" element={<TecnicasAutorregulacion />} />
       <Route
         path="/mis-resenas"
         element={
@@ -113,6 +114,7 @@ const App = () => {
         }
       />
       <Route path="/centro-informacion" element={<CentroInformacion />} />
+      <Route path="/informacion-autismo" element={<InformacionAutismo />} />
       <Route
         path="/notificaciones"
         element={

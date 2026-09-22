@@ -311,7 +311,7 @@ const Comunidad = () => {
         {/* Hero Header */}
         <div className="comunidad-hero">
           <div className="comunidad-hero-content">
-            <div className="max-w-4xl">
+            <div className="comunidad-hero-text">
               <div className="comunidad-hero-badge">
                 <Star size={16} className="text-[#43A1F2]" />
                 <span className="comunidad-hero-badge-text">Comunidad AutiSi</span>
@@ -345,11 +345,11 @@ const Comunidad = () => {
         {/* Main Layout: Feed 75% + Sidebar 340px */}
         <div className="comunidad-layout">
           {/* Feed Section */}
-          <section className="comunidad-feed">
+          <section className="comunidad-feed feed-section">
             {/* Search & Filters */}
             <div className="comunidad-search-card">
               <div className="comunidad-search-header">
-                <div>
+                <div className="comunidad-search-info">
                   <h2 className="comunidad-search-title">Explorá la comunidad</h2>
                   <p className="comunidad-search-description">Filtrá por categoría, buscá por palabra clave o elegí lo más reciente.</p>
                 </div>

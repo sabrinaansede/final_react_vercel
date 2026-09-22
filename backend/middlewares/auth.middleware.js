@@ -19,4 +19,6 @@ export function authenticateToken(req, res, next) {
   }
 }
 
+export const authMiddleware = authenticateToken;
+
 export default authenticateToken;

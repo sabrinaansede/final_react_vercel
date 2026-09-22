@@ -1,62 +1,38 @@
 import React from 'react'
-import { Heart, CheckCircle, Star, MapPin } from 'lucide-react'
+import { CheckCircle, Star, MapPin, ArrowRight, Video, Building2 } from 'lucide-react'
 
 const ProfessionalCard = ({ professional, onView }) => {
   const { _id, nombre, apellido, especialidad, ubicacion, modalidad, foto, descripcion, calificacion } = professional
 
   return (
-    <article className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-100 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full" onClick={() => onView(professional)}>
-      <div className="relative h-48 sm:h-40 bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="w-full h-full flex items-center justify-center">
+    <article className="professional-card" onClick={() => onView(professional)}>
+      <div className="professional-card-top">
+        <div className="professional-avatar">
           {foto ? (
-            <img src={foto} alt={`${nombre} ${apellido}`} className="w-full h-full object-cover" />
+            <img src={foto} alt={`${nombre} ${apellido}`} />
           ) : (
-            <div className="w-24 h-24 sm:w-20 sm:h-20 rounded-full bg-[rgba(67,161,242,0.12)] flex items-center justify-center text-[#43A1F2] font-bold text-3xl">
-              {nombre?.[0]}
-            </div>
+            <span>{nombre?.[0]}</span>
           )}
         </div>
-
-        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-md">
-          <CheckCircle size={18} className="text-[#43A1F2]" />
-          <span className="text-xs font-semibold text-[#43A1F2]">Verificado</span>
+        <div className="professional-verified"><CheckCircle size={15} /> Verificado</div>
+        <div className="professional-rating"><Star size={15} fill="currentColor" /> {calificacion?.toFixed(1) || '4.8'}</div>
+      </div>
+      <div className="professional-card-body">
+        <div className="professional-name-row"><div><h3>{nombre} {apellido}</h3><p>{especialidad}</p></div></div>
+        <div className="professional-meta"><span><MapPin size={15} /> {ubicacion || 'Cerca tuyo'}</span><span>·</span><span>{calificacion?.toFixed(1) || '4.8'} valoración</span></div>
+        <div className="professional-tags"><span>Autismo</span><span>Infancia</span><span>Adolescentes</span></div>
+        <div className="professional-mode">
+          {modalidad !== 'virtual' && <span><Building2 size={14} /> Presencial</span>}
+          {modalidad !== 'presencial' && <span><Video size={14} /> Virtual</span>}
         </div>
-      </div>    
-      <div className="p-4 sm:p-4 flex flex-col flex-1">
-        <h3 className="text-lg sm:text-xl font-bold text-[#1b2a4a] mb-1">{nombre} {apellido}</h3>
-        <div className="text-xs sm:text-sm text-[#43A1F2] font-semibold mb-2">{especialidad}</div>
-        
-        <div className="flex items-center gap-2 mb-2">
-          <div className="flex items-center gap-1">
-            <Star size={18} className="text-orange-500 fill-orange-500" />
-            <span className="font-bold text-orange-500">{calificacion?.toFixed(1) || 'N/A'}</span>
-          </div>
-          <span className="text-xs text-gray-500">(24 opiniones)</span>
-        </div>
-
-        <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600 mb-2">
-          <MapPin size={18} />
-          <span>{ubicacion}</span>
-        </div>
-
-        <div className="mb-2">
-          <span className="bg-blue-50 text-[#43A1F2] px-3 py-1 sm:px-2 sm:py-0.5 rounded-lg text-xs font-semibold">
-            {modalidad === 'presencial' ? 'Atención presencial' : modalidad === 'virtual' ? 'Atención online' : 'Atención presencial y online'}
-          </span>
-        </div>
-
-        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-3 flex-1">
-          {descripcion?.substring(0, 80) || 'Descripción no especificada.'}{descripcion?.length > 80 ? '...' : ''}
-        </p>
-
         <button
-          className="w-full bg-[#43A1F2] text-white border-none px-4 py-3 sm:px-3 sm:py-2 rounded-xl font-bold text-xs sm:text-sm cursor-pointer hover:bg-[#2e7bb8] transition-colors shadow-md"
+          className="professional-view-btn"
           onClick={(e) => {
             e.stopPropagation()
             onView(professional)
           }}
         >
-          Ver perfil
+          Ver perfil <ArrowRight size={17} />
         </button>
       </div>
     </article>

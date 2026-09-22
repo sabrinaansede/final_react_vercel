@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Home, MapPin, Users, BookOpen, CheckSquare, MessageCircle, MessagesSquare, Mail, User, UserPlus, Info, LayoutDashboard } from "lucide-react";
+import { Menu, X, Home, MapPin, Users, BookOpen, CheckSquare, MessageCircle, MessagesSquare, Mail, User, UserPlus, Info, LayoutDashboard, Lightbulb, Bell } from "lucide-react";
 import logo from "../assets/logo.png";
 
 const Navbar = () => {
@@ -85,6 +85,12 @@ const Navbar = () => {
           <NavLink to="/comunidad" className="nav-link">
             Comunidad
           </NavLink>
+          <NavLink to="/informacion-autismo" className="nav-link">
+            Información
+          </NavLink>
+          <NavLink to="/tecnicas" className="nav-link">
+            Técnicas
+          </NavLink>
           <NavLink to="/checklist" className="nav-link">
             Checklist
           </NavLink>
@@ -97,9 +103,15 @@ const Navbar = () => {
             </NavLink>
           )}
           {usuario ? (
-            <NavLink to="/perfil" className="nav-link">
-              Perfil
-            </NavLink>
+            <>
+              <NavLink to="/notificaciones" className="nav-link" aria-label="Notificaciones">
+                <Bell size={18} />
+                <span>Notificaciones</span>
+              </NavLink>
+              <NavLink to="/perfil" className="nav-link">
+                Perfil
+              </NavLink>
+            </>
           ) : (
             <Link to="/login" className="nav-button">
               Ingresar
@@ -135,6 +147,14 @@ const Navbar = () => {
           <NavLink to="/comunidad" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
             <MessageCircle size={20} />
             <span>Comunidad</span>
+          </NavLink>
+          <NavLink to="/informacion-autismo" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+            <Info size={20} />
+            <span>Información</span>
+          </NavLink>
+          <NavLink to="/tecnicas" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
+            <Lightbulb size={20} />
+            <span>Técnicas</span>
           </NavLink>
           <NavLink to="/checklist" className="nav-link mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>
             <CheckSquare size={20} />

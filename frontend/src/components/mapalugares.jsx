@@ -1,15 +1,64 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { createPortal } from "react-dom";
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "../App.css";
-import LeyendaMapa from "./LeyendaMapa";
+import "./mapalugares.css";
 import { useAuth } from "../context/AuthContext.jsx";
 import apadeaIcon from "../assets/apadea.png";
-import { MapPin, CheckCircle, Star, Check } from 'lucide-react';
+import { MapPin, CheckCircle, Star, Check, Search, Navigation, Plus, Settings, User, Building, Activity, Heart, Briefcase, ChevronRight, Minus } from 'lucide-react';
 
 // Base URL del backend (Vite)
 const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
+
+const getIconForCategory = (tipo) => {
+  const tipoLower = (tipo || '').toLowerCase();
+  if (tipoLower.includes('profesional') || tipoLower.includes('terapia') || tipoLower.includes('doctor')) {
+    return L.divIcon({
+      className: 'icono-circular',
+      html: `<div class="marker-circle marker-professional"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>`,
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
+      popupAnchor: [0, -22],
+    });
+  }
+  if (tipoLower.includes('espacio') || tipoLower.includes('lugar') || tipoLower.includes('edificio') || tipoLower.includes('escuela')) {
+    return L.divIcon({
+      className: 'icono-circular',
+      html: `<div class="marker-circle marker-space"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4 8 4v14M9 10a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v11H9V10z"></path></svg></div>`,
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
+      popupAnchor: [0, -22],
+    });
+  }
+  if (tipoLower.includes('actividad') || tipoLower.includes('recreación') || tipoLower.includes('juego')) {
+    return L.divIcon({
+      className: 'icono-circular',
+      html: `<div class="marker-circle marker-activity"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg></div>`,
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
+      popupAnchor: [0, -22],
+    });
+  }
+  if (tipoLower.includes('servicio') || tipoLower.includes('salud') || tipoLower.includes('ayuda')) {
+    return L.divIcon({
+      className: 'icono-circular',
+      html: `<div class="marker-circle marker-service"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></div>`,
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
+      popupAnchor: [0, -22],
+    });
+  }
+  // Default
+  return L.divIcon({
+    className: 'icono-circular',
+    html: `<div class="marker-circle marker-default"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg></div>`,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -22],
+  });
+};
 
 const iconoApadea = L.divIcon({
   className: "icono-apadea",
@@ -18,6 +67,35 @@ const iconoApadea = L.divIcon({
   iconAnchor: [18, 48],
   popupAnchor: [0, -44],
 });
+
+const normalizeLugares = (data) => {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  return [];
+};
+
+const hasValidCoords = (lugar) =>
+  Number.isFinite(Number(lugar?.latitud)) && Number.isFinite(Number(lugar?.longitud));
+
+function MapRefBridge({ mapRef }) {
+  const map = useMap();
+  useEffect(() => {
+    mapRef.current = map;
+    return () => {
+      mapRef.current = null;
+    };
+  }, [map, mapRef]);
+  return null;
+}
+
+function ClickMarker({ onMapClick }) {
+  useMapEvents({
+    click(e) {
+      onMapClick(e.latlng);
+    },
+  });
+  return null;
+}
 
 const iconoComunidad = L.divIcon({
   className: "icono-comunidad",
@@ -42,6 +120,16 @@ export default function MapaLugares() {
   const panelRef = useRef(null);
   const [lugares, setLugares] = useState([]);
   const [resenas, setResenas] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
   const [filtros, setFiltros] = useState({
     q: "",
     tipo: "",
@@ -94,8 +182,10 @@ export default function MapaLugares() {
   const [sortKey, setSortKey] = useState("default");
   const [soloGuardados, setSoloGuardados] = useState(false);
   const [selectedLugarId, setSelectedLugarId] = useState(null);
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [sheetExpanded, setSheetExpanded] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [tagInput, setTagInput] = useState("");
   const getCert = (l) => (l.certificacion || l.certificadoPor || "Comunidad");
 
   useEffect(() => {
@@ -103,7 +193,7 @@ export default function MapaLugares() {
       try {
         const res = await fetch(`${API_URL}/api/lugares`);
         const data = await res.json();
-        setLugares(Array.isArray(data) ? data : data.data || data);
+        setLugares(normalizeLugares(data));
       } catch (err) {
         console.error("Error al cargar lugares:", err);
         setMensaje("❌ Error al cargar los lugares del mapa.");
@@ -138,18 +228,13 @@ export default function MapaLugares() {
     return result;
   }, [resenas]);
 
-  function ClickMarker() {
-    useMapEvents({
-      click(e) {
-        setNuevoLugar((prev) => ({
-          ...prev,
-          latitud: e.latlng.lat,
-          longitud: e.latlng.lng,
-        }));
-      },
-    });
-    return null;
-  }
+  const handleMapClick = (latlng) => {
+    setNuevoLugar((prev) => ({
+      ...prev,
+      latitud: latlng.lat,
+      longitud: latlng.lng,
+    }));
+  };
 
   const centrarUbicacionActual = () => {
     if (!navigator.geolocation) {
@@ -170,10 +255,6 @@ export default function MapaLugares() {
 
   const abrirPanelAgregar = () => {
     setShowAddForm(true);
-    setSheetExpanded(true);
-    setTimeout(() => {
-      if (panelRef.current) panelRef.current.scrollIntoView({ behavior: "smooth" });
-    }, 120);
   };
 
   const cerrarPanel = () => {
@@ -280,7 +361,7 @@ export default function MapaLugares() {
         try {
           const re = await fetch(`${API_URL}/api/lugares`);
           const lista = await re.json();
-          const arr = Array.isArray(lista) ? lista : (lista.data || lista);
+          const arr = normalizeLugares(lista);
           console.log("📌 Lista de lugares tras crear:", arr.length);
           setLugares(arr);
         } catch (e) {
@@ -506,330 +587,745 @@ export default function MapaLugares() {
   }, [lugaresFiltrados, sortKey, ratingPorLugar]);
 
   return (
-    <div className="mapa-container">
-      <div className="container-mapa-form">
-        <div className="map-wrapper">
-          <MapContainer center={[-34.6037, -58.3816]} zoom={13} className="mapa-leaflet" whenCreated={(map) => (mapRef.current = map)}>
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-            />
-            <ClickMarker />
+    <>
+      <div className="mapa-container">
+        <div className="container-mapa-form">
+          <div className="map-wrapper">
+            <MapContainer center={[-34.6037, -58.3816]} zoom={13} className="mapa-leaflet">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+              />
+              <MapRefBridge mapRef={mapRef} />
+              <ClickMarker onMapClick={handleMapClick} />
 
-            {lugaresFiltrados.map((lugar) => (
-              <Marker
-                key={lugar._id}
-                position={[lugar.latitud, lugar.longitud]}
-                icon={getCert(lugar) === "APADEA" ? iconoApadea : iconoComunidad}
-                ref={(ref) => { if (ref) markerRefs.current[lugar._id] = ref; }}
-                eventHandlers={{
-                  click: () => setSelectedLugarId(lugar._id),
-                }}
-              >
-                <Popup closeButton={false}>
-                  <div className="marker-popup" onClick={(e) => e.stopPropagation()}>
-                    <div className="marker-popup-header">
-                      <h4>{lugar.nombre}</h4>
-                    </div>
-                    <div className="marker-popup-body">
-                      <div className="address">
-                        <MapPin size={12} className="text-gray-500" />
-                        <span>{lugar.direccion || 'Sin dirección'}</span>
+              {lugaresFiltrados.filter(hasValidCoords).map((lugar) => (
+                <Marker
+                  key={lugar._id}
+                  position={[Number(lugar.latitud), Number(lugar.longitud)]}
+                  icon={getCert(lugar) === "APADEA" ? iconoApadea : getIconForCategory(lugar.tipo)}
+                  ref={(ref) => { if (ref) markerRefs.current[lugar._id] = ref; }}
+                  eventHandlers={{
+                    click: () => {
+                      setSelectedLugarId(lugar._id);
+                      setShowBottomSheet(true);
+                    },
+                  }}
+                >
+                  <Popup closeButton={false}>
+                    <div className="marker-popup" onClick={(e) => e.stopPropagation()}>
+                      <div className="marker-popup-header">
+                        <h4>{lugar.nombre}</h4>
                       </div>
-                      
-                      {(lugar.tipo || lugar.provincia || getCert(lugar) === 'APADEA') && (
-                        <div className="popup-meta">
-                          {lugar.tipo && <span className="tag">{lugar.tipo}</span>}
-                          {lugar.provincia && lugar.provincia !== 'CABA' && (
-                            <span className="tag">{lugar.provincia}</span>
-                          )}
-                          {getCert(lugar) === 'APADEA' && (
-                            <span className="tag apadea-tag">
-                              <CheckCircle size={12} className="text-[#1e40af]" style={{marginRight: '4px'}} />
-                              Certificado APADEA
-                            </span>
-                          )}
+                      <div className="marker-popup-body">
+                        <div className="address">
+                          <MapPin size={12} className="text-gray-500" />
+                          <span>{lugar.direccion || 'Sin dirección'}</span>
                         </div>
-                      )}
-                      
-                      <button 
-                        className="w-full bg-[#43A1F2] text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-[#2E7BB8] transition-colors"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          abrirDetalleLugar(lugar);
-                          const marker = markerRefs.current[lugar._id];
-                          if (marker?.closePopup) marker.closePopup();
-                        }}
-                      >
-                        Ver detalles y reseñas
-                      </button>
+                        
+                        {(lugar.tipo || lugar.provincia || getCert(lugar) === 'APADEA') && (
+                          <div className="popup-meta">
+                            {lugar.tipo && <span className="tag">{lugar.tipo}</span>}
+                            {lugar.provincia && lugar.provincia !== 'CABA' && (
+                              <span className="tag">{lugar.provincia}</span>
+                            )}
+                            {getCert(lugar) === 'APADEA' && (
+                              <span className="tag apadea-tag">
+                                <CheckCircle size={12} className="text-[#1e40af]" style={{marginRight: '4px'}} />
+                                Certificado APADEA
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        
+                        <div className="popup-actions">
+                          <button 
+                            className="popup-action-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFavLugar(lugar._id);
+                            }}
+                          >
+                            <Heart size={14} className={favLugares.has(lugar._id) ? "text-red-500" : ""} />
+                          </button>
+                          <button 
+                            className="popup-action-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              abrirDetalleLugar(lugar);
+                            }}
+                          >
+                            <ChevronRight size={14} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
+
+          {/* Desktop Elements */}
+          <div className={`map-search-desktop ${detalleLugar ? 'hidden' : ''}`}>
+            <Search size={20} className="text-gray-400" />
+            <input 
+              type="text" 
+              placeholder="¿Qué estás buscando?" 
+              value={filtros.q} 
+              onChange={(e) => setFiltros({ ...filtros, q: e.target.value })}
+            />
+            <button 
+              className="map-filter-button-desktop"
+              onClick={() => setSheetExpanded(true)}
+            >
+              <Settings size={20} />
+            </button>
+          </div>
+
+          <div className={`map-controls-desktop-group ${detalleLugar ? 'hidden' : ''}`}>
+            <div className="map-control-group-desktop">
+              <button type="button" className="map-float-button-desktop" onClick={() => {
+                if (mapRef.current) {
+                  mapRef.current.zoomIn();
+                }
+              }}>
+                <Plus size={20} />
+              </button>
+              <button type="button" className="map-float-button-desktop" onClick={() => {
+                if (mapRef.current) {
+                  mapRef.current.zoomOut();
+                }
+              }}>
+                <Minus size={20} />
+              </button>
+            </div>
+            <button type="button" className="map-float-button-desktop" onClick={centrarUbicacionActual}>
+              <Navigation size={20} />
+            </button>
+            <button type="button" className="map-float-button-desktop primary" onClick={abrirPanelAgregar}>
+              <Plus size={20} />
+            </button>
+          </div>
+
+          {/* Mobile Elements */}
+          <div className="map-search-compact">
+            <Search size={20} className="text-gray-400" />
+            <input 
+              type="text" 
+              placeholder="¿Qué estás buscando?" 
+              value={filtros.q} 
+              onChange={(e) => setFiltros({ ...filtros, q: e.target.value })}
+            />
+            <button 
+              className="map-filter-button"
+              onClick={() => setSheetExpanded(true)}
+            >
+              <Settings size={20} />
+            </button>
+          </div>
 
           <div className={`map-controls ${detalleLugar ? 'hidden' : ''}`}>
-            <button type="button" className="!bg-white text-[#0f172a] border border-[#e2e8f0] px-[14px] py-[10px] !rounded-full shadow-[0_12px_28px_rgba(15,23,42,0.16)] cursor-pointer font-bold min-w-[170px] transition-transform hover:-translate-y-px hover:bg-[#f8fbff]" onClick={centrarUbicacionActual}>
-              Mi ubicación
+            <div className="map-control-group">
+              <button type="button" className="map-float-button" onClick={() => {
+                if (mapRef.current) {
+                  mapRef.current.zoomIn();
+                }
+              }}>
+                <Plus size={20} />
+              </button>
+              <button type="button" className="map-float-button" onClick={() => {
+                if (mapRef.current) {
+                  mapRef.current.zoomOut();
+                }
+              }}>
+                <Minus size={20} />
+              </button>
+            </div>
+            <button type="button" className="map-float-button" onClick={centrarUbicacionActual}>
+              <Navigation size={20} />
             </button>
-            <button type="button" className="!bg-[#43A1F2] !text-white !border-transparent px-[14px] py-[10px] !rounded-full shadow-[0_12px_28px_rgba(15,23,42,0.16)] cursor-pointer font-bold min-w-[170px] transition-transform hover:-translate-y-px hover:!bg-[#1f6ed8]" onClick={abrirPanelAgregar}>
-              + Agregar lugar
+            <button type="button" className="map-float-button primary" onClick={abrirPanelAgregar}>
+              <Plus size={20} />
             </button>
           </div>
-        </div>
 
-      <div className={`sheet-preview ${sheetExpanded ? 'hidden' : ''}`} onClick={abrirPanelAgregar}>
-        <div>
-          <div className="preview-title">Explorar lugares</div>
-          <div className="preview-subtitle">Abrí el panel para ver lugares y agregar uno nuevo.</div>
-        </div>
-        <button type="button" className="bg-[#43A1F2] text-white rounded-full px-4 py-2.5 border-none font-bold hover:bg-[#2E7BB8] transition-colors">Abrir</button>
-      </div>
+          {/* Bottom Sheet para lugar seleccionado */}
+          {showBottomSheet && selectedLugarId && (() => {
+            const lugar = lugaresFiltrados.find(l => l._id === selectedLugarId);
+            if (!lugar) return null;
+            return (
+              <div className="place-bottom-sheet visible">
+                <div className="sheet-preview-content">
+                  <div className="sheet-preview-title">{lugaresFiltrados.length} lugares encontrados ↑</div>
+                  <div className="sheet-preview-subtitle">Tocá para ver detalles</div>
+                </div>
+                <button type="button" className="sheet-preview-button">
+                  Ver
+                </button>
+              </div>
+            );
+          })()}
 
       <div ref={panelRef} className={`formulario-lugar ${sheetExpanded ? 'sheet-open' : 'sheet-closed'}`}>
-        <div className="sheet-handle" onClick={() => setSheetExpanded((v) => !v)}>
-          <span className="sheet-handle-bar" />
-          <span className="sheet-handle-label">{sheetExpanded ? 'Desliza hacia abajo para cerrar' : 'Explorar lugares'}</span>
-        </div>
-        {/* Exploración estilo lista (claro) */}
-        <div className="sidebar-light">
-          <div className="sidebar-header">
-            <div className="sidebar-title">Explorar lugares</div>
-            <div className="sidebar-actions">
-              <select className="select" value={filtros.minRating} onChange={(e) => setFiltros({ ...filtros, minRating: e.target.value })}>
-                <option value={0}>Todos</option>
-                {[1,2,3,4,5].map((n) => (
-                  <option key={n} value={n}>{n}+ ⭐</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <input className="input" type="text" placeholder="Buscar..." value={filtros.q} onChange={(e)=> setFiltros({ ...filtros, q: e.target.value })} />
-
-          <div className="toolbar">
-            <div className="toolbar-group">
-              <button type="button" className="menu-button" onClick={() => setMenuOpen(menuOpen === 'show' ? null : 'show')}>Mostrar ▾</button>
-              {menuOpen === 'show' && (
-                <div className="menu" onMouseLeave={() => setMenuOpen(null)}>
-                  <button className="menu-item" onClick={() => { setFiltros({ ...filtros, certificado: '', minRating: 0 }); setMenuOpen(null); }}>Todos</button>
-                  <button className="menu-item" onClick={() => { setFiltros({ ...filtros, certificado: 'APADEA' }); setMenuOpen(null); }}>Certificados APADEA</button>
-                  <button className="menu-item" onClick={() => { setFiltros({ ...filtros, certificado: 'Comunidad' }); setMenuOpen(null); }}>Comunidad</button>
-                  <button className="menu-item" onClick={() => { setFiltros({ ...filtros, minRating: 4 }); setMenuOpen(null); }}>Rating 4+ ⭐</button>
-                </div>
-              )}
-            </div>
-            <div className="toolbar-group">
-              <button type="button" className="menu-button" onClick={() => setMenuOpen(menuOpen === 'sort' ? null : 'sort')}>Ordenar por ▾</button>
-              {menuOpen === 'sort' && (
-                <div className="menu" onMouseLeave={() => setMenuOpen(null)}>
-                  <button className={`menu-item ${sortKey==='default'?'active':''}`} onClick={() => { setSortKey('default'); setMenuOpen(null); }}>Relevancia</button>
-                  <button className={`menu-item ${sortKey==='name'?'active':''}`} onClick={() => { setSortKey('name'); setMenuOpen(null); }}>Nombre (A–Z)</button>
-                  <button className={`menu-item ${sortKey==='rating'?'active':''}`} onClick={() => { setSortKey('rating'); setMenuOpen(null); }}>Rating (alto→bajo)</button>
-                </div>
-              )}
-            </div>
-            <div className="toolbar-group">
-              <button type="button" className="menu-button" onClick={() => setMenuOpen(menuOpen === 'filters' ? null : 'filters')}>Filtros ▾</button>
-              {menuOpen === 'filters' && (
-                <div className="menu" onMouseLeave={() => setMenuOpen(null)}>
-                  <div className="menu-row">
-                    <label className="label">Tipo</label>
-                    <select className="select" value={filtros.tipo} onChange={(e)=> setFiltros({ ...filtros, tipo: e.target.value })}>
-                      <option value="">Todos</option>
-                      {tipos.map((t)=> (<option key={t} value={t}>{t}</option>))}
-                    </select>
-                  </div>
-                  <div className="menu-row">
-                    <label className="label">Provincia</label>
-                    <select className="select" value={filtros.provincia} onChange={(e)=> setFiltros({ ...filtros, provincia: e.target.value })}>
-                      <option value="">Todas</option>
-                      {provincias.map((p)=> (<option key={p} value={p}>{p}</option>))}
-                    </select>
-                  </div>
-                  <div className="menu-row">
-                    <label className="label">Inicial</label>
-                    <select className="select" value={filtros.inicial} onChange={(e)=> setFiltros({ ...filtros, inicial: e.target.value })}>
-                      <option value="">Todas</option>
-                      {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((ch) => (
-                        <option key={ch} value={ch}>{ch}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="menu-actions">
-                    <button type="button" className="btn btn-secondary" onClick={() => { setFiltros({ q:"", tipo:"", provincia:"", certificado:"", minRating:0, inicial:"" }); setMenuOpen(null); }}>Limpiar</button>
-                    <button type="button" className="btn btn-primary" onClick={() => setMenuOpen(null)}>Aplicar</button>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="toolbar-group">
-              <button
-                type="button"
-                className="menu-button"
-                onClick={() => setSoloGuardados((v) => !v)}
+        {/* Filtros */}
+        {sheetExpanded && (
+          <div className="sidebar-light">
+            <div className="sidebar-header">
+              <div className="sidebar-title">Filtros</div>
+              <button 
+                className="sidebar-close-button"
+                onClick={() => setSheetExpanded(false)}
               >
-                {soloGuardados ? "Ver todos" : "Solo guardados"}
+                ✕
+              </button>
+            </div>
+
+          <div className="filters-section">
+            <div className="filters-label">¿Qué necesitás encontrar?</div>
+            <div className="filters-chips">
+              <button 
+                type="button"
+                className={`filter-chip ${!filtros.tipo ? 'active' : ''}`}
+                onClick={() => setFiltros({ ...filtros, tipo: '' })}
+              >
+                Todos
+              </button>
+              <button 
+                type="button"
+                className={`filter-chip ${filtros.tipo === 'Profesionales' ? 'active' : ''}`}
+                onClick={() => setFiltros({ ...filtros, tipo: 'Profesionales' })}
+              >
+                Profesionales
+              </button>
+              <button 
+                type="button"
+                className={`filter-chip ${filtros.tipo === 'Espacios' ? 'active' : ''}`}
+                onClick={() => setFiltros({ ...filtros, tipo: 'Espacios' })}
+              >
+                Espacios
+              </button>
+              <button 
+                type="button"
+                className={`filter-chip ${filtros.tipo === 'Actividades' ? 'active' : ''}`}
+                onClick={() => setFiltros({ ...filtros, tipo: 'Actividades' })}
+              >
+                Actividades
+              </button>
+              <button 
+                type="button"
+                className={`filter-chip ${filtros.tipo === 'Servicios' ? 'active' : ''}`}
+                onClick={() => setFiltros({ ...filtros, tipo: 'Servicios' })}
+              >
+                Servicios
               </button>
             </div>
           </div>
 
-          <div className="place-list">
-            {listaOrdenada.slice(0, 3).map((l) => (
-              <button
-                key={l._id}
-                type="button"
-                className={`place-item ${selectedLugarId === l._id ? "selected" : ""}`}
-                onClick={() => {
-                  setSelectedLugarId(l._id);
-                  if (mapRef.current) {
-                    mapRef.current.setView(
-                      [l.latitud, l.longitud],
-                      Math.max(mapRef.current.getZoom?.() || 13, 15),
-                      { animate: true }
-                    );
-                  }
-                  if (markerRefs.current[l._id]?.openPopup) {
-                    setTimeout(() => markerRefs.current[l._id].openPopup(), 200);
-                  }
-                }}
-              >
-                <div className="place-meta">
-                  <div className="place-title">{l.nombre}</div>
-                  <div className="place-sub">
-                    {l.tipo || "—"} · {getCert(l)} ·{" "}
-                    {Number(ratingPorLugar[l._id]?.avg || 0).toFixed(1)}⭐
-                    {favLugares.has(l._id) && " · ★ Guardado"}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        {showAddForm && (
-          <div className="card pb-56 md:pb-0 relative">
-            <button 
-              className="absolute top-2 right-2 text-2xl text-slate-400 hover:text-slate-600 cursor-pointer bg-white/80 rounded-full w-8 h-8 flex items-center justify-center z-10"
-              onClick={() => setShowAddForm(false)}
-              aria-label="Cerrar formulario"
+          <div className="filters-section">
+            <div className="filters-label">Distancia máxima</div>
+            <select 
+              className="filters-select"
+              value={filtros.distancia}
+              onChange={(e) => setFiltros({ ...filtros, distancia: e.target.value })}
             >
-              &times;
+              <option value="">Todas las distancias</option>
+              <option value="1">1 km</option>
+              <option value="5">5 km</option>
+              <option value="10">10 km</option>
+              <option value="20">20 km</option>
+              <option value="50">50 km</option>
+            </select>
+          </div>
+
+          <div className="filters-section">
+            <div className="filters-toggle">
+              <div className="filters-toggle-info">
+                <span className="filters-toggle-icon">♿</span>
+                <span className="filters-toggle-text">Accesible</span>
+              </div>
+              <button 
+                type="button"
+                className={`filters-toggle-switch ${filtros.accesible ? 'active' : ''}`}
+                onClick={() => setFiltros({ ...filtros, accesible: !filtros.accesible })}
+              >
+                <span className="filters-toggle-slider"></span>
+              </button>
+            </div>
+
+            <div className="filters-toggle">
+              <div className="filters-toggle-info">
+                <span className="filters-toggle-icon">◷</span>
+                <span className="filters-toggle-text">Abierto ahora</span>
+              </div>
+              <button 
+                type="button"
+                className={`filters-toggle-switch ${filtros.abiertoAhora ? 'active' : ''}`}
+                onClick={() => setFiltros({ ...filtros, abiertoAhora: !filtros.abiertoAhora })}
+              >
+                <span className="filters-toggle-slider"></span>
+              </button>
+            </div>
+
+            <div className="filters-toggle">
+              <div className="filters-toggle-info">
+                <span className="filters-toggle-icon">⭐</span>
+                <span className="filters-toggle-text">Solo guardados</span>
+              </div>
+              <button 
+                type="button"
+                className={`filters-toggle-switch ${soloGuardados ? 'active' : ''}`}
+                onClick={() => setSoloGuardados(!soloGuardados)}
+              >
+                <span className="filters-toggle-slider"></span>
+              </button>
+            </div>
+          </div>
+
+          <div className="filters-footer">
+            <button 
+              type="button"
+              className="filters-button-secondary"
+              onClick={() => {
+                setFiltros({ q: filtros.q, tipo: "", provincia: "", certificado: "", minRating: 0, inicial: "" });
+                setSoloGuardados(false);
+              }}
+            >
+              Limpiar filtros
             </button>
-            <div className="card-title">Agregar nuevo lugar</div>
-            <p className="label">
+            <button 
+              type="button"
+              className="filters-button-primary"
+              onClick={() => setSheetExpanded(false)}
+            >
+              Aplicar filtros
+            </button>
+          </div>
+        </div>
+        )}
+      </div>
+      </div>
+      </div>
+
+      {/* Modal para agregar nuevo lugar - Desktop/Tablet con inline styles */}
+      {!isMobile && showAddForm && createPortal(
+        <div 
+          onClick={() => setShowAddForm(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(15, 35, 60, 0.5)',
+            zIndex: 9999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'white',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+              maxWidth: '430px',
+              width: 'calc(100% - 40px)',
+              maxHeight: 'calc(100vh - 40px)',
+              overflowY: 'auto',
+              padding: '20px'
+            }}
+          >
+            <button 
+              onClick={() => setShowAddForm(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#F3F4F6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#6B7280',
+                fontSize: '18px',
+                zIndex: 1
+              }}
+            >
+              ✕
+            </button>
+            
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '16px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid #E5E7EB'
+            }}>
+              <MapPin size={20} style={{ color: '#43A1F2' }} />
+              <div style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#1B2A4A'
+              }}>
+                Agregar nuevo lugar
+              </div>
+            </div>
+            
+            <p style={{
+              fontSize: '14px',
+              color: '#6B7280',
+              marginBottom: '16px',
+              lineHeight: 1.5
+            }}>
               Podés escribir la dirección real y el sistema la geocodificará automáticamente.
             </p>
-          <div style={{ fontSize: 12, color: '#64748b' }}>
-            {nuevoLugar.latitud && nuevoLugar.longitud ? (
-              <span>
-                Coordenadas cargadas ✓ (lat: {nuevoLugar.latitud.toFixed(5)}, lng: {nuevoLugar.longitud.toFixed(5)})
-              </span>
-            ) : (
-              <span>Usaremos la dirección para ubicar el lugar automáticamente.</span>
-            )}
-          </div>
-
-          <form className="form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="label">Nombre del lugar</label>
-              <input
-                className="input"
-                type="text"
-                value={nuevoLugar.nombre}
-                onChange={(e) => setNuevoLugar({ ...nuevoLugar, nombre: e.target.value })}
-                required
-              />
+            
+            <div style={{
+              fontSize: '13px',
+              color: '#065F46',
+              background: '#D1FAE5',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              marginBottom: '16px'
+            }}>
+              {nuevoLugar.latitud && nuevoLugar.longitud ? (
+                <span>
+                  Coordenadas cargadas ✓ (lat: {nuevoLugar.latitud?.toFixed(5) || 'N/A'}, lng: {nuevoLugar.longitud?.toFixed(5) || 'N/A'})
+                </span>
+              ) : (
+                <span>Usaremos la dirección para ubicar el lugar automáticamente.</span>
+              )}
             </div>
 
-            <div className="form-group">
-              <label className="label">Dirección</label>
-              <input
-                className="input"
-                type="text"
-                value={nuevoLugar.direccion}
-                onChange={(e) => setNuevoLugar({ ...nuevoLugar, direccion: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="filtros-row">
+            <form onSubmit={handleSubmit} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
               <div className="form-group">
-                <label className="label">Tipo</label>
+                <label className="label">Nombre del lugar *</label>
                 <input
                   className="input"
                   type="text"
-                  placeholder="Ej: Shopping, Café..."
-                  value={nuevoLugar.tipo}
-                  onChange={(e) => setNuevoLugar({ ...nuevoLugar, tipo: e.target.value })}
+                  placeholder="Ej. Centro de día, Biblioteca, etc."
+                  value={nuevoLugar.nombre}
+                  onChange={(e) => setNuevoLugar({ ...nuevoLugar, nombre: e.target.value })}
+                  required
                 />
               </div>
+
               <div className="form-group">
-                <label className="label">Provincia</label>
+                <label className="label">Dirección *</label>
                 <input
                   className="input"
                   type="text"
-                  value={nuevoLugar.provincia}
-                  onChange={(e) => setNuevoLugar({ ...nuevoLugar, provincia: e.target.value })}
+                  placeholder="Ej. Av. Siempre Viva 123"
+                  value={nuevoLugar.direccion}
+                  onChange={(e) => setNuevoLugar({ ...nuevoLugar, direccion: e.target.value })}
+                  required
                 />
               </div>
-            </div>
 
-            <div className="form-group">
-              <label className="label">Descripción breve</label>
-              <textarea
-                className="input"
-                placeholder="Contá qué hace especial a este lugar"
-                value={nuevoLugar.descripcion}
-                onChange={(e) => setNuevoLugar({ ...nuevoLugar, descripcion: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="label">Etiquetas sensoriales</label>
-              <div className="chips">
-                {nuevoLugar.etiquetasSensoriales.map((tag, idx) => (
-                  <span key={idx} className="chip">
-                    {tag}
-                    <button type="button" onClick={() => setNuevoLugar((prev) => ({
-                      ...prev,
-                      etiquetasSensoriales: prev.etiquetasSensoriales.filter((_, i) => i !== idx)
-                    }))}>×</button>
-                  </span>
-                ))}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+                gap: '12px'
+              }}>
+                <div className="form-group">
+                  <label className="label">Tipo *</label>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Ej: Shopping, Café..."
+                    value={nuevoLugar.tipo}
+                    onChange={(e) => setNuevoLugar({ ...nuevoLugar, tipo: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="label">Provincia *</label>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Ej: Buenos Aires"
+                    value={nuevoLugar.provincia}
+                    onChange={(e) => setNuevoLugar({ ...nuevoLugar, provincia: e.target.value })}
+                  />
+                </div>
               </div>
-              <input
-                className="input"
-                type="text"
-                placeholder="Escribe y presioná Enter o coma"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ',') {
-                    e.preventDefault();
-                    const val = e.currentTarget.value.trim();
-                    if (val && !nuevoLugar.etiquetasSensoriales.includes(val)) {
-                      setNuevoLugar((prev) => ({ ...prev, etiquetasSensoriales: [...prev.etiquetasSensoriales, val] }));
+
+              <div className="form-group">
+                <label className="label">Descripción breve *</label>
+                <textarea
+                  className="input"
+                  placeholder="Contá qué hace especial a este lugar"
+                  value={nuevoLugar.descripcion}
+                  onChange={(e) => setNuevoLugar({ ...nuevoLugar, descripcion: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <label className="label">Etiquetas sensoriales</label>
+                <div className="chips">
+                  {(nuevoLugar.etiquetasSensoriales || []).map((tag, idx) => (
+                    <span key={idx} className="chip">
+                      {tag}
+                      <button type="button" onClick={() => setNuevoLugar((prev) => ({
+                        ...prev,
+                        etiquetasSensoriales: (prev.etiquetasSensoriales || []).filter((_, i) => i !== idx)
+                      }))}>×</button>
+                    </span>
+                  ))}
+                </div>
+                <input
+                  className="input"
+                  type="text"
+                  placeholder="Agregar etiqueta (ej: silencioso, iluminado)"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && tagInput.trim()) {
+                      e.preventDefault();
+                      setNuevoLugar((prev) => ({
+                        ...prev,
+                        etiquetasSensoriales: [...(prev.etiquetasSensoriales || []), tagInput.trim()]
+                      }));
+                      setTagInput('');
                     }
-                    e.currentTarget.value = '';
-                  }
-                }}
-              />
-            </div>
-            <button
-              className="w-full bg-[#43A1F2] text-white px-4 py-2.5 rounded-lg font-medium text-sm hover:bg-[#2E7BB8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              type="submit"
-              disabled={!nuevoLugar.nombre || !nuevoLugar.direccion}
-            >
-              Agregar lugar
-            </button>
-          </form>
+                  }}
+                />
+              </div>
 
-          {mensaje && (
-            <p className={mensaje.includes("Error") ? "msg msg-error" : "msg msg-success"}>{mensaje}</p>
-          )}
-        </div>
+              <div style={{
+                display: 'flex',
+                gap: '12px',
+                marginTop: '8px'
+              }}>
+                <button
+                  type="button"
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    background: '#F3F4F6',
+                    color: '#374151',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '15px',
+                    fontWeight: 500,
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setShowAddForm(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    background: '#43A1F2',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '15px',
+                    fontWeight: 500,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Agregar lugar
+                </button>
+              </div>
+
+              {mensaje && (
+                <p style={{
+                  marginTop: '12px',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  background: mensaje.includes('Error') ? '#FEE2E2' : '#D1FAE5',
+                  color: mensaje.includes('Error') ? '#991B1B' : '#065F46'
+                }}>
+                  {mensaje}
+                </p>
+              )}
+            </form>
+          </div>
+        </div>,
+        document.body
       )}
-      </div>
+
+      {/* Modal para agregar nuevo lugar - Mobile Bottom Sheet */}
+      {isMobile && createPortal(
+        <div 
+          className={`add-place-modal-overlay ${showAddForm ? 'visible' : ''}`}
+          onClick={() => setShowAddForm(false)}
+        >
+          <div 
+            className={`add-place-modal-container ${showAddForm ? 'open' : ''}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle indicador para mobile */}
+            <div className="add-place-handle"></div>
+            
+            <button 
+              className="add-place-close"
+              onClick={() => setShowAddForm(false)}
+            >
+              ✕
+            </button>
+            
+            <div className="add-place-header">
+              <MapPin size={20} className="add-place-icon" />
+              <div className="add-place-title">Agregar nuevo lugar</div>
+            </div>
+            
+            <p className="add-place-description">
+              Podés escribir la dirección real y el sistema la geocodificará automáticamente.
+            </p>
+            
+            <div className="add-place-coords">
+              {nuevoLugar.latitud && nuevoLugar.longitud ? (
+                <span>
+                  Coordenadas cargadas ✓ (lat: {nuevoLugar.latitud?.toFixed(5) || 'N/A'}, lng: {nuevoLugar.longitud?.toFixed(5) || 'N/A'})
+                </span>
+              ) : (
+                <span>Usaremos la dirección para ubicar el lugar automáticamente.</span>
+              )}
+            </div>
+
+            <form className="add-place-form" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label className="label">Nombre del lugar *</label>
+                <input
+                  className="input"
+                  type="text"
+                  placeholder="Ej. Centro de día, Biblioteca, etc."
+                  value={nuevoLugar.nombre}
+                  onChange={(e) => setNuevoLugar({ ...nuevoLugar, nombre: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="label">Dirección *</label>
+                <input
+                  className="input"
+                  type="text"
+                  placeholder="Ej. Av. Siempre Viva 123"
+                  value={nuevoLugar.direccion}
+                  onChange={(e) => setNuevoLugar({ ...nuevoLugar, direccion: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="add-place-modal-row">
+                <div className="form-group">
+                  <label className="label">Tipo *</label>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Ej: Shopping, Café..."
+                    value={nuevoLugar.tipo}
+                    onChange={(e) => setNuevoLugar({ ...nuevoLugar, tipo: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="label">Provincia *</label>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Ej: Buenos Aires"
+                    value={nuevoLugar.provincia}
+                    onChange={(e) => setNuevoLugar({ ...nuevoLugar, provincia: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="label">Descripción breve *</label>
+                <textarea
+                  className="input"
+                  placeholder="Contá qué hace especial a este lugar"
+                  value={nuevoLugar.descripcion}
+                  onChange={(e) => setNuevoLugar({ ...nuevoLugar, descripcion: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <label className="label">Etiquetas sensoriales</label>
+                <div className="chips">
+                  {(nuevoLugar.etiquetasSensoriales || []).map((tag, idx) => (
+                    <span key={idx} className="chip">
+                      {tag}
+                      <button type="button" onClick={() => setNuevoLugar((prev) => ({
+                        ...prev,
+                        etiquetasSensoriales: (prev.etiquetasSensoriales || []).filter((_, i) => i !== idx)
+                      }))}>×</button>
+                    </span>
+                  ))}
+                </div>
+                <input
+                  className="input"
+                  type="text"
+                  placeholder="Agregar etiqueta (ej: silencioso, iluminado)"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && tagInput.trim()) {
+                      e.preventDefault();
+                      setNuevoLugar((prev) => ({
+                        ...prev,
+                        etiquetasSensoriales: [...(prev.etiquetasSensoriales || []), tagInput.trim()]
+                      }));
+                      setTagInput('');
+                    }
+                  }}
+                />
+              </div>
+
+              <div className="add-place-buttons">
+                <button
+                  type="button"
+                  className="add-place-button-secondary"
+                  onClick={() => setShowAddForm(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="add-place-button-primary"
+                >
+                  Agregar lugar
+                </button>
+              </div>
+
+              {mensaje && (
+                <p className={`add-place-message ${mensaje.includes('Error') ? 'msg-error' : 'msg-success'}`}>
+                  {mensaje}
+                </p>
+              )}
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Modal de detalle de lugar */}
       {detalleLugar && (
         <div className="fixed inset-0 bg-black/80 flex items-start justify-center p-5 pt-24 z-[10000]" onClick={cerrarDetalle}>
           <div className="bg-white rounded-t-3xl md:rounded-2xl max-w-3xl w-full md:max-h-[80vh] h-[80vh] md:h-auto overflow-y-auto relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
@@ -870,254 +1366,84 @@ export default function MapaLugares() {
                       {detalleLugar.provincia && detalleLugar.provincia !== 'CABA' ? `, ${detalleLugar.provincia}` : ''}
                     </p>
                     {detalleLugar.tipo && (
-                      <span className="inline-block px-3 py-1 bg-[#43A1F2]/10 text-[#43A1F2] rounded-full text-xs font-medium mb-2">
+                      <span className="inline-block bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full mb-2">
                         {detalleLugar.tipo}
                       </span>
                     )}
-                    <div className="flex items-center gap-2">
-                      <div className="flex text-yellow-400 text-sm">
-                        {[1, 2, 3, 4, 5].map((n) => (
-                          <Star 
-                            key={n} 
-                            size={18} 
-                            fill={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "currentColor" : "none"} 
-                            stroke={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "none" : "currentColor"}
-                            strokeWidth={2}
-                          />
-                        ))}
+                    {getCert(detalleLugar) === 'APADEA' && (
+                      <div className="flex items-center gap-1 text-blue-600 text-sm mb-2">
+                        <CheckCircle size={14} />
+                        <span>Certificado APADEA</span>
                       </div>
-                      <span className="text-sm font-semibold text-slate-700">
-                        {Number(ratingPorLugar[detalleLugar._id]?.avg || 0).toFixed(1)}
-                      </span>
-                      <span className="text-sm text-slate-500">
-                        ({resenas.filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id).length} opiniones)
-                      </span>
-                    </div>
+                    )}
+                    <p className="text-sm text-slate-600 mt-2">
+                      {detalleLugar.descripcion || 'Sin descripción'}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-            
-            <div className="p-4 md:p-4 md:pt-6 max-w-2xl mx-auto">
-              {/* Tarjeta de certificación - diseño unificado (vertical en ambos) */}
-              <div className="bg-gradient-to-r from-[#43A1F2]/10 to-[#43A1F2]/5 border border-[#43A1F2]/20 rounded-xl p-4 mb-4">
-                <div className="flex flex-col gap-3">
-                  <div className="flex gap-3">
-                    {detalleLugar.certificadoPor === 'APADEA' && (
-                      <div className="flex items-center gap-2 px-3 py-2 bg-white border border-[#43A1F2]/30 rounded-lg shadow-sm">
-                        <CheckCircle size={18} className="text-[#43A1F2]" />
-                        <div>
-                          <div className="text-xs font-bold text-[#43A1F2]">Certificado APADEA</div>
-                          <div className="text-[10px] text-[#43A1F2]/70">Validación oficial</div>
+
+            {/* Sección de reseñas */}
+            <div className="p-4 border-t border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-800 mb-3">Reseñas</h3>
+              {resenas.filter(r => r.lugarId === detalleLugar._id).length === 0 ? (
+                <p className="text-sm text-slate-500">No hay reseñas aún.</p>
+              ) : (
+                <div className="space-y-3">
+                  {resenas.filter(r => r.lugarId === detalleLugar._id).map((resena) => (
+                    <div key={resena._id} className="bg-slate-50 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-slate-700">
+                          {resena.usuario || 'Usuario'}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              className={i < resena.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
+                            />
+                          ))}
                         </div>
                       </div>
-                    )}
-                    <div className="flex items-center gap-2 px-3 py-2 bg-white border border-[#43A1F2]/30 rounded-lg shadow-sm">
-                      <Star size={18} className="text-[#43A1F2]" fill="currentColor" />
-                      <div>
-                        <div className="text-xs font-bold text-[#43A1F2]">Validado por comunidad</div>
-                      </div>
+                      <p className="text-sm text-slate-600">{resena.comentario}</p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4 justify-center pt-2 border-t border-[#43A1F2]/20">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-[#43A1F2]">{Number(ratingPorLugar[detalleLugar._id]?.avg || 0).toFixed(1)}</div>
-                      <div className="text-[10px] text-slate-500">Puntaje promedio</div>
-                    </div>
-                    <div className="h-8 w-px bg-slate-300"></div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-[#43A1F2]">{ratingPorLugar[detalleLugar._id]?.count || 0}</div>
-                      <div className="text-[10px] text-slate-500">Usuarios</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Descripción */}
-              {detalleLugar.descripcion && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-[#43A1F2] mb-2">Descripción</h4>
-                  <div className="text-sm text-slate-600 leading-relaxed">
-                    {expandedDescription ? (
-                      <>
-                        {detalleLugar.descripcion}
-                        <button 
-                          className="text-[#43A1F2] font-medium ml-2 hover:underline text-xs"
-                          onClick={(e) => { e.stopPropagation(); setExpandedDescription(false); }}
-                        >
-                          Ver menos
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        {detalleLugar.descripcion.split(' ').slice(0, 15).join(' ')}...
-                        <button 
-                          className="text-[#43A1F2] font-medium ml-2 hover:underline text-xs"
-                          onClick={(e) => { e.stopPropagation(); setExpandedDescription(true); }}
-                        >
-                          Ver más
-                        </button>
-                      </>
-                    )}
-                  </div>
+                  ))}
                 </div>
               )}
 
-              {/* Características sensoriales */}
-              {detalleLugar.etiquetasSensoriales?.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-[#43A1F2] mb-2">Características sensoriales</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {detalleLugar.etiquetasSensoriales.slice(0, expandedTags ? undefined : 3).map((tag, i) => (
-                      <span key={i} className="px-3 py-1.5 bg-gradient-to-r from-[#43A1F2]/10 to-[#59C2BA]/10 text-slate-700 rounded-full text-xs font-medium border border-[#43A1F2]/20">
-                        {tag}
-                      </span>
-                    ))}
-                    {detalleLugar.etiquetasSensoriales.length > 3 && !expandedTags && (
-                      <button 
-                        className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-xs font-medium hover:bg-slate-200"
-                        onClick={(e) => { e.stopPropagation(); setExpandedTags(true); }}
-                      >
-                        +{detalleLugar.etiquetasSensoriales.length - 3} más
-                      </button>
-                    )}
-                  </div>
+              {/* Formulario para agregar reseña */}
+              <div className="mt-4 pt-4 border-t border-slate-200">
+                <h4 className="text-sm font-medium text-slate-700 mb-2">Agregar tu reseña</h4>
+                <div className="flex items-center gap-2 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={20}
+                      className={i < nuevaResena.rating ? "text-yellow-400 fill-yellow-400 cursor-pointer" : "text-gray-300 cursor-pointer"}
+                      onClick={() => setNuevaResena({ ...nuevaResena, rating: i + 1 })}
+                    />
+                  ))}
                 </div>
-              )}
-              
-              {/* Sección inferior: diseño unificado (vertical en ambos) */}
-              <div className="grid grid-cols-1 gap-4 mb-4">
-                {/* Tarjeta izquierda: Opiniones de la comunidad */}
-                <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
-                  <h3 className="text-base font-bold text-[#43A1F2] mb-3">Opiniones de la comunidad</h3>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex text-yellow-400">
-                      {[1, 2, 3, 4, 5].map((n) => (
-                        <svg key={n} width="16" height="16" viewBox="0 0 24 24" fill={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "currentColor" : "none"} stroke={n <= Math.round(ratingPorLugar[detalleLugar._id]?.avg || 0) ? "none" : "currentColor"} strokeWidth="2">
-                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                        </svg>
-                      ))}
-                    </div>
-                    <span className="text-sm font-semibold text-slate-700">
-                      {Number(ratingPorLugar[detalleLugar._id]?.avg || 0).toFixed(1)}
-                    </span>
-                  </div>
-                  <p className="text-sm text-slate-500 mb-3">
-                    {resenas.filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id).length} opiniones
-                  </p>
-                  {resenas.filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id).length > 0 && (
-                    <button 
-                      className="w-full py-2.5 bg-white text-slate-800 border border-slate-300 rounded-lg text-sm font-medium cursor-pointer hover:bg-slate-50"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowAllReviews(true);
-                      }}
-                    >
-                      Ver todas las opiniones
-                    </button>
-                  )}
-
-                  {/* Lista de opiniones */}
-                  {showAllReviews && (
-                    <div className="bg-white p-3 rounded-lg mt-3">
-                      <div className="reviews-list max-h-40 overflow-y-auto">
-                        {resenas
-                          .filter(r => (r.lugar?._id || r.lugar) === detalleLugar._id)
-                          .reverse()
-                          .map((r, idx) => (
-                            <div key={idx} className="review-item mb-2 last:mb-0 pb-2 border-b border-slate-100 last:border-0">
-                              <div className="review-comment text-xs text-slate-700 mb-1">
-                                {r.comentario || '(Sin comentario)'}
-                              </div>
-                              <div className="review-user text-[10px] text-slate-500">
-                                {typeof r.usuario === 'object' ? (r.usuario?.nombre || 'Usuario') : 'Usuario'}
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                      <button 
-                        className="w-full mt-2 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium cursor-pointer hover:bg-slate-200"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowAllReviews(false);
-                        }}
-                      >
-                        Ocultar opiniones
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Tarjeta derecha: Escribir una reseña */}
-                <div className="bg-gradient-to-br from-[#43A1F2]/5 to-[#43A1F2]/10 rounded-xl p-4 border border-[#43A1F2]/20">
-                  <h3 className="text-base font-bold text-slate-900 mb-2">Comparte tu experiencia</h3>
-                  <p className="text-sm text-slate-700 mb-3">
-                    Ayuda a la comunidad contando cómo fue tu visita a este lugar.
-                  </p>
-                  <button 
-                    className="w-full py-2.5 bg-[#43A1F2] text-white rounded-lg text-sm font-medium cursor-pointer border-none hover:bg-[#2E7BB8]"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowReviewForm(!showReviewForm);
-                    }}
-                  >
-                    {showReviewForm ? 'Cancelar' : 'Escribir reseña'}
-                  </button>
-
-                  {/* Formulario de reseña */}
-                  {showReviewForm && (
-                    <div className="bg-white p-3 rounded-lg mt-3">
-                      <div className="rating-stars mb-2">
-                        {[1, 2, 3, 4, 5].map((n) => (
-                          <button
-                            key={n}
-                            type="button"
-                            className={`star-btn ${n <= resenaForm.puntuacion ? 'active' : ''}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setResenaForm(prev => ({ ...prev, puntuacion: n }));
-                            }}
-                            aria-label={`Calificar con ${n} estrellas`}
-                          >
-                            ★
-                          </button>
-                        ))}
-                      </div>
-                      
-                      <textarea
-                        className="review-textarea mb-2"
-                        placeholder="Escribe tu reseña aquí..."
-                        value={resenaForm.comentario}
-                        onChange={(e) => setResenaForm(prev => ({ ...prev, comentario: e.target.value }))}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      
-                      <button
-                        className="submit-review-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          enviarResenaModal();
-                        }}
-                        disabled={!resenaForm.puntuacion}
-                      >
-                        Enviar reseña
-                      </button>
-                      
-                      {mensaje && (
-                        <p className={`review-message ${mensaje.includes('Error') ? 'error' : 'success'}`}>
-                          {mensaje}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <textarea
+                  className="w-full border border-slate-300 rounded-lg p-2 text-sm"
+                  placeholder="Escribe tu reseña..."
+                  value={nuevaResena.comentario}
+                  onChange={(e) => setNuevaResena({ ...nuevaResena, comentario: e.target.value })}
+                  rows={3}
+                />
+                <button
+                  className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                  onClick={handleAgregarResena}
+                >
+                  Publicar reseña
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
-      {!sheetExpanded && !detalleLugar && <LeyendaMapa />}
-    </div>
-  </div>
+    </>
   );
-}
+};

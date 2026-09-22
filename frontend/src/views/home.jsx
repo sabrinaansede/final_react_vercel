@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AuthLanding from "../components/AuthLanding.jsx";
-import MainExploreCard from "../components/MainExploreCard";
-import QuickAccessGrid from "../components/QuickAccessGrid";
-import RecommendedList from "../components/RecommendedList";
 import ActiveChecklist from "../components/ActiveChecklist";
 import EmergencyMode from "../components/EmergencyMode";
-import { AlertTriangle, Frown, Meh, Smile, Star, Map, MessageSquare, Heart, CheckSquare, Lightbulb, Cloud, Sun } from 'lucide-react';
-import { useAuth } from '../context/AuthContext.jsx';
-import './home.css';
+import { AlertTriangle, Heart, MapPin, MessageCircle, Wind, Search, Bell, User, ArrowRight, BookOpen, Stethoscope } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
+import "./home.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://autisi-backend.onrender.com";
 
@@ -19,6 +16,52 @@ const LUGARES_DESTACADOS = [
   { _id: "dest-cafe", nombre: "Café Posible", tipo: "Cafetería", certificacion: "Comunidad", rating: 4.5, distancia: "0.8 km" },
 ];
 
+const MOODS = [
+  { id: "muy-mal", emoji: "☹️", label: "Mal" },
+  { id: "asi-asi", emoji: "😐", label: "Más o menos" },
+  { id: "bien", emoji: "🙂", label: "Bien" },
+  { id: "genial", emoji: "😄", label: "Genial" },
+];
+
+const PRIMARY_CARDS = [
+  {
+    id: "calma",
+    title: "Encontrá tu calma",
+    text: "Herramientas para regularte y sentirte mejor.",
+    to: "/tecnicas",
+    icon: Wind,
+    tone: "blue",
+    keywords: ["calma", "regular", "técnica", "tecnicas", "bienestar", "respir", "autorregul"],
+  },
+  {
+    id: "lugares",
+    title: "Explorar lugares",
+    text: "Descubrí espacios inclusivos.",
+    to: "/mapa",
+    icon: MapPin,
+    tone: "teal",
+    keywords: ["lugar", "mapa", "espacio", "inclusiv", "explorar"],
+  },
+  {
+    id: "aprender",
+    title: "Aprendé y comprendé",
+    text: "Información clara para comprender el autismo y acompañar de manera respetuosa.",
+    to: "/informacion-autismo",
+    icon: BookOpen,
+    tone: "yellow",
+    keywords: ["aprender", "comprend", "inform", "autismo", "educ", "conoc", "apoyar"],
+  },
+  {
+    id: "comunidad",
+    title: "Comunidad",
+    text: "Compartí y conectate.",
+    to: "/comunidad",
+    icon: MessageCircle,
+    tone: "coral",
+    keywords: ["comunidad", "compart", "foro", "conect"],
+  },
+];
+
 const Home = () => {
   const navigate = useNavigate();
   const { guestMode } = useAuth();
@@ -26,8 +69,9 @@ const Home = () => {
   const [lugares, setLugares] = useState([]);
   const [estadoAnimo, setEstadoAnimo] = useState(null);
   const [emergencyModeOpen, setEmergencyModeOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showMoodPanel, setShowMoodPanel] = useState(true);
 
-  // Mantenerse en Inicio aunque esté logueado (sin auto-redirect)
   useEffect(() => {
     try {
       const raw = localStorage.getItem("usuario");
@@ -43,7 +87,6 @@ const Home = () => {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // Si está logueado, traer algunos lugares destacados
   useEffect(() => {
     const fetchLugares = async () => {
       try {
@@ -58,174 +101,177 @@ const Home = () => {
   }, [usuario]);
 
   const lugaresMostrar = lugares.length > 0 ? lugares : LUGARES_DESTACADOS;
-
   const isGuest = Boolean(guestMode);
+  const isSignedIn = Boolean(usuario) && !guestMode;
 
-  // Render condicional según autenticación
+  const filteredCards = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return PRIMARY_CARDS;
+    return PRIMARY_CARDS.filter(
+      (card) =>
+        card.title.toLowerCase().includes(q) ||
+        card.text.toLowerCase().includes(q) ||
+        card.keywords.some((word) => word.includes(q) || q.includes(word))
+    );
+  }, [searchQuery]);
+
+  const openCard = (card) => {
+    if (card.to) navigate(card.to);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (filteredCards.length === 1) openCard(filteredCards[0]);
+  };
+
   if (!usuario && !isGuest) {
     return <AuthLanding initialTab="login" />;
   }
 
-  // Vista de inicio para usuario autenticado o visitante
   return (
-    <div className="home-container">
-      <div className="home-wrapper">
-        {/* Header Section */}
-        <div className="home-header">
-          <h1 className="home-greeting">
-            {isGuest ? "Explorá AutiSi" : `Hola, ${usuario?.nombre?.split(' ')[0] || ""} 👋`}
-          </h1>
-          <p className="home-subtitle">
-            ¿Cómo podemos acompañarte hoy?
-          </p>
-          {!isGuest && (
-            <p className="home-description">
-              Encontrá herramientas y recursos pensados para vos.
-            </p>
-          )}
-        </div>
+    <div className="autisi-home">
+      <div className="autisi-home-inner">
+        <header className="autisi-home-header">
+          <div className="autisi-home-greeting">
+            <h1>Hola, ¿qué querés hacer hoy?</h1>
+            <p>Estoy acá para acompañarte.</p>
+          </div>
+          <div className="autisi-home-header-actions">
+            {isSignedIn && (
+              <>
+                <button
+                  type="button"
+                  className="autisi-home-icon-btn"
+                  onClick={() => navigate("/notificaciones")}
+                  aria-label="Notificaciones"
+                >
+                  <Bell size={20} />
+                </button>
+                <button
+                  type="button"
+                  className="autisi-home-icon-btn"
+                  onClick={() => navigate("/perfil")}
+                  aria-label="Perfil"
+                >
+                  <User size={20} />
+                </button>
+              </>
+            )}
+          </div>
+        </header>
 
-        {isGuest ? (
-          <>
-            <QuickAccessGrid items={[
-              { id: 'mapa', kicker: 'Mapa', title: 'Lugares adaptados', to: '/mapa' },
-              { id: 'tecnicas', kicker: 'Técnicas', title: 'Técnicas sensoriales', to: '/tecnicas' },
-            ]} />
-          </>
-        ) : (
-          <>
-            {/* Wellness Card */}
-            <div className="home-wellness-card">
-              <div className="home-wellness-illustration">
-                <Cloud size={80} />
-              </div>
-              <div className="home-wellness-content">
-                <h2 className="home-wellness-title">¿Cómo te sentís hoy?</h2>
-                <p className="home-wellness-text">
-                  Registrá cómo te sentís y llevá un seguimiento de tu bienestar.
-                </p>
-                {estadoAnimo ? (
-                  <div className="px-6 py-3 rounded-full mb-4" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}>
-                    <span className="text-white font-semibold">
-                      Hoy te sentís: <strong>{estadoAnimo.label}</strong>
-                    </span>
-                  </div>
-                ) : (
-                  <button className="home-wellness-button">
-                    Registrar
-                  </button>
-                )}
-              </div>
+        <div className="autisi-home-mascot-slot" aria-hidden="true" />
+
+        <form className="autisi-home-search" onSubmit={handleSearchSubmit} role="search">
+          <label htmlFor="autisi-home-search-input" className="sr-only">
+            ¿Qué necesitás ahora?
+          </label>
+          <Search size={18} aria-hidden="true" />
+          <input
+            id="autisi-home-search-input"
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="¿Qué necesitás ahora?"
+            autoComplete="off"
+          />
+        </form>
+
+        {showMoodPanel && (
+          <section className="autisi-home-mood" aria-labelledby="autisi-mood-title">
+            <div className="autisi-home-mood-head">
+              <h2 id="autisi-mood-title">¿Cómo te sentís hoy?</h2>
+              <p>Elegí una opción para registrar tu estado de ánimo.</p>
             </div>
-
-            {/* Needs Section */}
-            <div className="home-needs-section">
-              <h2 className="home-needs-title">¿Qué necesitás hoy?</h2>
-              <div className="home-needs-grid">
-                {/* Explorar */}
+            {estadoAnimo && (
+              <p className="autisi-home-mood-selected">
+                Hoy te sentís: <strong>{estadoAnimo.label}</strong>
+              </p>
+            )}
+            <div className="autisi-home-mood-row">
+              {MOODS.map((mood) => (
                 <button
-                  onClick={() => navigate('/mapa')}
-                  className="home-needs-card explore"
+                  key={mood.id}
+                  type="button"
+                  className={`autisi-home-mood-btn ${estadoAnimo?.id === mood.id ? "is-active" : ""}`}
+                  onClick={() => setEstadoAnimo(mood)}
+                  aria-pressed={estadoAnimo?.id === mood.id}
+                  aria-label={mood.label}
                 >
-                  <div className="home-needs-icon">
-                    <Map size={64} />
-                  </div>
-                  <h3 className="home-needs-title">Explorar lugares</h3>
-                  <p className="home-needs-description">
-                    Encontrá espacios adaptados para vos.
-                  </p>
+                  <span aria-hidden="true">{mood.emoji}</span>
+                  <span>{mood.label}</span>
                 </button>
-
-                {/* Comunidad */}
-                <button
-                  onClick={() => navigate('/comunidad')}
-                  className="home-needs-card community"
-                >
-                  <div className="home-needs-icon">
-                    <MessageSquare size={64} />
-                  </div>
-                  <h3 className="home-needs-title">Comunidad</h3>
-                  <p className="home-needs-description">
-                    Compartí y conectá con otras personas.
-                  </p>
-                </button>
-
-                {/* Checklist */}
-                <button
-                  onClick={() => navigate('/checklist')}
-                  className="home-needs-card checklist"
-                >
-                  <div className="home-needs-icon">
-                    <CheckSquare size={64} />
-                  </div>
-                  <h3 className="home-needs-title">Checklist</h3>
-                  <p className="home-needs-description">
-                    Prepará lo que necesitás llevar.
-                  </p>
-                </button>
-
-                {/* Profesionales */}
-                <button
-                  onClick={() => navigate('/profesionales')}
-                  className="home-needs-card prepare"
-                >
-                  <div className="home-needs-icon">
-                    <Sun size={64} />
-                  </div>
-                  <h3 className="home-needs-title">Profesionales</h3>
-                  <p className="home-needs-description">
-                    Encontrá terapeutas y especialistas.
-                  </p>
-                </button>
-              </div>
+              ))}
             </div>
+          </section>
+        )}
 
-            {/* Recommended Section */}
-            <div className="home-recommended-section">
-              <h2 className="home-recommended-title">Recomendado para vos</h2>
-              <div className="home-recommended-card">
-                <div className="home-recommended-image">
-                  <Map size={64} />
-                </div>
-                <div className="home-recommended-content">
-                  <h3 className="home-recommended-name">
-                    {lugaresMostrar[0]?.nombre || "Bullrich APADEA"}
-                  </h3>
-                  <p className="home-recommended-location">
-                    📍 Buenos Aires
-                  </p>
-                  <span className="home-recommended-badge">
-                    Espacio adaptado
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Emergency Card */}
-            <div className="home-emergency-card">
-              <div className="home-emergency-icon">
-                <AlertTriangle size={28} />
-              </div>
-              <div className="home-emergency-content">
-                <h3 className="home-emergency-title">Modo de emergencia</h3>
-                <p className="home-emergency-text">
-                  Accedé rápidamente a tus contactos y lugares de ayuda.
-                </p>
-              </div>
+        <section className="autisi-home-grid" aria-label="Accesos principales">
+          {filteredCards.map((card) => {
+            const Icon = card.icon;
+            return (
               <button
-                onClick={() => setEmergencyModeOpen(true)}
-                className="home-emergency-button"
+                key={card.id}
+                type="button"
+                className={`autisi-home-card tone-${card.tone}`}
+                onClick={() => openCard(card)}
+                aria-label={`${card.title}. ${card.text}`}
               >
-                Activar
+                <span className="autisi-home-card-icon" aria-hidden="true">
+                  <Icon size={32} />
+                </span>
+                <span className="autisi-home-card-copy">
+                  <span className="autisi-home-card-title">{card.title}</span>
+                  <span className="autisi-home-card-text">{card.text}</span>
+                </span>
+                <span className="autisi-home-card-go" aria-hidden="true">
+                  <ArrowRight size={18} />
+                </span>
               </button>
-            </div>
+            );
+          })}
+        </section>
 
+        {isSignedIn && (
+          <button
+            type="button"
+            className="autisi-home-professionals"
+            onClick={() => navigate("/profesionales")}
+          >
+            <span className="autisi-home-professionals-icon" aria-hidden="true">
+              <Stethoscope size={20} />
+            </span>
+            <span className="autisi-home-professionals-content">
+              <span className="autisi-home-professionals-title">Encontrá profesionales</span>
+              <span className="autisi-home-professionals-text">Accedé a profesionales y especialistas que pueden acompañarte.</span>
+            </span>
+            <span className="autisi-home-professionals-cta" aria-hidden="true">
+              Ver profesionales →
+            </span>
+          </button>
+        )}
+
+        {isSignedIn && (
+          <div className="autisi-home-secondary">
             <ActiveChecklist />
-          </>
+            <button
+              type="button"
+              className="autisi-home-emergency"
+              onClick={() => setEmergencyModeOpen(true)}
+            >
+              <AlertTriangle size={22} />
+              <span>
+                <strong>Necesito ayuda</strong>
+                <small>Accedé al modo de emergencia</small>
+              </span>
+            </button>
+          </div>
         )}
       </div>
-      
-      {!isGuest && <EmergencyMode isOpen={emergencyModeOpen} onClose={() => setEmergencyModeOpen(false)} />}
+
+      {!isGuest && (
+        <EmergencyMode isOpen={emergencyModeOpen} onClose={() => setEmergencyModeOpen(false)} />
+      )}
     </div>
   );
 };
